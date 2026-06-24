@@ -137,7 +137,7 @@ tr:hover td{background:#f8fafc}
 <div class="form-row"><div><label>Competencia</label><select id="vincCompMembro"></select></div><div><label>Membro</label><select id="vincMembroSel"></select></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompMembro()">Vincular</button><div class="msg" id="msgVincMembro"></div>
 <div style="margin-top:14px"><strong style="font-size:.85rem">Vinculos Membro:</strong><div id="listaVincMembro" class="chip-list" style="margin-top:8px"></div></div></div>
-                                                                                                                                                  </div>
+</div>
 <!-- AVALIAR EQUIPE -->
 <div id="avaliar" class="section">
 <div class="card">
@@ -157,30 +157,30 @@ tr:hover td{background:#f8fafc}
 <div id="avaliacoes" class="sub-section active">
 <div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
 <h2>Nova Avaliacao do Gestor</h2>
-<div class="form-row"><div><label>Periodo (mes/ano)</label><input type="month" id="avPeriodo"/></div><div><label>Comentario</label><input type="text" id="avComentario" placeholder="Observacoes gerais..."/></div></div>
-<div class="comp-grid" id="compGrid" style="margin-top:14px"></div>
+<div class="form-row"><div><label>Periodo (mes/ano)</label><input type="month" id="avPeriodo"/></div><div><label>Comentario (opcional)</label><input type="text" id="avComentario" placeholder="Observacoes gerais..."/></div></div>
+<p style="font-size:.82rem;color:#64748b;margin-top:10px">Avalie as competencias (1 a 5 estrelas):</p>
+<div class="comp-grid" id="compGrid" style="margin-top:8px"></div>
 <button class="btn btn-primary" style="margin-top:16px" onclick="salvarAvaliacao()">Salvar Avaliacao</button>
 <div class="msg" id="msgAvaliacao"></div>
 </div>
 <div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0;margin-top:0">
 <h2>Historico de Avaliacoes</h2>
-<table><thead><tr><th>Periodo</th><th>Media</th><th>Comentario</th><th>Acoes</th></tr></thead><tbody id="tabelaAvaliacoes"></tbody></table>
+<table><thead><tr><th>Periodo</th><th>Nota Media</th><th>Comentario</th><th>Acoes</th></tr></thead><tbody id="tabelaAvaliacoes"></tbody></table>
 </div>
 </div>
 <!-- SUB: INDICADORES -->
 <div id="registros_ind" class="sub-section">
 <div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
 <h2>Registros de Indicadores do Membro</h2>
-<table><thead><tr><th>Periodo</th><th>Indicador</th><th>Valor</th><th>Meta</th><th>Observacao</th></tr></thead><tbody id="tabelaRegInd"></tbody></table>
+<table><thead><tr><th>Periodo</th><th>Indicador</th><th>Resultado</th><th>Meta</th></tr></thead><tbody id="tabelaRegInd"></tbody></table>
 </div>
 </div>
 <!-- SUB: PDI -->
 <div id="pdi" class="sub-section">
 <div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
-<h2>Novo PDI</h2>
-<div class="form-row"><div><label>Objetivo</label><input type="text" id="pdiObjetivo" placeholder="Ex: Melhorar comunicacao com cliente"/></div><div><label>Prazo</label><input type="date" id="pdiPrazo"/></div></div>
-<label>Descricao / Acoes</label><textarea id="pdiDescricao" rows="3" placeholder="Descreva as acoes e recursos necessarios..."></textarea>
-<div class="form-row"><div><label>Competencia relacionada (opcional)</label><select id="pdiCompetencia"><option value="">-- nenhuma --</option></select></div><div><label>Status</label><select id="pdiStatus"><option value="aberto">Aberto</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluido</option></select></div></div>
+<h2>Novo PDI / Plano de Acao</h2>
+<div class="form-row"><div><label>Objetivo / Acao</label><input type="text" id="pdiAcao" placeholder="Ex: Melhorar comunicacao com cliente"/></div><div><label>Prazo</label><input type="date" id="pdiPrazo"/></div></div>
+<div><label>Status</label><select id="pdiStatus"><option value="aberto">Aberto</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluido</option></select></div>
 <button class="btn btn-purple" style="margin-top:14px" onclick="salvarPDI()">Salvar PDI</button>
 <div class="msg" id="msgPDI"></div>
 </div>
@@ -191,7 +191,7 @@ tr:hover td{background:#f8fafc}
 </div>
 </div>
 </div>
-                                                  </div>
+</div>
 <!-- MODALS -->
 <div class="modal-overlay" id="modalMembro"><div class="modal"><h3>Editar Membro</h3><input type="hidden" id="editMembroId"/><label>Nome</label><input type="text" id="editMembroNome"/><label>Equipe</label><select id="editMembroEquipe"></select><label>Nivel / Papel</label><select id="editMembroPapel"></select><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoMembro()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalMembro')">Cancelar</button></div></div></div>
 <div class="modal-overlay" id="modalNivel"><div class="modal"><h3>Editar Nivel</h3><input type="hidden" id="editNivelId"/><label>Codigo</label><input type="text" id="editNivelCod"/><label>Nome</label><input type="text" id="editNivelNome"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoNivel()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalNivel')">Cancelar</button></div></div></div>
@@ -272,12 +272,9 @@ async function carregarNiveisSelects(){
 async function carregarCompetenciasSelects(){
   const {data} = await sb.from('competencias').select('*').order('codigo');
   const opts = data ? data.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
-  ['vincCompNivel','vincCompMembro','pdiCompetencia'].forEach(id=>{
+  ['vincCompNivel','vincCompMembro'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el){
-      if(id==='pdiCompetencia') el.innerHTML='<option value="">-- nenhuma --</option>'+opts;
-      else el.innerHTML = opts;
-    }
+    if(el) el.innerHTML = opts;
   });
 }
 // MEMBROS
@@ -307,15 +304,11 @@ async function adicionarMembro(){
   const equipe = document.getElementById('novaEquipe').value;
   const papel = document.getElementById('novoPapel').value;
   if(!email||!nome){msg('msgMembro','Preencha e-mail e nome.','err');return;}
-  const {data:eu} = await sb.auth.getUser();
-  const {data:adm,error:e1} = await sb.auth.admin ? {data:null,error:{message:'n/a'}} : {data:null,error:{message:'n/a'}};
   const {error} = await sb.from('perfis').upsert({id:email,email,nome,papel,equipe},{onConflict:'email'});
   if(error){
-    const {data:inv,error:e2} = await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+'/index.html'}});
+    const {error:e2} = await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+'/index.html'}});
     if(e2){msg('msgMembro','Erro: '+e2.message,'err');return;}
-    const {error:e3} = await sb.from('perfis').upsert({email,nome,papel,equipe},{onConflict:'email'});
-    if(e3){msg('msgMembro','Convite enviado. Perfil sera criado no primeiro login.','ok');}
-    else {msg('msgMembro','Convite enviado para '+email,'ok');}
+    msg('msgMembro','Convite enviado para '+email+'. O perfil sera criado no primeiro login.','ok');
   } else {msg('msgMembro','Membro adicionado!','ok');}
   carregarMembros();
 }
@@ -518,13 +511,12 @@ async function carregarVinculos(){
   const {data:comps} = await sb.from('competencias').select('*').order('codigo');
   const {data:niveis} = await sb.from('niveis').select('*').order('nome');
   const {data:membros} = await sb.from('perfis').select('*').order('nome');
-  const compOptsN = comps ? comps.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
-  const compOptsM = compOptsN;
+  const compOpts = comps ? comps.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
   const nivOpts = niveis ? niveis.map(n=>'<option value="'+n.id+'">'+n.nome+'</option>').join('') : '';
   const memOpts = membros ? membros.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('') : '';
-  document.getElementById('vincCompNivel').innerHTML = compOptsN;
+  document.getElementById('vincCompNivel').innerHTML = compOpts;
   document.getElementById('vincNivelSel').innerHTML = nivOpts;
-  document.getElementById('vincCompMembro').innerHTML = compOptsM;
+  document.getElementById('vincCompMembro').innerHTML = compOpts;
   document.getElementById('vincMembroSel').innerHTML = memOpts;
   await carregarListaVincNivel();
   await carregarListaVincMembro();
@@ -571,24 +563,21 @@ async function vincularCompMembro(){
 }
 
 async function removerVincNivel(btn){
-  const id = btn.dataset.vincid;
-  await sb.from('competencias_niveis').delete().eq('id',id);
+  await sb.from('competencias_niveis').delete().eq('id',btn.dataset.vincid);
   carregarListaVincNivel();
 }
 
 async function removerVincMembro(btn){
-  const id = btn.dataset.vincid;
-  await sb.from('competencias_membros').delete().eq('id',id);
+  await sb.from('competencias_membros').delete().eq('id',btn.dataset.vincid);
   carregarListaVincMembro();
-  }
+}
+
 // AVALIAR EQUIPE
 async function carregarMembrosAvaliar(){
   const {data} = await sb.from('perfis').select('*').order('nome');
   const grid = document.getElementById('memberGrid');
   if(!data||!data.length){grid.innerHTML='<p style="color:#94a3b8">Nenhum membro cadastrado</p>';return;}
-  grid.innerHTML = data.map(m=>{
-    return '<div class="member-card" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||m.id)+'" onclick="selecionarMembro(this)"><strong style="font-size:.88rem">'+m.nome+'</strong><br><span style="font-size:.75rem;color:#64748b">'+nomePapel(m.papel)+(m.equipe?' | '+m.equipe:'')+'</span></div>';
-  }).join('');
+  grid.innerHTML = data.map(m=>'<div class="member-card" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||m.id)+'" onclick="selecionarMembro(this)"><strong style="font-size:.88rem">'+m.nome+'</strong><br><span style="font-size:.75rem;color:#64748b">'+nomePapel(m.papel)+(m.equipe?' | '+m.equipe:'')+'</span></div>').join('');
   document.getElementById('avaliarConteudo').style.display='none';
   membroAtualId = null;
 }
@@ -600,9 +589,13 @@ function selecionarMembro(card){
   document.getElementById('membroSelecionadoNome').textContent = decodeURIComponent(card.dataset.nome);
   document.getElementById('avaliarConteudo').style.display='block';
   avaliacaoStars = {};
+  // Reset to first sub-tab
+  document.querySelectorAll('.sub-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('avaliacoes').classList.add('active');
+  document.querySelector('.sub-tab').classList.add('active');
   carregarCompGrid();
   carregarAvaliacoesMembro();
-  carregarCompetenciasSelects();
 }
 
 async function carregarCompGrid(){
@@ -625,8 +618,8 @@ function setStar(span){
   row.querySelectorAll('span').forEach(s=>{
     s.classList.toggle('filled', parseInt(s.dataset.val) <= val);
   });
-}
-
+  }
+// AVALIACOES - usa colunas: colaborador_id, gestor_id, periodo, nota
 async function salvarAvaliacao(){
   if(!membroAtualId){msg('msgAvaliacao','Selecione um membro.','err');return;}
   const periodo = document.getElementById('avPeriodo').value;
@@ -635,15 +628,16 @@ async function salvarAvaliacao(){
   const notas = Object.entries(avaliacaoStars).filter(([k,v])=>v>0);
   if(!notas.length){msg('msgAvaliacao','Avalie pelo menos uma competencia.','err');return;}
   const media = notas.reduce((s,[k,v])=>s+v,0)/notas.length;
-  const {data:av,error} = await sb.from('avaliacoes_gestor').insert({
+  const insertData = {
     colaborador_id:membroAtualId,
     gestor_id:userSession.user.id,
     periodo:periodo+'-01',
-    media_geral:parseFloat(media.toFixed(2)),
-    comentario
-  }).select().single();
+    nota:parseFloat(media.toFixed(2))
+  };
+  const {error} = await sb.from('avaliacoes_gestor').insert(insertData);
   if(error){msg('msgAvaliacao','Erro ao salvar: '+error.message,'err');return;}
-  msg('msgAvaliacao','Avaliacao salva!','ok');
+  msg('msgAvaliacao','Avaliacao salva! Nota media: '+media.toFixed(1),'ok');
+  if(comentario) console.log('Comentario (campo nao existe ainda):', comentario);
   carregarAvaliacoesMembro();
 }
 
@@ -654,7 +648,8 @@ async function carregarAvaliacoesMembro(){
   if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhuma avaliacao registrada</td></tr>';return;}
   tbody.innerHTML = data.map(a=>{
     const per = a.periodo ? a.periodo.substring(0,7) : '—';
-    return '<tr><td>'+per+'</td><td>'+(a.media_geral||'—')+'</td><td>'+(a.comentario||'—')+'</td><td><button class="btn btn-sm btn-red" data-id="'+a.id+'" onclick="removerAvaliacao(this)">Remover</button></td></tr>';
+    const nota = a.nota || a.media_geral || '—';
+    return '<tr><td>'+per+'</td><td>'+nota+'</td><td>—</td><td><button class="btn btn-sm btn-red" data-id="'+a.id+'" onclick="removerAvaliacao(this)">Remover</button></td></tr>';
   }).join('');
 }
 
@@ -664,52 +659,48 @@ async function removerAvaliacao(btn){
   carregarAvaliacoesMembro();
 }
 
-// REGISTROS INDICADORES
+// REGISTROS INDICADORES - usa colunas: colaborador_id, indicador_id, periodo, meta
 async function carregarRegIndicadores(){
   if(!membroAtualId) return;
-  const {data} = await sb.from('registros_indicadores').select('*,tipos_indicadores(nome,unidade,meta_padrao)').eq('analista_id',membroAtualId).order('periodo',{ascending:false}).limit(50);
+  const {data} = await sb.from('registros_indicadores').select('*').eq('colaborador_id',membroAtualId).order('periodo',{ascending:false}).limit(50);
   const tbody = document.getElementById('tabelaRegInd');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum registro encontrado</td></tr>';return;}
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum registro encontrado</td></tr>';return;}
   tbody.innerHTML = data.map(r=>{
     const per = r.periodo ? r.periodo.substring(0,7) : '—';
-    const ind = r.tipos_indicadores;
-    return '<tr><td>'+per+'</td><td>'+(ind?ind.nome:r.indicador_nome||'—')+'</td><td>'+r.valor+(ind&&ind.unidade?' '+ind.unidade:'')+'</td><td>'+(ind&&ind.meta_padrao?ind.meta_padrao+(ind.unidade?' '+ind.unidade:''):'—')+'</td><td>'+(r.observacao||'—')+'</td></tr>';
+    return '<tr><td>'+per+'</td><td>'+(r.indicador_id||'—')+'</td><td>'+(r.resultado||r.valor||r.meta||'—')+'</td><td>'+(r.meta||'—')+'</td></tr>';
   }).join('');
 }
 
-// PDI
+// PDI - usa colunas: colaborador_id, gestor_id, prazo, status, acao
 async function salvarPDI(){
   if(!membroAtualId){msg('msgPDI','Selecione um membro.','err');return;}
-  const objetivo = document.getElementById('pdiObjetivo').value.trim();
+  const acao = document.getElementById('pdiAcao').value.trim();
   const prazo = document.getElementById('pdiPrazo').value;
-  const descricao = document.getElementById('pdiDescricao').value.trim();
-  const comp_id = document.getElementById('pdiCompetencia').value||null;
   const status = document.getElementById('pdiStatus').value;
-  if(!objetivo){msg('msgPDI','Preencha o objetivo.','err');return;}
+  if(!acao){msg('msgPDI','Preencha o objetivo/acao.','err');return;}
   const {error} = await sb.from('pdis').insert({
     colaborador_id:membroAtualId,
     gestor_id:userSession.user.id,
-    objetivo,prazo:prazo||null,descricao,
-    competencia_id:comp_id,status
+    acao,
+    prazo:prazo||null,
+    status
   });
   if(error){msg('msgPDI','Erro: '+error.message,'err');return;}
   msg('msgPDI','PDI salvo!','ok');
-  document.getElementById('pdiObjetivo').value='';
-  document.getElementById('pdiDescricao').value='';
+  document.getElementById('pdiAcao').value='';
   document.getElementById('pdiPrazo').value='';
   carregarPDI();
 }
 
 async function carregarPDI(){
   if(!membroAtualId) return;
-  const {data} = await sb.from('pdis').select('*,competencias(codigo,nome)').eq('colaborador_id',membroAtualId).order('created_at',{ascending:false});
+  const {data} = await sb.from('pdis').select('*').eq('colaborador_id',membroAtualId).order('id',{ascending:false});
   const el = document.getElementById('listaPDI');
   if(!data||!data.length){el.innerHTML='<p style="color:#94a3b8;font-size:.85rem">Nenhum PDI cadastrado para este membro</p>';return;}
   el.innerHTML = data.map(p=>{
-    const comp = p.competencias ? ' | '+p.competencias.codigo+' - '+p.competencias.nome : '';
-    const prazo = p.prazo ? ' | Prazo: '+p.prazo : '';
+    const prazo = p.prazo ? 'Prazo: '+p.prazo : '';
     const statusCls = 'pdi-status pdi-'+(p.status||'aberto');
-    return '<div class="pdi-item"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4>'+p.objetivo+'</h4><small style="color:#94a3b8">'+prazo.replace(' | ','')+comp+'</small></div><button class="btn btn-sm btn-red" data-id="'+p.id+'" onclick="removerPDI(this)">Remover</button></div>'+(p.descricao?'<p style="font-size:.83rem;margin-top:6px;color:#374151">'+p.descricao+'</p>':'')+'<span class="'+statusCls+'">'+p.status+'</span></div>';
+    return '<div class="pdi-item"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4>'+(p.acao||p.objetivo||'PDI')+'</h4><small style="color:#94a3b8">'+prazo+'</small></div><button class="btn btn-sm btn-red" data-id="'+p.id+'" onclick="removerPDI(this)">Remover</button></div><span class="'+statusCls+'">'+(p.status||'aberto')+'</span></div>';
   }).join('');
 }
 
