@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Painel do Gestor</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--primary:#2563eb;--bg:#f1f5f9;--card:#fff;--text:#1e293b;--muted:#64748b;--green:#16a34a;--yellow:#d97706;--red:#dc2626;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--primary);color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:1.1rem;}
+.btn{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.88rem;}
+.btn-outline{background:transparent;border:1px solid #fff;color:#fff;}
+.btn-primary{background:var(--primary);color:#fff;font-weight:600;}
+.btn-sm{padding:4px 9px;font-size:.8rem;}
+.container{max-width:1100px;margin:0 auto;padding:20px 16px;}
+.tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e2e8f0;}
+.tab{padding:9px 18px;cursor:pointer;border:none;background:none;font-size:.9rem;color:var(--muted);}
+.tab.active{color:var(--primary);font-weight:600;border-bottom:2px solid var(--primary);margin-bottom:-2px;}
+.section{display:none;}.section.active{display:block;}
+.card{background:var(--card);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px;}
+.card h2{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:3px;margin-top:9px;}
+select,input,textarea{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:.88rem;background:#fff;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+table{width:100%;border-collapse:collapse;font-size:.86rem;}
+th{text-align:left;padding:7px 9px;background:#f8fafc;color:var(--muted);border-bottom:1px solid #e2e8f0;}
+td{padding:7px 9px;border-bottom:1px solid #f1f5f9;}
+tr:hover td{background:#f8fafc;}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.76rem;font-weight:600;}
+.bg{background:#dcfce7;color:var(--green);}
+.by{background:#fef9c3;color:var(--yellow);}
+.br{background:#fee2e2;color:var(--red);}
+.bar{height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;}
+.fill{height:100%;border-radius:4px;}
+.fg{background:var(--green);}.fy{background:var(--yellow);}.fr{background:var(--red);}
+.stat{background:var(--card);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:14px 18px;text-align:center;}
+.stat .v{font-size:1.8rem;font-weight:700;color:var(--primary);}
+.stat .l{font-size:.79rem;color:var(--muted);margin-top:3px;}
+.empty{text-align:center;color:var(--muted);padding:30px;font-size:.88rem;}
+#toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:11px 18px;border-radius:8px;font-size:.88rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Painel do Gestor</h1>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span id="gNome" style="font-size:.85rem;opacity:.85;"></span>
+    <button class="btn btn-outline btn-sm" onclick="sair()">Sair</button>
+    <a href="gestor-indicadores.html" style="color:#fff;font-size:.85rem;border:1px solid rgba(255,255,255,.5);padding:5px 10px;border-radius:6px;text-decoration:none;">Indicadores</a>
+  </div>
+</header>
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="aba('visao',this)">Visao Geral</button>
+    <button class="tab" onclick="aba('competencias',this)">Avaliar</button>
+    <button class="tab" onclick="aba('gaps',this)">Gaps</button>
+    <button class="tab" onclick="aba('pdi',this)">PDI</button>
+    <button class="tab" onclick="aba('historico',this)">Historico</button>
+    <button class="tab" onclick="aba('equipe',this)">Equipe</button>
+  </div>
+
+  <div id="visao" class="section active">
+    <div class="grid-3" id="stats" style="margin-bottom:16px;"></div>
+    <div class="card"><h2>Colaborador</h2>
+      <select id="selC" onchange="resumoColab()"><option value="">-- selecione --</option></select>
+    </div>
+    <div id="resumo" style="display:none;">
+      <div class="grid-2"><div class="card" id="cComp"></div><div class="card" id="cGap"></div></div>
+    </div>
+  </div>
+
+  <div id="competencias" class="section">
+    <div class="card"><h2>Avaliar Competencias</h2>
+      <div class="grid-2">
+        <div><label>Colaborador</label><select id="avC"></select></div>
+        <div><label>Periodo</label><input type="month" id="avP"/></div>
+      </div>
+      <div id="avForm" style="margin-top:14px;"></div>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="salvarAv()">Salvar Avaliacao</button>
+    </div>
+  </div>
+
+  <div id="gaps" class="section">
+    <div class="card"><h2>Mapa de Gaps da Equipe</h2><div id="mapaG"></div></div>
+  </div>
+
+  <div id="pdi" class="section">
+    <div class="card"><h2>PDI</h2>
+      <div><label>Colaborador</label><select id="pdiC" onchange="carPDI()"></select></div>
+      <div id="pdiLista" style="margin-top:12px;"></div>
+      <hr style="margin:14px 0;border-color:#e2e8f0;">
+      <div class="grid-2">
+        <div><label>Competencia</label><input id="pdiComp" placeholder="Ex: Comunicacao"/></div>
+        <div><label>Prazo</label><input type="date" id="pdiPrazo"/></div>
+      </div>
+      <div><label>Acao</label><textarea id="pdiAcao" rows="2"></textarea></div>
+      <div><label>Status</label><select id="pdiSt"><option value="nao_iniciado">Nao iniciado</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluido</option></select></div>
+      <button class="btn btn-primary" style="margin-top:12px;" onclick="addPDI()">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div id="historico" class="section">
+    <div class="card"><h2>Historico</h2>
+      <div><label>Colaborador</label><select id="histC" onchange="carHist()"></select></div>
+      <div id="histD" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <div id="equipe" class="section">
+    <div class="card"><h2>Cadastrar Colaborador</h2>
+      <div class="grid-2">
+        <div><label>Nome</label><input id="nNome"/></div>
+        <div><label>E-mail</label><input type="email" id="nEmail"/></div>
+      </div>
+      <div class="grid-2">
+        <div><label>Equipe</label><select id="nEquipe"><option value="Cond21">Cond21</option><option value="GC">GC</option></select></div>
+        <div><label>Senha</label><input type="password" id="nSenha"/></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:12px;" onclick="addColab()">+ Cadastrar</button>
+    </div>
+    <div class="card"><h2>Time</h2><div id="listaE"></div></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const sb=supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
+const COMP=[
+  {id:'C1',n:'Conhecimento do produto'},
+  {id:'C2',n:'Escuta ativa'},
+  {id:'C3',n:'Comunicacao consultiva'},
+  {id:'C4',n:'Gestao do relacionamento'},
+  {id:'C5',n:'Resolucao de problemas'},
+  {id:'C6',n:'Organizacao e tempo'},
+  {id:'C7',n:'Colaboracao em equipe'},
+  {id:'C8',n:'Adaptabilidade'}
+];
+const NV={1:'Iniciante',2:'Em dev.',3:'Proficiente',4:'Avancado',5:'Referencia'};
+let cols=[],gId=null;
+
+async function boot(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){location.href='index.html';return;}
+  gId=session.user.id;
+  const{data:p}=await sb.from('perfis').select('*').eq('id',gId).single();
+  if(!p||p.papel!=='gestor'){location.href='index.html';return;}
+  document.getElementById('gNome').textContent=p.nome;
+  await carCols();
+  await stats();
+  renderAvForm();
+  preencheSels();
+  const m=new Date(),mm=String(m.getMonth()+1).padStart(2,'0');
+  document.getElementById('avP').value=m.getFullYear()+'-'+mm;
+}
+
+async function carCols(){
+  const{data}=await sb.from('perfis').select('*').eq('papel','colaborador').order('nome');
+  cols=data||[];
+}
+
+function preencheSels(){
+  ['selC','avC','pdiC','histC'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    s.innerHTML='<option value="">-- selecione --</option>';
+    cols.forEach(c=>{s.innerHTML+=`<option value="${c.id}">${c.nome} (${c.equipe||''})</option>`;});
+  });
+}
+
+async function stats(){
+  const{data:avs}=await sb.from('avaliacoes_gestor').select('nota');
+  const total=cols.length,cnt=avs?.length||0;
+  const media=cnt?((avs.reduce((s,a)=>s+a.nota,0))/cnt).toFixed(1):'--';
+  document.getElementById('stats').innerHTML=
+    `<div class="stat"><div class="v">${total}</div><div class="l">Colaboradores</div></div>
+    <div class="stat"><div class="v">${cnt}</div><div class="l">Avaliacoes</div></div>
+    <div class="stat"><div class="v">${media}</div><div class="l">Media geral</div></div>`;
+}
+
+async function resumoColab(){
+  const id=document.getElementById('selC').value;
+  const div=document.getElementById('resumo');
+  if(!id){div.style.display='none';return;}
+  div.style.display='';
+  const{data:avs}=await sb.from('avaliacoes_gestor').select('*').eq('colaborador_id',id).order('periodo',{ascending:false});
+  const ult=avs&&avs.length?avs[0].periodo:null;
+  const notas={};
+  if(avs)avs.filter(a=>a.periodo===ult).forEach(a=>{notas[a.competencia_id]=a.nota;});
+  let hc='<h2>Competencias</h2>';
+  if(!ult){hc+='<p class="empty">Sem avaliacoes.</p>';}
+  else{COMP.forEach(c=>{const n=notas[c.id]||0,p=(n/5)*100,cl=n>=4?'fg':n>=3?'fy':'fr';
+    hc+=`<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:2px;"><span>${c.n}</span><b>${n||'--'}</b></div><div class="bar"><div class="fill ${cl}" style="width:${p}%"></div></div></div>`;});}
+  document.getElementById('cComp').innerHTML=hc;
+  let hg='<h2>Gaps</h2>';
+  const gaps=COMP.filter(c=>(notas[c.id]||0)<3);
+  if(!gaps.length){hg+='<p class="empty">Nenhum gap critico.</p>';}
+  else{gaps.forEach(c=>{const d=3-(notas[c.id]||0);hg+=`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;"><span style="font-size:.85rem;">${c.n}</span><span class="badge br">Gap:${d}</span></div>`;});}
+  document.getElementById('cGap').innerHTML=hg;
+}
+
+function renderAvForm(){
+  let h='';
+  COMP.forEach(c=>{
+    h+=`<div style="margin-bottom:12px;"><label>${c.id} - ${c.n}</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">${[1,2,3,4,5].map(n=>
+      `<label style="display:flex;align-items:center;gap:3px;font-size:.82rem;cursor:pointer;background:#f8fafc;padding:4px 9px;border-radius:5px;border:1px solid #e2e8f0;margin:0;" id="opt_${c.id}_${n}" onclick="sel('${c.id}',${n})"><b>${n}</b> ${NV[n]}</label>`
+    ).join('')}</div></div>`;
+  });
+  document.getElementById('avForm').innerHTML=h;
+}
+
+const notas={};
+function sel(cid,n){
+  notas[cid]=n;
+  [1,2,3,4,5].forEach(i=>{
+    const el=document.getElementById(`opt_${cid}_${i}`);
+    if(el)el.style.cssText=i===n?'background:#eff6ff;border-color:#2563eb;color:#2563eb;display:flex;align-items:center;gap:3px;font-size:.82rem;cursor:pointer;padding:4px 9px;border-radius:5px;margin:0;':'background:#f8fafc;border-color:#e2e8f0;color:#1e293b;display:flex;align-items:center;gap:3px;font-size:.82rem;cursor:pointer;padding:4px 9px;border-radius:5px;margin:0;';
+  });
+}
+
+async function salvarAv(){
+  const cid=document.getElementById('avC').value,per=document.getElementById('avP').value;
+  if(!cid||!per){toast('Selecione colaborador e periodo.');return;}
+  if(COMP.some(c=>!notas[c.id])){toast('Avalie todas as competencias.');return;}
+  for(const c of COMP){
+    await sb.from('avaliacoes_gestor').upsert({colaborador_id:cid,gestor_id:gId,competencia_id:c.id,nota:notas[c.id],periodo:per},{onConflict:'colaborador_id,competencia_id,periodo'});
+  }
+  toast('Avaliacao salva!');await stats();await carGaps();
+}
+
+async function carGaps(){
+  const{data:avs}=await sb.from('avaliacoes_gestor').select('*');
+  if(!avs||!avs.length){document.getElementById('mapaG').innerHTML='<p class="empty">Sem avaliacoes.</p>';return;}
+  const map={};
+  avs.forEach(a=>{if(!map[a.colaborador_id])map[a.colaborador_id]={};if(!map[a.colaborador_id][a.competencia_id]||a.periodo>map[a.colaborador_id][a.competencia_id].periodo)map[a.colaborador_id][a.competencia_id]=a;});
+  let h='<div style="overflow-x:auto;"><table><tr><th>Colaborador</th>';
+  COMP.forEach(c=>{h+=`<th title="${c.n}">${c.id}</th>`;});
+  h+='<th>Media</th></tr>';
+  cols.forEach(col=>{
+    const ns=map[col.id]||{};let soma=0,cnt=0;
+    h+=`<tr><td>${col.nome}</td>`;
+    COMP.forEach(c=>{const n=ns[c.id]?.nota||0;soma+=n;if(n)cnt++;const cl=n>=4?'bg':n>=3?'by':'br';h+=`<td>${n?'<span class="badge '+cl+'">'+n+'</span>':'--'}</td>`;});
+    h+=`<td><b>${cnt?(soma/cnt).toFixed(1):'--'}</b></td></tr>`;
+  });
+  h+='</table></div>';
+  document.getElementById('mapaG').innerHTML=h;
+}
+
+async function carPDI(){
+  const id=document.getElementById('pdiC').value;
+  if(!id){document.getElementById('pdiLista').innerHTML='';return;}
+  const{data}=await sb.from('pdis').select('*').eq('colaborador_id',id).order('prazo');
+  if(!data||!data.length){document.getElementById('pdiLista').innerHTML='<p class="empty">Sem PDI.</p>';return;}
+  const cl={em_andamento:'by',concluido:'bg',nao_iniciado:'br'};
+  const lb={em_andamento:'Em andamento',concluido:'Concluido',nao_iniciado:'Nao iniciado'};
+  let h='<table><tr><th>Competencia</th><th>Acao</th><th>Prazo</th><th>Status</th><th></th></tr>';
+  data.forEach(p=>{h+=`<tr><td>${p.competencia}</td><td>${p.acao}</td><td>${p.prazo||'--'}</td><td><span class="badge ${cl[p.status]||''}">${lb[p.status]||p.status}</span></td><td><button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:none;" onclick="delPDI('${p.id}')">X</button></td></tr>`;});
+  h+='</table>';document.getElementById('pdiLista').innerHTML=h;
+}
+
+async function addPDI(){
+  const id=document.getElementById('pdiC').value,comp=document.getElementById('pdiComp').value.trim(),acao=document.getElementById('pdiAcao').value.trim(),prazo=document.getElementById('pdiPrazo').value,st=document.getElementById('pdiSt').value;
+  if(!id||!comp||!acao){toast('Preencha colaborador, competencia e acao.');return;}
+  await sb.from('pdis').insert({colaborador_id:id,gestor_id:gId,competencia:comp,acao,prazo:prazo||null,status:st});
+  document.getElementById('pdiComp').value='';document.getElementById('pdiAcao').value='';
+  toast('PDI adicionado!');carPDI();
+}
+
+async function delPDI(id){if(!confirm('Remover?'))return;await sb.from('pdis').delete().eq('id',id);carPDI();}
+
+async function carHist(){
+  const id=document.getElementById('histC').value;
+  if(!id){document.getElementById('histD').innerHTML='';return;}
+  const{data}=await sb.from('avaliacoes_gestor').select('*').eq('colaborador_id',id).order('periodo',{ascending:false});
+  if(!data||!data.length){document.getElementById('histD').innerHTML='<p class="empty">Sem historico.</p>';return;}
+  const pers=[...new Set(data.map(a=>a.periodo))];
+  let h='';
+  pers.forEach(p=>{
+    const ns={};data.filter(a=>a.periodo===p).forEach(a=>{ns[a.competencia_id]=a.nota;});
+    let s=0,c=0;COMP.forEach(x=>{if(ns[x.id]){s+=ns[x.id];c++;}});
+    h+=`<div style="margin-bottom:14px;"><b>${p}</b> — Media: <b>${c?(s/c).toFixed(1):'--'}</b><div style="overflow-x:auto;margin-top:6px;"><table><tr>${COMP.map(x=>'<th>'+x.id+'</th>').join('')}</tr><tr>${COMP.map(x=>{const n=ns[x.id]||0;const cl=n>=4?'bg':n>=3?'by':'br';return '<td>'+(n?'<span class="badge '+cl+'">'+n+'</span>':'--')+'</td>';}).join('')}</tr></table></div></div>`;
+  });
+  document.getElementById('histD').innerHTML=h;
+}
+
+async function carEquipe(){
+  let h=cols.length?'<table><tr><th>Nome</th><th>Equipe</th><th>E-mail</th></tr>':'<p class="empty">Nenhum colaborador.</p>';
+  cols.forEach(c=>{h+=`<tr><td>${c.nome}</td><td>${c.equipe||'--'}</td><td>${c.email||'--'}</td></tr>`;});
+  if(cols.length)h+='</table>';
+  document.getElementById('listaE').innerHTML=h;
+}
+
+async function addColab(){
+  const nome=document.getElementById('nNome').value.trim(),email=document.getElementById('nEmail').value.trim(),equipe=document.getElementById('nEquipe').value,senha=document.getElementById('nSenha').value;
+  if(!nome||!email||!senha){toast('Preencha todos os campos.');return;}
+  if(senha.length<8){toast('Senha minimo 8 caracteres.');return;}
+  const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome,equipe,papel:'colaborador'}}});
+  if(error){toast('Erro: '+error.message);return;}
+  if(data.user)await sb.from('perfis').upsert({id:data.user.id,nome,email,equipe,papel:'colaborador'},{onConflict:'id'});
+  toast('Colaborador cadastrado!');
+  document.getElementById('nNome').value='';document.getElementById('nEmail').value='';document.getElementById('nSenha').value='';
+  await carCols();preencheSels();carEquipe();
+}
+
+function aba(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+  if(id==='gaps')carGaps();if(id==='equipe')carEquipe();
+}
+
+function sair(){sb.auth.signOut().then(()=>location.href='index.html');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+boot();
+</script>
+</body>
+</html>
