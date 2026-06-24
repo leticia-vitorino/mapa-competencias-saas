@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Indicadores Mensais</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--primary:#2563eb;--bg:#f1f5f9;--card:#fff;--text:#1e293b;--muted:#64748b;--green:#16a34a;--yellow:#d97706;--red:#dc2626;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--primary);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:1.05rem;}
+.nav-link{color:#fff;font-size:.85rem;border:1px solid rgba(255,255,255,.5);padding:5px 10px;border-radius:5px;text-decoration:none;}
+.btn-out{background:transparent;border:1px solid #fff;color:#fff;padding:5px 12px;font-size:.83rem;cursor:pointer;border-radius:5px;}
+.container{max-width:1100px;margin:0 auto;padding:20px 14px;}
+.card{background:var(--card);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px;}
+.card h2{font-size:.83rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:3px;margin-top:9px;}
+select,input{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:.88rem;background:#fff;}
+.btn{padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-size:.88rem;}
+.btn-p{background:var(--primary);color:#fff;font-weight:600;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:640px){.grid-2,.grid-4{grid-template-columns:1fr;}}
+table{width:100%;border-collapse:collapse;font-size:.86rem;}
+th{text-align:left;padding:7px 9px;background:#f8fafc;color:var(--muted);border-bottom:1px solid #e2e8f0;}
+td{padding:7px 9px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+tr:hover td{background:#f8fafc;}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.76rem;font-weight:600;}
+.bg{background:#dcfce7;color:var(--green);}.by{background:#fef9c3;color:var(--yellow);}.br{background:#fee2e2;color:var(--red);}
+.bar{height:10px;border-radius:5px;background:#e2e8f0;overflow:hidden;min-width:70px;}
+.fill{height:100%;border-radius:5px;}
+.fg{background:var(--green);}.fy{background:var(--yellow);}.fr{background:var(--red);}
+.stat{background:var(--card);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:14px 18px;text-align:center;}
+.stat .v{font-size:1.7rem;font-weight:700;color:var(--primary);}
+.stat .l{font-size:.79rem;color:var(--muted);margin-top:3px;}
+.tab-bar{display:flex;gap:2px;margin-bottom:18px;border-bottom:2px solid #e2e8f0;}
+.tab{padding:8px 16px;cursor:pointer;border:none;background:none;font-size:.88rem;color:var(--muted);}
+.tab.active{color:var(--primary);font-weight:600;border-bottom:2px solid var(--primary);margin-bottom:-2px;}
+.sec{display:none;}.sec.active{display:block;}
+.empty{text-align:center;color:var(--muted);padding:28px;font-size:.88rem;}
+#toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:11px 18px;border-radius:8px;font-size:.88rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Indicadores Mensais</h1>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <a href="gestor-painel.html" class="nav-link">Painel</a>
+    <button class="btn-out" onclick="sair()">Sair</button>
+  </div>
+</header>
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab active" onclick="aba('lancar',this)">Lancar</button>
+    <button class="tab" onclick="aba('painel',this)">Painel</button>
+    <button class="tab" onclick="aba('evolucao',this)">Evolucao</button>
+  </div>
+
+  <div id="lancar" class="sec active">
+    <div class="card"><h2>Lancar resultado mensal</h2>
+      <div class="grid-2">
+        <div><label>Colaborador</label><select id="lC"></select></div>
+        <div><label>Periodo</label><input type="month" id="lP"/></div>
+      </div>
+      <div id="lForm" style="margin-top:14px;overflow-x:auto;"></div>
+      <button class="btn btn-p" style="margin-top:14px;" onclick="salvarLanc()">Salvar lancamento</button>
+    </div>
+  </div>
+
+  <div id="painel" class="sec">
+    <div class="card"><h2>Filtros</h2>
+      <div class="grid-2">
+        <div><label>Periodo</label><input type="month" id="pP" onchange="carPainel()"/></div>
+        <div><label>Equipe</label><select id="pE" onchange="carPainel()"><option value="">Todas</option><option value="Cond21">Cond21</option><option value="GC">GC</option></select></div>
+      </div>
+    </div>
+    <div id="pStats" class="grid-4" style="margin-bottom:14px;"></div>
+    <div class="card"><div id="pTabela"></div></div>
+  </div>
+
+  <div id="evolucao" class="sec">
+    <div class="card"><h2>Evolucao por colaborador</h2>
+      <div class="grid-2">
+        <div><label>Colaborador</label><select id="eC" onchange="carEvolucao()"></select></div>
+        <div><label>Indicador</label><select id="eI" onchange="carEvolucao()"></select></div>
+      </div>
+    </div>
+    <div class="card"><div id="eTabela"></div></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const sb=supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
+let cols=[],inds=[],gId=null;
+
+async function boot(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){location.href='index.html';return;}
+  gId=session.user.id;
+  const{data:p}=await sb.from('perfis').select('papel').eq('id',gId).single();
+  if(!p||p.papel!=='gestor'){location.href='index.html';return;}
+  const[{data:c},{data:i}]=await Promise.all([
+    sb.from('perfis').select('*').eq('papel','colaborador').order('nome'),
+    sb.from('indicadores').select('*').order('nome')
+  ]);
+  cols=c||[];inds=i||[];
+  const m=new Date(),mm=String(m.getMonth()+1).padStart(2,'0');
+  ['lP','pP'].forEach(id=>document.getElementById(id).value=m.getFullYear()+'-'+mm);
+  preencheSels();
+  renderLancForm();
+}
+
+function preencheSels(){
+  ['lC','eC'].forEach(id=>{
+    const s=document.getElementById(id);if(!s)return;
+    s.innerHTML='<option value="">-- selecione --</option>';
+    cols.forEach(c=>{s.innerHTML+=`<option value="${c.id}">${c.nome} (${c.equipe||''})</option>`;});
+  });
+  const eI=document.getElementById('eI');
+  eI.innerHTML='<option value="">-- selecione --</option>';
+  inds.forEach(i=>{eI.innerHTML+=`<option value="${i.id}">${i.nome}</option>`;});
+}
+
+function renderLancForm(){
+  if(!inds.length){document.getElementById('lForm').innerHTML='<p class="empty">Sem indicadores.</p>';return;}
+  let h='<table><tr><th>Indicador</th><th>Meta</th><th>Realizado</th><th>Unidade</th></tr>';
+  inds.forEach(ind=>{h+=`<tr><td>${ind.nome}</td><td><input type="number" id="m_${ind.id}" value="${ind.meta_padrao||''}" step="any" style="width:90px;"/></td><td><input type="number" id="r_${ind.id}" placeholder="0" step="any" style="width:90px;"/></td><td style="color:var(--muted);font-size:.82rem;">${ind.unidade||''}</td></tr>`;});
+  h+='</table>';document.getElementById('lForm').innerHTML=h;
+}
+
+async function salvarLanc(){
+  const cid=document.getElementById('lC').value,per=document.getElementById('lP').value;
+  if(!cid||!per){toast('Selecione colaborador e periodo.');return;}
+  const rows=[];
+  inds.forEach(ind=>{
+    const r=document.getElementById(`r_${ind.id}`);
+    const m=document.getElementById(`m_${ind.id}`);
+    if(r&&r.value!==''){rows.push({colaborador_id:cid,indicador_id:ind.id,periodo:per,meta:m.value!==''?parseFloat(m.value):(ind.meta_padrao||null),realizado:parseFloat(r.value),gestor_id:gId});}
+  });
+  if(!rows.length){toast('Preencha ao menos um indicador.');return;}
+  for(const r of rows){await sb.from('registros_indicadores').upsert(r,{onConflict:'colaborador_id,indicador_id,periodo'});}
+  toast('Lancamento salvo!');
+  inds.forEach(ind=>{const el=document.getElementById(`r_${ind.id}`);if(el)el.value='';});
+}
+
+async function carPainel(){
+  const per=document.getElementById('pP').value,eq=document.getElementById('pE').value;
+  if(!per){document.getElementById('pTabela').innerHTML='';return;}
+  let{data}=await sb.from('registros_indicadores').select('*,perfis(nome,equipe),indicadores(nome,unidade)').eq('periodo',per);
+  let regs=data||[];
+  if(eq)regs=regs.filter(r=>r.perfis?.equipe===eq);
+  const tot=regs.length,at=regs.filter(r=>r.meta&&r.realizado>=r.meta).length;
+  const pct=tot?Math.round((at/tot)*100):0;
+  const mp=tot?(regs.reduce((s,r)=>s+(r.meta?(r.realizado/r.meta)*100:0),0)/tot).toFixed(0):'--';
+  document.getElementById('pStats').innerHTML=`
+    <div class="stat"><div class="v">${tot}</div><div class="l">Lancamentos</div></div>
+    <div class="stat"><div class="v">${at}</div><div class="l">Metas atingidas</div></div>
+    <div class="stat"><div class="v">${pct}%</div><div class="l">Taxa atingimento</div></div>
+    <div class="stat"><div class="v">${mp}%</div><div class="l">Performance media</div></div>`;
+  if(!regs.length){document.getElementById('pTabela').innerHTML='<p class="empty">Sem lancamentos.</p>';return;}
+  regs.sort((a,b)=>(a.perfis?.nome||'').localeCompare(b.perfis?.nome||''));
+  let h='<table><tr><th>Colaborador</th><th>Equipe</th><th>Indicador</th><th>Meta</th><th>Realizado</th><th>Performance</th><th>Status</th></tr>';
+  regs.forEach(r=>{
+    const pf=r.meta?(r.realizado/r.meta)*100:null;
+    const pfs=pf!==null?pf.toFixed(0)+'%':'--';
+    const cl=pf===null?'':pf>=100?'fg':pf>=80?'fy':'fr';
+    const badge=pf===null?'':pf>=100?'<span class="badge bg">Atingido</span>':pf>=80?'<span class="badge by">Proximo</span>':'<span class="badge br">Abaixo</span>';
+    h+=`<tr><td>${r.perfis?.nome||'--'}</td><td>${r.perfis?.equipe||'--'}</td><td>${r.indicadores?.nome||'--'}</td><td>${r.meta??'--'} <small style="color:var(--muted)">${r.indicadores?.unidade||''}</small></td><td>${r.realizado} <small style="color:var(--muted)">${r.indicadores?.unidade||''}</small></td><td><div style="display:flex;align-items:center;gap:6px;"><div class="bar"><div class="fill ${cl}" style="width:${Math.min(pf||0,100)}%"></div></div>${pfs}</div></td><td>${badge}</td></tr>`;
+  });
+  h+='</table>';document.getElementById('pTabela').innerHTML=h;
+}
+
+async function carEvolucao(){
+  const cid=document.getElementById('eC').value,iid=document.getElementById('eI').value;
+  if(!cid||!iid){document.getElementById('eTabela').innerHTML='';return;}
+  const{data}=await sb.from('registros_indicadores').select('*').eq('colaborador_id',cid).eq('indicador_id',iid).order('periodo');
+  if(!data||!data.length){document.getElementById('eTabela').innerHTML='<p class="empty">Sem dados.</p>';return;}
+  let h='<table><tr><th>Periodo</th><th>Meta</th><th>Realizado</th><th>Performance</th><th>Status</th></tr>';
+  data.forEach(r=>{
+    const pf=r.meta?(r.realizado/r.meta)*100:null;
+    const cl=pf===null?'':pf>=100?'fg':pf>=80?'fy':'fr';
+    const badge=pf===null?'--':pf>=100?'<span class="badge bg">Atingido</span>':pf>=80?'<span class="badge by">Proximo</span>':'<span class="badge br">Abaixo</span>';
+    h+=`<tr><td>${r.periodo}</td><td>${r.meta??'--'}</td><td>${r.realizado}</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="bar"><div class="fill ${cl}" style="width:${Math.min(pf||0,100)}%"></div></div>${pf!==null?pf.toFixed(0)+'%':'--'}</div></td><td>${badge}</td></tr>`;
+  });
+  h+='</table>';document.getElementById('eTabela').innerHTML=h;
+}
+
+function aba(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+  if(id==='painel')carPainel();
+}
+function sair(){sb.auth.signOut().then(()=>location.href='index.html');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+boot();
+</script>
+</body>
+</html>
