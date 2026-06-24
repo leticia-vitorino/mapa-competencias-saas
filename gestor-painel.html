@@ -17,35 +17,42 @@ header h1{font-size:1.1rem}
 .btn-sm{padding:4px 10px;font-size:.8rem}
 .btn-red{background:#dc2626;color:#fff}
 .btn-yellow{background:#d97706;color:#fff}
-.container{max-width:1100px;margin:0 auto;padding:20px 16px}
-.tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e2e8f0}
-.tab{padding:9px 18px;cursor:pointer;border:none;background:none;font-size:.9rem;color:#64748b;border-bottom:2px solid transparent;margin-bottom:-2px}
-.tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600}
+.btn-green{background:#16a34a;color:#fff}
+.container{max-width:1200px;margin:0 auto;padding:20px 16px}
+.nav-tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e2e8f0;flex-wrap:wrap}
+.nav-tab{padding:9px 16px;cursor:pointer;border:none;background:none;font-size:.85rem;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.nav-tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600}
 .section{display:none}.section.active{display:block}
 .card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px}
 .card h2{font-size:.85rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
-label{display:block;font-size:.83rem;color:#374151;margin-bottom:3px;margin-top:12px}
-input,select{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:.9rem;outline:none}
-input:focus,select:focus{border-color:#2563eb}
+label{display:block;font-size:.83rem;color:#374151;margin-bottom:3px;margin-top:10px}
+input,select,textarea{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:.9rem;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#2563eb}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .msg{margin-top:10px;padding:9px 12px;border-radius:6px;font-size:.85rem;display:none}
 .msg.ok{background:#d1fae5;color:#065f46;display:block}
 .msg.err{background:#fee2e2;color:#991b1b;display:block}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
-th{background:#f8fafc;padding:10px 12px;text-align:left;font-size:.8rem;color:#64748b;text-transform:uppercase;border-bottom:2px solid #e2e8f0}
-td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+th{background:#f8fafc;padding:9px 12px;text-align:left;font-size:.78rem;color:#64748b;text-transform:uppercase;border-bottom:2px solid #e2e8f0}
+td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 tr:hover td{background:#f8fafc}
 .badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
 .badge-gestor{background:#dbeafe;color:#1d4ed8}
 .badge-n1{background:#d1fae5;color:#065f46}
 .badge-n2{background:#fef3c7;color:#92400e}
+.badge-n3{background:#fce7f3;color:#9d174d}
+.badge-rt{background:#f3e8ff;color:#6b21a8}
 .badge-analista_op{background:#ede9fe;color:#5b21b6}
-.acoes{display:flex;gap:6px}
+.acoes{display:flex;gap:6px;flex-wrap:wrap}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:460px;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;box-shadow:0 8px 30px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
 .modal h3{font-size:1rem;margin-bottom:16px;color:#1e293b}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#e0e7ff;color:#3730a3;border-radius:20px;font-size:.8rem}
+.chip button{background:none;border:none;cursor:pointer;color:#6366f1;font-size:.9rem;padding:0;line-height:1}
 </style>
 </head>
 <body>
@@ -54,13 +61,16 @@ tr:hover td{background:#f8fafc}
 <button class="btn btn-outline" onclick="sair()">Sair</button>
 </header>
 <div class="container">
-<div class="tabs">
-<button class="tab active" onclick="aba('equipe',this)">Equipe</button>
-<button class="tab" onclick="aba('avaliacoes',this)">Avaliacoes</button>
-<button class="tab" onclick="aba('indicadores',this)">Indicadores</button>
-<button class="tab" onclick="aba('pdi',this)">PDI</button>
+<div class="nav-tabs">
+<button class="nav-tab active" onclick="aba('membros',this)">Membros</button>
+<button class="nav-tab" onclick="aba('niveis',this)">Niveis</button>
+<button class="nav-tab" onclick="aba('equipes',this)">Equipes</button>
+<button class="nav-tab" onclick="aba('indicadores',this)">Indicadores</button>
+<button class="nav-tab" onclick="aba('competencias',this)">Competencias</button>
+<button class="nav-tab" onclick="aba('vinculos',this)">Vinculos</button>
 </div>
-<div id="equipe" class="section active">
+<!-- ===== ABA MEMBROS ===== -->
+<div id="membros" class="section active">
 <div class="card">
 <h2>Adicionar Membro</h2>
 <div class="form-row">
@@ -68,22 +78,11 @@ tr:hover td{background:#f8fafc}
 <div><label>Nome</label><input type="text" id="novoNome" placeholder="Nome completo"/></div>
 </div>
 <div class="form-row">
-<div><label>Equipe</label>
-<select id="novaEquipe">
-<option value="Cond21">Cond21</option>
-<option value="GC">GC</option>
-<option value="Ambas">Ambas (Cond21 + GC)</option>
-</select></div>
-<div><label>Nivel / Papel</label>
-<select id="novoPapel">
-<option value="n1">N1 - Suporte Nivel 1</option>
-<option value="n2">N2 - Suporte Nivel 2</option>
-<option value="analista_op">Analista Operacional</option>
-<option value="gestor">Gestor</option>
-</select></div>
+<div><label>Equipe</label><select id="novaEquipe"></select></div>
+<div><label>Nivel / Papel</label><select id="novoPapel"></select></div>
 </div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="adicionarMembro()">Adicionar</button>
-<div class="msg" id="msgEquipe"></div>
+<div class="msg" id="msgMembro"></div>
 </div>
 <div class="card">
 <h2>Membros da Equipe</h2>
@@ -92,107 +91,526 @@ tr:hover td{background:#f8fafc}
 </table>
 </div>
 </div>
-<div id="avaliacoes" class="section">
-<div class="card"><h2>Avaliacoes da Equipe</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+
+<!-- ===== ABA NIVEIS ===== -->
+<div id="niveis" class="section">
+<div class="card">
+<h2>Adicionar Nivel</h2>
+<div class="form-row">
+<div><label>Codigo (ex: n1, rt)</label><input type="text" id="novoNivelCod" placeholder="n1"/></div>
+<div><label>Nome</label><input type="text" id="novoNivelNome" placeholder="N1 - Suporte Nivel 1"/></div>
 </div>
+<div class="form-row">
+<div><label>Descricao (opcional)</label><input type="text" id="novoNivelDesc" placeholder=""/></div>
+<div><label>Ordem</label><input type="number" id="novoNivelOrdem" placeholder="1" min="0"/></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarNivel()">Adicionar</button>
+<div class="msg" id="msgNivel"></div>
+</div>
+<div class="card">
+<h2>Niveis Cadastrados</h2>
+<table><thead><tr><th>Codigo</th><th>Nome</th><th>Ordem</th><th>Acoes</th></tr></thead>
+<tbody id="listaNiveis"><tr><td colspan="4" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<!-- ===== ABA EQUIPES ===== -->
+<div id="equipes" class="section">
+<div class="card">
+<h2>Adicionar Equipe</h2>
+<div class="form-row">
+<div><label>Nome</label><input type="text" id="novaEquipeNome" placeholder="Ex: Cond21"/></div>
+<div><label>Descricao (opcional)</label><input type="text" id="novaEquipeDesc" placeholder=""/></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarEquipe()">Adicionar</button>
+<div class="msg" id="msgEquipe"></div>
+</div>
+<div class="card">
+<h2>Equipes Cadastradas</h2>
+<table><thead><tr><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead>
+<tbody id="listaEquipes"><tr><td colspan="3" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<!-- ===== ABA INDICADORES ===== -->
 <div id="indicadores" class="section">
-<div class="card"><h2>Indicadores Operacionais</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+<div class="card">
+<h2>Adicionar Indicador</h2>
+<div class="form-row">
+<div><label>Nome</label><input type="text" id="novoIndNome" placeholder="Ex: NPS do cliente"/></div>
+<div><label>Unidade</label><input type="text" id="novoIndUnidade" placeholder="%, pts, qtd..."/></div>
 </div>
-<div id="pdi" class="section">
-<div class="card"><h2>Plano de Desenvolvimento</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+<div class="form-row">
+<div><label>Meta Padrao</label><input type="number" id="novoIndMeta" placeholder="70"/></div>
+<div><label>Descricao (opcional)</label><input type="text" id="novoIndDesc" placeholder=""/></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarIndicador()">Adicionar</button>
+<div class="msg" id="msgIndicador"></div>
+</div>
+<div class="card">
+<h2>Indicadores Cadastrados</h2>
+<table><thead><tr><th>Nome</th><th>Meta Padrao</th><th>Unidade</th><th>Ativo</th><th>Acoes</th></tr></thead>
+<tbody id="listaIndicadores"><tr><td colspan="5" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody>
+</table>
 </div>
 </div>
-<div class="modal-overlay" id="modalEditar">
+
+<!-- ===== ABA COMPETENCIAS ===== -->
+<div id="competencias" class="section">
+<div class="card">
+<h2>Adicionar Competencia</h2>
+<div class="form-row">
+<div><label>Codigo (ex: C1)</label><input type="text" id="novaCompCod" placeholder="C1"/></div>
+<div><label>Nome</label><input type="text" id="novaCompNome" placeholder="Comunicacao"/></div>
+</div>
+<div><label>Descricao (opcional)</label><input type="text" id="novaCompDesc" placeholder=""/></div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarCompetencia()">Adicionar</button>
+<div class="msg" id="msgComp"></div>
+</div>
+<div class="card">
+<h2>Competencias Cadastradas</h2>
+<table><thead><tr><th>Codigo</th><th>Nome</th><th>Descricao</th><th>Ativa</th><th>Acoes</th></tr></thead>
+<tbody id="listaComps"><tr><td colspan="5" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody>
+</table>
+</div>
+</div>
+
+<!-- ===== ABA VINCULOS ===== -->
+<div id="vinculos" class="section">
+<div class="card">
+<h2>Vincular Competencia a Nivel</h2>
+<div class="form-row">
+<div><label>Competencia</label><select id="vincCompNivel"></select></div>
+<div><label>Nivel</label><select id="vincNivelSel"></select></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompNivel()">Vincular</button>
+<div class="msg" id="msgVincNivel"></div>
+<div style="margin-top:14px">
+<strong style="font-size:.85rem">Vinculos Nivel existentes:</strong>
+<div id="listaVincNivel" class="chip-list" style="margin-top:8px"></div>
+</div>
+</div>
+<div class="card">
+<h2>Vincular Competencia a Membro especifico</h2>
+<div class="form-row">
+<div><label>Competencia</label><select id="vincCompMembro"></select></div>
+<div><label>Membro</label><select id="vincMembroSel"></select></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompMembro()">Vincular</button>
+<div class="msg" id="msgVincMembro"></div>
+<div style="margin-top:14px">
+<strong style="font-size:.85rem">Vinculos Membro existentes:</strong>
+<div id="listaVincMembro" class="chip-list" style="margin-top:8px"></div>
+</div>
+</div>
+</div>
+  </div>
+<!-- ===== MODALS ===== -->
+<!-- Modal Editar Membro -->
+<div class="modal-overlay" id="modalMembro">
 <div class="modal">
 <h3>Editar Membro</h3>
-<input type="hidden" id="editId"/>
-<label>Nome</label>
-<input type="text" id="editNome"/>
-<label>E-mail</label>
-<input type="email" id="editEmail"/>
-<label>Equipe</label>
-<select id="editEquipe">
-<option value="Cond21">Cond21</option>
-<option value="GC">GC</option>
-<option value="Ambas">Ambas (Cond21 + GC)</option>
-</select>
-<label>Nivel / Papel</label>
-<select id="editPapel">
-<option value="n1">N1 - Suporte Nivel 1</option>
-<option value="n2">N2 - Suporte Nivel 2</option>
-<option value="analista_op">Analista Operacional</option>
-<option value="gestor">Gestor</option>
-</select>
+<input type="hidden" id="editMembroId"/>
+<label>Nome</label><input type="text" id="editMembroNome"/>
+<label>E-mail</label><input type="email" id="editMembroEmail"/>
+<label>Equipe</label><select id="editMembroEquipe"></select>
+<label>Nivel / Papel</label><select id="editMembroPapel"></select>
 <div class="modal-footer">
-<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal()">Cancelar</button>
-<button class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalMembro')">Cancelar</button>
+<button class="btn btn-primary" onclick="salvarMembro()">Salvar</button>
 </div>
-<div class="msg" id="msgEditar"></div>
+<div class="msg" id="msgEditMembro"></div>
+</div>
+</div>
+
+<!-- Modal Editar Nivel -->
+<div class="modal-overlay" id="modalNivel">
+<div class="modal">
+<h3>Editar Nivel</h3>
+<input type="hidden" id="editNivelId"/>
+<label>Codigo</label><input type="text" id="editNivelCod"/>
+<label>Nome</label><input type="text" id="editNivelNome"/>
+<label>Descricao</label><input type="text" id="editNivelDesc"/>
+<label>Ordem</label><input type="number" id="editNivelOrdem"/>
+<div class="modal-footer">
+<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalNivel')">Cancelar</button>
+<button class="btn btn-primary" onclick="salvarNivel()">Salvar</button>
+</div>
+<div class="msg" id="msgEditNivel"></div>
+</div>
+</div>
+
+<!-- Modal Editar Equipe -->
+<div class="modal-overlay" id="modalEquipe">
+<div class="modal">
+<h3>Editar Equipe</h3>
+<input type="hidden" id="editEquipeId"/>
+<label>Nome</label><input type="text" id="editEquipeNome"/>
+<label>Descricao</label><input type="text" id="editEquipeDesc"/>
+<div class="modal-footer">
+<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalEquipe')">Cancelar</button>
+<button class="btn btn-primary" onclick="salvarEquipe()">Salvar</button>
+</div>
+<div class="msg" id="msgEditEquipe"></div>
+</div>
+</div>
+
+<!-- Modal Editar Indicador -->
+<div class="modal-overlay" id="modalIndicador">
+<div class="modal">
+<h3>Editar Indicador</h3>
+<input type="hidden" id="editIndId"/>
+<label>Nome</label><input type="text" id="editIndNome"/>
+<label>Meta Padrao</label><input type="number" id="editIndMeta"/>
+<label>Unidade</label><input type="text" id="editIndUnidade"/>
+<label>Descricao</label><input type="text" id="editIndDesc"/>
+<label>Ativo</label><select id="editIndAtivo"><option value="true">Sim</option><option value="false">Nao</option></select>
+<div class="modal-footer">
+<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalIndicador')">Cancelar</button>
+<button class="btn btn-primary" onclick="salvarIndicador()">Salvar</button>
+</div>
+<div class="msg" id="msgEditInd"></div>
+</div>
+</div>
+
+<!-- Modal Editar Competencia -->
+<div class="modal-overlay" id="modalComp">
+<div class="modal">
+<h3>Editar Competencia</h3>
+<input type="hidden" id="editCompId"/>
+<label>Codigo</label><input type="text" id="editCompCod"/>
+<label>Nome</label><input type="text" id="editCompNome"/>
+<label>Descricao</label><input type="text" id="editCompDesc"/>
+<label>Ativa</label><select id="editCompAtiva"><option value="true">Sim</option><option value="false">Nao</option></select>
+<div class="modal-footer">
+<button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalComp')">Cancelar</button>
+<button class="btn btn-primary" onclick="salvarComp()">Salvar</button>
+</div>
+<div class="msg" id="msgEditComp"></div>
 </div>
 </div>
 <script>
 const SURL='https://zsfysyphhpsajxbkwywk.supabase.co';
 const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
 const sb=supabase.createClient(SURL,SKEY);
-let membrosCache={};
-function showMsg(id,txt,tipo){const m=document.getElementById(id);m.textContent=txt;m.className='msg '+tipo;}
-function aba(nome,el){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(nome).classList.add('active');el.classList.add('active');}
-function badgePapel(p){const l={gestor:'Gestor',n1:'N1',n2:'N2',analista_op:'Analista Op.'};return '<span class="badge badge-'+p+'">'+(l[p]||p)+'</span>';}
+let membrosCache={},niveisCache={},equipesCache={},indicadoresCache={},compsCache={};
+
+function showMsg(id,txt,tipo){const m=document.getElementById(id);if(!m)return;m.textContent=txt;m.className='msg '+tipo;}
+function aba(nome,el){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(nome).classList.add('active');el.classList.add('active');}
+function fecharModal(id){document.getElementById(id).classList.remove('open');}
+function abrirModal(id){document.getElementById(id).classList.add('open');}
+
+function badgePapel(p){const l={gestor:'Gestor',n1:'N1',n2:'N2',n3:'N3',rt:'RT',analista_op:'Analista Op.'};return '<span class="badge badge-'+p+'">'+(l[p]||p)+'</span>';}
+
+function preencherSelectEquipes(selId,extra){
+const sel=document.getElementById(selId);if(!sel)return;
+sel.innerHTML='';
+if(extra){extra.forEach(e=>{const o=document.createElement('option');o.value=e.v;o.textContent=e.t;sel.appendChild(o);});}
+Object.values(equipesCache).forEach(e=>{const o=document.createElement('option');o.value=e.nome;o.textContent=e.nome;sel.appendChild(o);});
+}
+function preencherSelectNiveis(selId){
+const sel=document.getElementById(selId);if(!sel)return;
+sel.innerHTML='';
+Object.values(niveisCache).sort((a,b)=>a.ordem-b.ordem).forEach(n=>{const o=document.createElement('option');o.value=n.codigo;o.textContent=n.nome;sel.appendChild(o);});
+}
+
+/* ===== MEMBROS ===== */
 async function carregarEquipe(){
-  const{data,error}=await sb.from('perfis').select('*').order('nome');
-  if(error)return;
-  membrosCache={};
-  const tb=document.getElementById('listaEquipe');
-  if(!data||!data.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}
-  data.forEach(m=>{membrosCache[m.id]=m;});
-  tb.innerHTML=data.map(m=>'<tr><td><strong>'+(m.nome||m.email)+'</strong><br><small style="color:#64748b">'+m.email+'</small></td><td>'+(m.equipe||'&mdash;')+'</td><td>'+badgePapel(m.papel)+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+m.id+'" onclick="abrirEdicaoPorId(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+m.id+'" onclick="removerMembro(this.dataset.id)">Remover</button></div></td></tr>').join('');
+const{data,error}=await sb.from('perfis').select('*').order('nome');
+if(error)return;
+membrosCache={};
+if(!data||!data.length){document.getElementById('listaEquipe').innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}
+data.forEach(m=>{membrosCache[m.id]=m;});
+document.getElementById('listaEquipe').innerHTML=data.map(m=>'<tr><td><strong>'+(m.nome||m.email)+'</strong><br><small style="color:#64748b">'+m.email+'</small></td><td>'+(m.equipe||'&mdash;')+'</td><td>'+badgePapel(m.papel)+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+m.id+'" onclick="abrirEditarMembro(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+m.id+'" onclick="removerMembro(this.dataset.id)">Remover</button></div></td></tr>').join('');
 }
 async function adicionarMembro(){
-  const email=document.getElementById('novoEmail').value.trim();
-  const nome=document.getElementById('novoNome').value.trim();
-  const equipe=document.getElementById('novaEquipe').value;
-  const papel=document.getElementById('novoPapel').value;
-  if(!email||!nome){showMsg('msgEquipe','Preencha e-mail e nome.','err');return;}
-  const{error}=await sb.from('perfis').upsert({email,nome,equipe,papel},{onConflict:'email'});
-  if(error){showMsg('msgEquipe','Erro: '+error.message,'err');}
-  else{showMsg('msgEquipe','Membro adicionado! Peca para ele criar conta com este e-mail.','ok');carregarEquipe();document.getElementById('novoEmail').value='';document.getElementById('novoNome').value='';}
+const email=document.getElementById('novoEmail').value.trim();
+const nome=document.getElementById('novoNome').value.trim();
+const equipe=document.getElementById('novaEquipe').value;
+const papel=document.getElementById('novoPapel').value;
+if(!email||!nome){showMsg('msgMembro','Preencha e-mail e nome.','err');return;}
+const{error}=await sb.from('perfis').upsert({email,nome,equipe,papel},{onConflict:'email'});
+if(error){showMsg('msgMembro','Erro: '+error.message,'err');}
+else{showMsg('msgMembro','Membro adicionado! Peca para ele criar conta com este e-mail.','ok');carregarEquipe();document.getElementById('novoEmail').value='';document.getElementById('novoNome').value='';}
 }
-function abrirEdicaoPorId(id){
-  const m=membrosCache[id];
-  if(!m)return;
-  document.getElementById('editId').value=m.id;
-  document.getElementById('editNome').value=m.nome||'';
-  document.getElementById('editEmail').value=m.email||'';
-  document.getElementById('editEquipe').value=m.equipe||'Cond21';
-  document.getElementById('editPapel').value=m.papel||'n1';
-  document.getElementById('msgEditar').className='msg';
-  document.getElementById('modalEditar').classList.add('open');
+function abrirEditarMembro(id){
+const m=membrosCache[id];if(!m)return;
+document.getElementById('editMembroId').value=m.id;
+document.getElementById('editMembroNome').value=m.nome||'';
+document.getElementById('editMembroEmail').value=m.email||'';
+preencherSelectEquipes('editMembroEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);
+document.getElementById('editMembroEquipe').value=m.equipe||'';
+preencherSelectNiveis('editMembroPapel');
+document.getElementById('editMembroPapel').value=m.papel||'n1';
+document.getElementById('msgEditMembro').className='msg';
+abrirModal('modalMembro');
 }
-function fecharModal(){document.getElementById('modalEditar').classList.remove('open');}
-async function salvarEdicao(){
-  const id=document.getElementById('editId').value;
-  const nome=document.getElementById('editNome').value.trim();
-  const email=document.getElementById('editEmail').value.trim();
-  const equipe=document.getElementById('editEquipe').value;
-  const papel=document.getElementById('editPapel').value;
-  if(!email||!nome){showMsg('msgEditar','Preencha todos os campos.','err');return;}
-  const{error}=await sb.from('perfis').update({nome,email,equipe,papel}).eq('id',id);
-  if(error){showMsg('msgEditar','Erro: '+error.message,'err');}
-  else{fecharModal();carregarEquipe();}
+async function salvarMembro(){
+const id=document.getElementById('editMembroId').value;
+const nome=document.getElementById('editMembroNome').value.trim();
+const email=document.getElementById('editMembroEmail').value.trim();
+const equipe=document.getElementById('editMembroEquipe').value;
+const papel=document.getElementById('editMembroPapel').value;
+if(!email||!nome){showMsg('msgEditMembro','Preencha todos os campos.','err');return;}
+const{error}=await sb.from('perfis').update({nome,email,equipe,papel}).eq('id',id);
+if(error){showMsg('msgEditMembro','Erro: '+error.message,'err');}
+else{fecharModal('modalMembro');carregarEquipe();}
 }
 async function removerMembro(id){
-  if(!confirm('Remover este membro?'))return;
-  const{error}=await sb.from('perfis').delete().eq('id',id);
-  if(error)alert('Erro ao remover: '+error.message);
-  else carregarEquipe();
+if(!confirm('Remover este membro?'))return;
+const{error}=await sb.from('perfis').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarEquipe();
 }
+
+/* ===== NIVEIS ===== */
+async function carregarNiveis(){
+const{data,error}=await sb.from('niveis').select('*').order('ordem');
+if(error)return;
+niveisCache={};
+if(!data||!data.length){document.getElementById('listaNiveis').innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum nivel</td></tr>';return;}
+data.forEach(n=>{niveisCache[n.id]=n;});
+document.getElementById('listaNiveis').innerHTML=data.map(n=>'<tr><td><span class="badge badge-'+n.codigo+'">'+n.codigo+'</span></td><td>'+n.nome+'</td><td>'+n.ordem+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+n.id+'" onclick="abrirEditarNivel(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+n.id+'" onclick="removerNivel(this.dataset.id)">Excluir</button></div></td></tr>').join('');
+preencherSelectNiveis('novoPapel');preencherSelectNiveis('editMembroPapel');preencherSelectNiveis('vincNivelSel');
+}
+async function adicionarNivel(){
+const codigo=document.getElementById('novoNivelCod').value.trim();
+const nome=document.getElementById('novoNivelNome').value.trim();
+const descricao=document.getElementById('novoNivelDesc').value.trim();
+const ordem=parseInt(document.getElementById('novoNivelOrdem').value)||0;
+if(!codigo||!nome){showMsg('msgNivel','Preencha codigo e nome.','err');return;}
+const{error}=await sb.from('niveis').insert({codigo,nome,descricao,ordem});
+if(error){showMsg('msgNivel','Erro: '+error.message,'err');}
+else{showMsg('msgNivel','Nivel adicionado!','ok');carregarNiveis();document.getElementById('novoNivelCod').value='';document.getElementById('novoNivelNome').value='';document.getElementById('novoNivelDesc').value='';document.getElementById('novoNivelOrdem').value='';}
+}
+function abrirEditarNivel(id){
+const n=niveisCache[id];if(!n)return;
+document.getElementById('editNivelId').value=n.id;
+document.getElementById('editNivelCod').value=n.codigo||'';
+document.getElementById('editNivelNome').value=n.nome||'';
+document.getElementById('editNivelDesc').value=n.descricao||'';
+document.getElementById('editNivelOrdem').value=n.ordem||0;
+document.getElementById('msgEditNivel').className='msg';
+abrirModal('modalNivel');
+}
+async function salvarNivel(){
+const id=document.getElementById('editNivelId').value;
+const codigo=document.getElementById('editNivelCod').value.trim();
+const nome=document.getElementById('editNivelNome').value.trim();
+const descricao=document.getElementById('editNivelDesc').value.trim();
+const ordem=parseInt(document.getElementById('editNivelOrdem').value)||0;
+if(!codigo||!nome){showMsg('msgEditNivel','Preencha todos os campos.','err');return;}
+const{error}=await sb.from('niveis').update({codigo,nome,descricao,ordem}).eq('id',id);
+if(error){showMsg('msgEditNivel','Erro: '+error.message,'err');}
+else{fecharModal('modalNivel');carregarNiveis();}
+}
+async function removerNivel(id){
+if(!confirm('Excluir este nivel?'))return;
+const{error}=await sb.from('niveis').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarNiveis();
+}
+
+/* ===== EQUIPES ===== */
+async function carregarEquipes(){
+const{data,error}=await sb.from('equipes').select('*').order('nome');
+if(error)return;
+equipesCache={};
+if(!data||!data.length){document.getElementById('listaEquipes').innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhuma equipe</td></tr>';return;}
+data.forEach(e=>{equipesCache[e.id]=e;});
+document.getElementById('listaEquipes').innerHTML=data.map(e=>'<tr><td>'+e.nome+'</td><td>'+(e.descricao||'&mdash;')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+e.id+'" onclick="abrirEditarEquipe(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+e.id+'" onclick="removerEquipe(this.dataset.id)">Excluir</button></div></td></tr>').join('');
+preencherSelectEquipes('novaEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);
+preencherSelectEquipes('editMembroEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);
+}
+async function adicionarEquipe(){
+const nome=document.getElementById('novaEquipeNome').value.trim();
+const descricao=document.getElementById('novaEquipeDesc').value.trim();
+if(!nome){showMsg('msgEquipe','Preencha o nome.','err');return;}
+const{error}=await sb.from('equipes').insert({nome,descricao});
+if(error){showMsg('msgEquipe','Erro: '+error.message,'err');}
+else{showMsg('msgEquipe','Equipe adicionada!','ok');carregarEquipes();document.getElementById('novaEquipeNome').value='';document.getElementById('novaEquipeDesc').value='';}
+}
+function abrirEditarEquipe(id){
+const e=equipesCache[id];if(!e)return;
+document.getElementById('editEquipeId').value=e.id;
+document.getElementById('editEquipeNome').value=e.nome||'';
+document.getElementById('editEquipeDesc').value=e.descricao||'';
+document.getElementById('msgEditEquipe').className='msg';
+abrirModal('modalEquipe');
+}
+async function salvarEquipe(){
+const id=document.getElementById('editEquipeId').value;
+const nome=document.getElementById('editEquipeNome').value.trim();
+const descricao=document.getElementById('editEquipeDesc').value.trim();
+if(!nome){showMsg('msgEditEquipe','Preencha o nome.','err');return;}
+const{error}=await sb.from('equipes').update({nome,descricao}).eq('id',id);
+if(error){showMsg('msgEditEquipe','Erro: '+error.message,'err');}
+else{fecharModal('modalEquipe');carregarEquipes();}
+}
+async function removerEquipe(id){
+if(!confirm('Excluir esta equipe?'))return;
+const{error}=await sb.from('equipes').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarEquipes();
+}
+
+/* ===== INDICADORES ===== */
+async function carregarIndicadores(){
+const{data,error}=await sb.from('tipos_indicadores').select('*').order('nome');
+if(error)return;
+indicadoresCache={};
+if(!data||!data.length){document.getElementById('listaIndicadores').innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum indicador</td></tr>';return;}
+data.forEach(i=>{indicadoresCache[i.id]=i;});
+document.getElementById('listaIndicadores').innerHTML=data.map(i=>'<tr><td>'+i.nome+'</td><td>'+(i.meta_padrao??'&mdash;')+'</td><td>'+(i.unidade||'&mdash;')+'</td><td>'+(i.ativo?'<span style="color:#16a34a">Sim</span>':'<span style="color:#dc2626">Nao</span>')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+i.id+'" onclick="abrirEditarIndicador(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+i.id+'" onclick="removerIndicador(this.dataset.id)">Excluir</button></div></td></tr>').join('');
+}
+async function adicionarIndicador(){
+const nome=document.getElementById('novoIndNome').value.trim();
+const unidade=document.getElementById('novoIndUnidade').value.trim();
+const meta_padrao=parseFloat(document.getElementById('novoIndMeta').value)||null;
+const descricao=document.getElementById('novoIndDesc').value.trim();
+if(!nome){showMsg('msgIndicador','Preencha o nome.','err');return;}
+const{error}=await sb.from('tipos_indicadores').insert({nome,unidade,meta_padrao,descricao});
+if(error){showMsg('msgIndicador','Erro: '+error.message,'err');}
+else{showMsg('msgIndicador','Indicador adicionado!','ok');carregarIndicadores();document.getElementById('novoIndNome').value='';document.getElementById('novoIndUnidade').value='';document.getElementById('novoIndMeta').value='';document.getElementById('novoIndDesc').value='';}
+}
+function abrirEditarIndicador(id){
+const i=indicadoresCache[id];if(!i)return;
+document.getElementById('editIndId').value=i.id;
+document.getElementById('editIndNome').value=i.nome||'';
+document.getElementById('editIndMeta').value=i.meta_padrao??'';
+document.getElementById('editIndUnidade').value=i.unidade||'';
+document.getElementById('editIndDesc').value=i.descricao||'';
+document.getElementById('editIndAtivo').value=String(i.ativo);
+document.getElementById('msgEditInd').className='msg';
+abrirModal('modalIndicador');
+}
+async function salvarIndicador(){
+const id=document.getElementById('editIndId').value;
+const nome=document.getElementById('editIndNome').value.trim();
+const meta_padrao=parseFloat(document.getElementById('editIndMeta').value)||null;
+const unidade=document.getElementById('editIndUnidade').value.trim();
+const descricao=document.getElementById('editIndDesc').value.trim();
+const ativo=document.getElementById('editIndAtivo').value==='true';
+if(!nome){showMsg('msgEditInd','Preencha o nome.','err');return;}
+const{error}=await sb.from('tipos_indicadores').update({nome,meta_padrao,unidade,descricao,ativo}).eq('id',id);
+if(error){showMsg('msgEditInd','Erro: '+error.message,'err');}
+else{fecharModal('modalIndicador');carregarIndicadores();}
+}
+async function removerIndicador(id){
+if(!confirm('Excluir este indicador?'))return;
+const{error}=await sb.from('tipos_indicadores').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarIndicadores();
+}
+
+/* ===== COMPETENCIAS ===== */
+async function carregarCompetencias(){
+const{data,error}=await sb.from('competencias').select('*').order('codigo');
+if(error)return;
+compsCache={};
+if(!data||!data.length){document.getElementById('listaComps').innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhuma competencia</td></tr>';return;}
+data.forEach(c=>{compsCache[c.id]=c;});
+document.getElementById('listaComps').innerHTML=data.map(c=>'<tr><td><strong>'+c.codigo+'</strong></td><td>'+c.nome+'</td><td>'+(c.descricao||'&mdash;')+'</td><td>'+(c.ativa?'<span style="color:#16a34a">Sim</span>':'<span style="color:#dc2626">Nao</span>')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+c.id+'" onclick="abrirEditarComp(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+c.id+'" onclick="removerComp(this.dataset.id)">Excluir</button></div></td></tr>').join('');
+preencherSelectComps();
+}
+function preencherSelectComps(){
+['vincCompNivel','vincCompMembro'].forEach(selId=>{
+const sel=document.getElementById(selId);if(!sel)return;
+sel.innerHTML='<option value="">Selecione...</option>';
+Object.values(compsCache).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.codigo+' - '+c.nome;sel.appendChild(o);});
+});
+}
+async function adicionarCompetencia(){
+const codigo=document.getElementById('novaCompCod').value.trim().toUpperCase();
+const nome=document.getElementById('novaCompNome').value.trim();
+const descricao=document.getElementById('novaCompDesc').value.trim();
+if(!codigo||!nome){showMsg('msgComp','Preencha codigo e nome.','err');return;}
+const{error}=await sb.from('competencias').insert({codigo,nome,descricao});
+if(error){showMsg('msgComp','Erro: '+error.message,'err');}
+else{showMsg('msgComp','Competencia adicionada!','ok');carregarCompetencias();document.getElementById('novaCompCod').value='';document.getElementById('novaCompNome').value='';document.getElementById('novaCompDesc').value='';}
+}
+function abrirEditarComp(id){
+const c=compsCache[id];if(!c)return;
+document.getElementById('editCompId').value=c.id;
+document.getElementById('editCompCod').value=c.codigo||'';
+document.getElementById('editCompNome').value=c.nome||'';
+document.getElementById('editCompDesc').value=c.descricao||'';
+document.getElementById('editCompAtiva').value=String(c.ativa);
+document.getElementById('msgEditComp').className='msg';
+abrirModal('modalComp');
+}
+async function salvarComp(){
+const id=document.getElementById('editCompId').value;
+const codigo=document.getElementById('editCompCod').value.trim().toUpperCase();
+const nome=document.getElementById('editCompNome').value.trim();
+const descricao=document.getElementById('editCompDesc').value.trim();
+const ativa=document.getElementById('editCompAtiva').value==='true';
+if(!codigo||!nome){showMsg('msgEditComp','Preencha codigo e nome.','err');return;}
+const{error}=await sb.from('competencias').update({codigo,nome,descricao,ativa}).eq('id',id);
+if(error){showMsg('msgEditComp','Erro: '+error.message,'err');}
+else{fecharModal('modalComp');carregarCompetencias();}
+}
+async function removerComp(id){
+if(!confirm('Excluir esta competencia?'))return;
+const{error}=await sb.from('competencias').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarCompetencias();
+}
+
+/* ===== VINCULOS ===== */
+async function carregarVinculos(){
+const[rn,rm]=await Promise.all([
+sb.from('competencias_niveis').select('id,competencia_id,nivel_codigo,competencias(codigo,nome)'),
+sb.from('competencias_membros').select('id,competencia_id,perfil_id,competencias(codigo,nome),perfis(nome,email)')
+]);
+const lvn=document.getElementById('listaVincNivel');
+const lvm=document.getElementById('listaVincMembro');
+if(rn.data&&rn.data.length){
+lvn.innerHTML=rn.data.map(v=>'<div class="chip">'+v.competencias.codigo+' - '+v.nivel_codigo+'<button onclick="removerVincNivel(''+v.id+'')" title="Desvincular">&times;</button></div>').join('');
+}else{lvn.innerHTML='<small style="color:#94a3b8">Nenhum vinculo de nivel.</small>';}
+if(rm.data&&rm.data.length){
+lvm.innerHTML=rm.data.map(v=>'<div class="chip">'+v.competencias.codigo+' - '+(v.perfis.nome||v.perfis.email)+'<button onclick="removerVincMembro(''+v.id+'')" title="Desvincular">&times;</button></div>').join('');
+}else{lvm.innerHTML='<small style="color:#94a3b8">Nenhum vinculo de membro.</small>';}
+const selM=document.getElementById('vincMembroSel');
+selM.innerHTML='<option value="">Selecione...</option>';
+Object.values(membrosCache).forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=(m.nome||m.email);selM.appendChild(o);});
+}
+async function vincularCompNivel(){
+const competencia_id=document.getElementById('vincCompNivel').value;
+const nivel_codigo=document.getElementById('vincNivelSel').value;
+if(!competencia_id||!nivel_codigo){showMsg('msgVincNivel','Selecione competencia e nivel.','err');return;}
+const{error}=await sb.from('competencias_niveis').insert({competencia_id,nivel_codigo});
+if(error){showMsg('msgVincNivel','Erro: '+error.message,'err');}
+else{showMsg('msgVincNivel','Vinculado!','ok');carregarVinculos();}
+}
+async function removerVincNivel(id){
+if(!confirm('Desvincular?'))return;
+const{error}=await sb.from('competencias_niveis').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarVinculos();
+}
+async function vincularCompMembro(){
+const competencia_id=document.getElementById('vincCompMembro').value;
+const perfil_id=document.getElementById('vincMembroSel').value;
+if(!competencia_id||!perfil_id){showMsg('msgVincMembro','Selecione competencia e membro.','err');return;}
+const{error}=await sb.from('competencias_membros').insert({competencia_id,perfil_id});
+if(error){showMsg('msgVincMembro','Erro: '+error.message,'err');}
+else{showMsg('msgVincMembro','Vinculado!','ok');carregarVinculos();}
+}
+async function removerVincMembro(id){
+if(!confirm('Desvincular?'))return;
+const{error}=await sb.from('competencias_membros').delete().eq('id',id);
+if(error)alert('Erro: '+error.message);else carregarVinculos();
+}
+
 async function sair(){await sb.auth.signOut();location.href='index.html';}
+
 async function init(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session){location.href='index.html';return;}
-  carregarEquipe();
+const{data:{session}}=await sb.auth.getSession();
+if(!session){location.href='index.html';return;}
+await Promise.all([carregarEquipes(),carregarNiveis()]);
+await carregarEquipe();
+await carregarIndicadores();
+await carregarCompetencias();
+await carregarVinculos();
 }
 init();
 </script>
 </body>
-                                                                                                        </html>
+</html>
