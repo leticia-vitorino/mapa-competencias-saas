@@ -1,20 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Competencias SaaS</title>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Competencias SaaS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Segoe UI',sans-serif;background:#f1f5f9;display:flex;justify-content:center;align-items:center;min-height:100vh;}.box{background:#fff;border-radius:12px;padding:40px;width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.10);}.box h1{color:#2563eb;margin-bottom:8px;font-size:1.4rem;}.box p{color:#64748b;margin-bottom:24px;font-size:.95rem;}label{display:block;font-size:.85rem;color:#374151;margin-bottom:4px;margin-top:14px;}input{width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:.95rem;outline:none;}input:focus{border-color:#2563eb;}button{width:100%;padding:11px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;margin-top:20px;font-weight:600;}button:hover{background:#1d4ed8;}.toggle{text-align:center;margin-top:16px;font-size:.9rem;color:#64748b;}.toggle a{color:#2563eb;cursor:pointer;text-decoration:underline;}.erro{color:#dc2626;font-size:.85rem;margin-top:10px;display:none;text-align:center;}.msg{color:#16a34a;font-size:.85rem;margin-top:10px;display:none;text-align:center;}</style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f1f5f9;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:40px;width:100%;max-width:380px}
+h1{color:#2563eb;font-size:1.5rem;margin-bottom:6px}
+p{color:#64748b;font-size:.9rem;margin-bottom:24px}
+label{display:block;font-size:.85rem;color:#374151;margin-bottom:4px;margin-top:14px}
+input{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:.95rem;outline:none}
+input:focus{border-color:#2563eb}
+.btn{width:100%;padding:11px;background:#2563eb;color:#fff;font-weight:600;border:none;border-radius:7px;cursor:pointer;margin-top:20px;font-size:.95rem}
+.btn:hover{background:#1d4ed8}
+.msg{margin-top:14px;padding:10px;border-radius:7px;font-size:.85rem;display:none}
+.msg.ok{background:#d1fae5;color:#065f46;display:block}
+.msg.err{background:#fee2e2;color:#991b1b;display:block}
+.toggle{text-align:center;margin-top:16px;font-size:.85rem;color:#64748b;cursor:pointer}
+.toggle b{color:#2563eb}
+.loading{text-align:center;color:#64748b;padding:20px}
+</style>
 </head>
 <body>
-<div class="box"><h1>Competencias SaaS</h1><p id="subtitulo">Entre com seu e-mail e senha.</p><label>E-mail</label><input type="email" id="email" placeholder="seu@email.com"/><label>Senha</label><input type="password" id="senha"/>
-<button id="btnAcao" onclick="acao()">Entrar</button>
-<div class="erro" id="erro"></div><div class="msg" id="msg"></div>
-<div class="toggle"><a onclick="alternarModo()">Não tem conta? <b>Criar conta</b></a></div></div>
+<div class="card">
+<div class="loading" id="loading">Carregando...</div>
+<div id="formArea" style="display:none">
+<h1>Competencias SaaS</h1>
+<p id="subtitle">Entre com seu e-mail e senha.</p>
+<label>E-mail</label>
+<input type="email" id="email" placeholder="seu@email.com"/>
+<label>Senha</label>
+<input type="password" id="senha" placeholder=""/>
+<label id="nomeLabel" style="display:none">Nome completo</label>
+<input type="text" id="nome" placeholder="Seu nome" style="display:none"/>
+<button class="btn" onclick="acao()" id="btnAcao">Entrar</button>
+<div class="msg" id="msg"></div>
+<div class="toggle"><a onclick="alternarModo()">Nao tem conta? <b>Criar conta</b></a></div>
+</div>
+</div>
 <script>
-const sb=supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
-let modo='login';
-function alternarModo(){modo=modo==='login'?'cadastro':'login';document.getElementById('subtitulo').textContent=modo==='login'?'Entre com seu e-mail e senha.':'Crie sua conta com e-mail e senha.';document.getElementById('btnAcao').textContent=modo==='login'?'Entrar':'Criar conta';document.querySelector('.toggle a').innerHTML=modo==='login'?'Não tem conta? <b>Criar conta</b>':'Já tem conta? <b>Entrar</b>';document.getElementById('erro').style.display='none';document.getElementById('msg').style.display='none';}
-function redirecionar(papel){if(papel==='gestor')location.href='gestor-painel.html';else if(papel==='analista')location.href='analista-indicadores.html';else location.href='colaborador-autoavaliacao.html';}
-async function acao(){const e=document.getElementById('email').value.trim(),s=document.getElementById('senha').value,er=document.getElementById('erro'),ms=document.getElementById('msg');er.style.display='none';ms.style.display='none';if(!e||!s){er.textContent='Preencha e-mail e senha.';er.style.display='block';return;}if(modo==='cadastro'){const{error}=await sb.auth.signUp({email:e,password:s});if(error){er.textContent=error.message;er.style.display='block';}else{ms.textContent='Conta criada! Verifique seu e-mail para confirmar, depois faça login.';ms.style.display='block';alternarModo();}}else{const{error}=await sb.auth.signInWithPassword({email:e,password:s});if(error){er.textContent='E-mail ou senha inválidos.';er.style.display='block';return;}const{data:{session}}=await sb.auth.getSession();if(session){const{data:p}=await sb.from('perfis').select('papel').eq('id',session.user.id).single();redirecionar(p?.papel);}}}
-document.addEventListener('keydown',e=>{if(e.key==='Enter')acao();});
-(async()=>{const{data:{session}}=await sb.auth.getSession();if(session){const{data:p}=await sb.from('perfis').select('papel').eq('id',session.user.id).single();redirecionar(p?.papel);}})();
-</script></body></html>
+const SURL='https://zsfysyphhpsajxbkwywk.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
+const sb=supabase.createClient(SURL,SKEY);
+let modoLogin=true;
+
+function showMsg(t,c){const m=document.getElementById('msg');m.textContent=t;m.className='msg '+c;}
+
+function redirecionar(papel){
+  if(papel==='gestor') location.href='gestor-painel.html';
+  else if(papel==='analista_op') location.href='analista-indicadores.html';
+  else location.href='colaborador-autoavaliacao.html';
+}
+
+async function verificarSessao(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    const{data:p}=await sb.from('perfis').select('papel').eq('id',session.user.id).single();
+    if(p) redirecionar(p.papel);
+    else redirecionar('n1');
+    return true;
+  }
+  return false;
+}
+
+async function init(){
+  sb.auth.onAuthStateChange(async(event,session)=>{
+    if(session&&(event==='SIGNED_IN'||event==='TOKEN_REFRESHED')){
+      const{data:p}=await sb.from('perfis').select('papel').eq('id',session.user.id).single();
+      if(p) redirecionar(p.papel);
+      else redirecionar('n1');
+    }
+  });
+  const logado=await verificarSessao();
+  if(!logado){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('formArea').style.display='block';
+  }
+}
+
+function alternarModo(){
+  modoLogin=!modoLogin;
+  const sub=document.getElementById('subtitle');
+  const btn=document.getElementById('btnAcao');
+  const nomeLabel=document.getElementById('nomeLabel');
+  const nomeInput=document.getElementById('nome');
+  const toggle=document.querySelector('.toggle a');
+  if(!modoLogin){
+    sub.textContent='Crie sua conta com o e-mail cadastrado pelo gestor.';
+    btn.textContent='Criar conta';
+    nomeLabel.style.display='block';
+    nomeInput.style.display='block';
+    toggle.innerHTML='Ja tem conta? <b>Entrar</b>';
+  } else {
+    sub.textContent='Entre com seu e-mail e senha.';
+    btn.textContent='Entrar';
+    nomeLabel.style.display='none';
+    nomeInput.style.display='none';
+    toggle.innerHTML='Nao tem conta? <b>Criar conta</b>';
+  }
+}
+
+async function acao(){
+  const email=document.getElementById('email').value.trim();
+  const senha=document.getElementById('senha').value;
+  if(!email||!senha){showMsg('Preencha e-mail e senha.','err');return;}
+  document.getElementById('btnAcao').disabled=true;
+  if(modoLogin){
+    const{data,error}=await sb.auth.signInWithPassword({email,password:senha});
+    if(error){showMsg('Erro: '+error.message,'err');}
+    else{const{data:p}=await sb.from('perfis').select('papel').eq('id',data.user.id).single();redirecionar(p?p.papel:'n1');}
+  } else {
+    const nome=document.getElementById('nome').value.trim();
+    const{data,error}=await sb.auth.signUp({email,password:senha,options:{data:{nome},emailRedirectTo:'https://leticia-vitorino.github.io/mapa-competencias-saas/'}});
+    if(error){showMsg('Erro: '+error.message,'err');}
+    else{showMsg('Conta criada! Faca login com seu e-mail e senha.','ok');}
+  }
+  document.getElementById('btnAcao').disabled=false;
+}
+init();
+</script>
+</body>
+</html>
