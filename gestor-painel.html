@@ -130,7 +130,6 @@ function gS(mid,cid){var s=S.scores[mid]||{};return s[cid]!==undefined?s[cid]:nu
 function gAS(mid,cid){var s=S.autoScores[mid]||{};return s[cid]!==undefined?s[cid]:null;}
 function gA(mid,cid){var m=S.membros.find(function(x){return x.id===mid;});if(!m)return 3;var nk=NM[m.nivel_codigo]||'N1';return parseInt((FAIXAS[nk]||'1-3').split('-')[1])||3;}
 function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' error':'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
-async 
 async function loadKpis(){
 S.kpis={};
 var r=await sb.from('historico_matrix').select('*').eq('gestor_id',S.user.id).lt('comp',0);
@@ -228,7 +227,7 @@ renderSidebar();
 renderConfig();
 toast('Colaborador atualizado!');
 }
-function fazerLogin(){var e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value,errEl=document.getElementById('loginError'),btn=document.getElementById('loginBtn');errEl.className='login-error';btn.textContent='Entrando...';btn.disabled=true;var r=await sb.auth.signInWithPassword({email:e,password:p});btn.textContent='Entrar';btn.disabled=false;if(r.error){errEl.textContent=r.error.message;errEl.className='login-error show';return;}S.user=r.data.user;await init();}
+async function fazerLogin(){var e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value,errEl=document.getElementById('loginError'),btn=document.getElementById('loginBtn');errEl.className='login-error';btn.textContent='Entrando...';btn.disabled=true;var r=await sb.auth.signInWithPassword({email:e,password:p});btn.textContent='Entrar';btn.disabled=false;if(r.error){errEl.textContent=r.error.message;errEl.className='login-error show';return;}S.user=r.data.user;await init();}
 async function sair(){await sb.auth.signOut();location.reload();}
 async function init(){document.getElementById('loginPage').style.display='none';document.getElementById('appPage').style.display='block';var meta=S.user.user_metadata||{};document.getElementById('topbarUserName').textContent=meta.nome||S.user.email;await Promise.all([loadEquipes(),loadNiveis(),loadMembros()]);await Promise.all([loadScores(),loadAutoScores(),loadPDI(),loadHist(),loadKpis()]);renderSidebar();renderConfig();}
 async function loadEquipes(){var r=await sb.from('equipes').select('*').order('nome');if(r.data)S.equipes=r.data;var fc=document.getElementById('sidebarFilters');fc.innerHTML='<button class="filter-btn active" data-eq="todos" onclick="filterEq(this)">Todos</button>';(r.data||[]).forEach(function(eq){fc.innerHTML+='<button class="filter-btn" data-eq="'+eq.id+'" onclick="filterEq(this)">'+eq.nome+'</button>';});var sel=document.getElementById('addEquipe');sel.innerHTML='<option value="">Equipe</option>';(r.data||[]).forEach(function(eq){sel.innerHTML+='<option value="'+eq.id+'">'+eq.nome+'</option>';});}
