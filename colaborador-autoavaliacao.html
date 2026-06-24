@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Autoavaliacao</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--primary:#2563eb;--bg:#f1f5f9;--card:#fff;--text:#1e293b;--muted:#64748b;--green:#16a34a;--yellow:#d97706;--red:#dc2626;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+header{background:var(--primary);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;}
+header h1{font-size:1.05rem;}
+.btn-out{background:transparent;border:1px solid #fff;color:#fff;padding:5px 12px;font-size:.83rem;cursor:pointer;border-radius:5px;}
+.container{max-width:700px;margin:0 auto;padding:20px 14px;}
+.card{background:var(--card);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px;}
+.card h2{font-size:.83rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;}
+label{display:block;font-size:.83rem;color:var(--muted);margin-bottom:3px;margin-top:9px;}
+input,textarea{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:.88rem;}
+.btn-p{width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:14px;}
+.comp-item{border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;}
+.comp-item h3{font-size:.88rem;margin-bottom:8px;}
+.opts{display:flex;flex-wrap:wrap;gap:6px;}
+.opt{display:flex;align-items:center;gap:4px;cursor:pointer;font-size:.8rem;background:#f8fafc;padding:5px 10px;border-radius:5px;border:1px solid #e2e8f0;color:var(--text);}
+.opt.sel{background:#eff6ff;border-color:var(--primary);color:var(--primary);font-weight:600;}
+.tab-bar{display:flex;gap:2px;margin-bottom:18px;border-bottom:2px solid #e2e8f0;}
+.tab{padding:8px 16px;cursor:pointer;border:none;background:none;font-size:.88rem;color:var(--muted);}
+.tab.active{color:var(--primary);font-weight:600;border-bottom:2px solid var(--primary);margin-bottom:-2px;}
+.sec{display:none;}.sec.active{display:block;}
+.empty{text-align:center;color:var(--muted);padding:28px;font-size:.88rem;}
+.bar{height:7px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-top:3px;}
+.fill{height:100%;border-radius:4px;}
+.fg{background:var(--green);}.fy{background:var(--yellow);}.fr{background:var(--red);}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.76rem;font-weight:600;}
+.bg{background:#dcfce7;color:var(--green);}.by{background:#fef9c3;color:var(--yellow);}.br{background:#fee2e2;color:var(--red);}
+#toast{position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:11px 18px;border-radius:8px;font-size:.88rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Minha Autoavaliacao</h1>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <span id="cNome" style="font-size:.83rem;opacity:.85;"></span>
+    <button class="btn-out" onclick="sair()">Sair</button>
+  </div>
+</header>
+<div class="container">
+  <div class="tab-bar">
+    <button class="tab active" onclick="aba('nova',this)">Nova avaliacao</button>
+    <button class="tab" onclick="aba('historico',this)">Meu historico</button>
+    <button class="tab" onclick="aba('pdi',this)">Meu PDI</button>
+  </div>
+
+  <div id="nova" class="sec active">
+    <div class="card"><h2>Periodo</h2>
+      <input type="month" id="per"/>
+      <p style="font-size:.79rem;color:var(--muted);margin-top:6px;">Avalie cada competencia de 1 a 5. Respostas sao confidenciais para o gestor.</p>
+    </div>
+    <div id="formC"></div>
+    <div class="card"><h2>Comentario (opcional)</h2>
+      <textarea id="coment" rows="2" placeholder="Algo sobre este periodo..."></textarea>
+    </div>
+    <button class="btn-p" onclick="salvar()">Enviar autoavaliacao</button>
+  </div>
+
+  <div id="historico" class="sec">
+    <div class="card"><h2>Minhas avaliacoes anteriores</h2><div id="histC"></div></div>
+  </div>
+
+  <div id="pdi" class="sec">
+    <div class="card"><h2>Meu Plano de Desenvolvimento</h2><div id="pdiC"></div></div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const sb=supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
+const COMP=[
+  {id:'C1',n:'Conhecimento do produto'},
+  {id:'C2',n:'Escuta ativa'},
+  {id:'C3',n:'Comunicacao consultiva'},
+  {id:'C4',n:'Gestao do relacionamento'},
+  {id:'C5',n:'Resolucao de problemas'},
+  {id:'C6',n:'Organizacao e tempo'},
+  {id:'C7',n:'Colaboracao em equipe'},
+  {id:'C8',n:'Adaptabilidade'}
+];
+const NV={1:'Iniciante',2:'Em dev.',3:'Proficiente',4:'Avancado',5:'Referencia'};
+const notas={};
+let uid=null;
+
+async function boot(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){location.href='index.html';return;}
+  uid=session.user.id;
+  const{data:p}=await sb.from('perfis').select('*').eq('id',uid).single();
+  if(!p||p.papel!=='colaborador'){location.href='index.html';return;}
+  document.getElementById('cNome').textContent=p.nome;
+  const m=new Date(),mm=String(m.getMonth()+1).padStart(2,'0');
+  document.getElementById('per').value=m.getFullYear()+'-'+mm;
+  renderForm();
+}
+
+function renderForm(){
+  let h='';
+  COMP.forEach(c=>{
+    h+=`<div class="comp-item"><h3>${c.id} - ${c.n}</h3><div class="opts" id="og_${c.id}">${[1,2,3,4,5].map(n=>`<div class="opt" id="o_${c.id}_${n}" onclick="sel('${c.id}',${n})"><b>${n}</b> ${NV[n]}</div>`).join('')}</div></div>`;
+  });
+  document.getElementById('formC').innerHTML=h;
+}
+
+function sel(cid,n){
+  notas[cid]=n;
+  [1,2,3,4,5].forEach(i=>{const el=document.getElementById(`o_${cid}_${i}`);if(el){el.className=i===n?'opt sel':'opt';}});
+}
+
+async function salvar(){
+  const per=document.getElementById('per').value;
+  if(!per){toast('Selecione o periodo.');return;}
+  const falt=COMP.filter(c=>!notas[c.id]);
+  if(falt.length){toast('Avalie todas as competencias. Faltam: '+falt.map(c=>c.id).join(', '));return;}
+  const coment=document.getElementById('coment').value.trim();
+  for(const c of COMP){
+    const{error}=await sb.from('autoavaliacoes').upsert({colaborador_id:uid,competencia_id:c.id,nota:notas[c.id],periodo:per,comentario:coment||null},{onConflict:'colaborador_id,competencia_id,periodo'});
+    if(error){toast('Erro: '+error.message);return;}
+  }
+  toast('Autoavaliacao enviada!');
+  COMP.forEach(c=>{notas[c.id]=null;[1,2,3,4,5].forEach(i=>{const el=document.getElementById(`o_${c.id}_${i}`);if(el)el.className='opt';});});
+  document.getElementById('coment').value='';
+}
+
+async function carHist(){
+  const{data}=await sb.from('autoavaliacoes').select('*').eq('colaborador_id',uid).order('periodo',{ascending:false});
+  if(!data||!data.length){document.getElementById('histC').innerHTML='<p class="empty">Sem autoavaliacoes ainda.</p>';return;}
+  const pers=[...new Set(data.map(a=>a.periodo))];
+  let h='';
+  pers.forEach(p=>{
+    const its=data.filter(a=>a.periodo===p);
+    const media=(its.reduce((s,a)=>s+a.nota,0)/its.length).toFixed(1);
+    const coment=its.find(a=>a.comentario)?.comentario||null;
+    h+=`<div style="margin-bottom:16px;"><b>${p}</b> — Media: <b>${media}</b>`;
+    its.forEach(a=>{const c=COMP.find(x=>x.id===a.competencia_id);const pct=(a.nota/5)*100;const cl=a.nota>=4?'fg':a.nota>=3?'fy':'fr';
+      h+=`<div style="display:flex;justify-content:space-between;font-size:.82rem;margin-top:4px;"><span>${c?c.n:a.competencia_id}</span><b>${a.nota}</b></div><div class="bar"><div class="fill ${cl}" style="width:${pct}%"></div></div>`;
+    });
+    if(coment)h+=`<p style="font-size:.8rem;color:var(--muted);margin-top:6px;background:#f8fafc;padding:7px;border-radius:5px;">"${coment}"</p>`;
+    h+='<hr style="margin:10px 0;border-color:#e2e8f0;"></div>';
+  });
+  document.getElementById('histC').innerHTML=h;
+}
+
+async function carPDI(){
+  const{data}=await sb.from('pdis').select('*').eq('colaborador_id',uid).order('prazo');
+  if(!data||!data.length){document.getElementById('pdiC').innerHTML='<p class="empty">Nenhuma acao de PDI definida ainda.</p>';return;}
+  const cl={em_andamento:'by',concluido:'bg',nao_iniciado:'br'};
+  const lb={em_andamento:'Em andamento',concluido:'Concluido',nao_iniciado:'Nao iniciado'};
+  let h='';
+  data.forEach(p=>{h+=`<div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:9px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><b style="font-size:.88rem;">${p.competencia}</b><span class="badge ${cl[p.status]||''}">${lb[p.status]||p.status}</span></div><p style="font-size:.83rem;">${p.acao}</p>${p.prazo?`<p style="font-size:.78rem;color:var(--muted);margin-top:4px;">Prazo: ${p.prazo}</p>`:''}</div>`;});
+  document.getElementById('pdiC').innerHTML=h;
+}
+
+function aba(id,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+  if(id==='historico')carHist();if(id==='pdi')carPDI();
+}
+function sair(){sb.auth.signOut().then(()=>location.href='index.html');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+
+boot();
+</script>
+</body>
+</html>
