@@ -18,6 +18,7 @@ header h1{font-size:1.1rem}
 .btn-red{background:#dc2626;color:#fff}
 .btn-yellow{background:#d97706;color:#fff}
 .btn-green{background:#16a34a;color:#fff}
+.btn-purple{background:#7c3aed;color:#fff}
 .container{max-width:1200px;margin:0 auto;padding:20px 16px}
 .nav-tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e2e8f0;flex-wrap:wrap}
 .nav-tab{padding:9px 16px;cursor:pointer;border:none;background:none;font-size:.85rem;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
@@ -46,12 +47,31 @@ tr:hover td{background:#f8fafc}
 .acoes{display:flex;gap:6px;flex-wrap:wrap}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;box-shadow:0 8px 30px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
-.modal h3{font-size:1rem;margin-bottom:16px;color:#1e293b}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
-.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#e0e7ff;color:#3730a3;border-radius:20px;font-size:.8rem}
-.chip button{background:none;border:none;cursor:pointer;color:#6366f1;font-size:.9rem;padding:0;line-height:1}
+.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.modal h3{font-size:1rem;margin-bottom:14px;color:#1e293b}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ede9fe;color:#5b21b6;padding:4px 10px;border-radius:20px;font-size:.78rem;display:flex;align-items:center;gap:5px}
+.chip button{background:none;border:none;cursor:pointer;color:#7c3aed;font-size:.85rem;padding:0 2px}
+.sub-tabs{display:flex;gap:2px;margin-bottom:14px;border-bottom:1.5px solid #e2e8f0;flex-wrap:wrap}
+.sub-tab{padding:7px 14px;cursor:pointer;border:none;background:none;font-size:.83rem;color:#64748b;border-bottom:2px solid transparent;margin-bottom:-1.5px}
+.sub-tab.active{color:#7c3aed;border-bottom-color:#7c3aed;font-weight:600}
+.sub-section{display:none}.sub-section.active{display:block}
+.star-row{display:flex;gap:4px;font-size:1.3rem;cursor:pointer}
+.star-row span{color:#d1d5db;transition:color .1s}
+.star-row span.filled{color:#f59e0b}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px}
+.comp-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px}
+.comp-card h4{font-size:.82rem;color:#374151;margin-bottom:6px}
+.member-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;cursor:pointer;transition:border-color .15s}
+.member-card:hover,.member-card.selected{border-color:#2563eb;background:#eff6ff}
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
+.pdi-item{border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px}
+.pdi-item h4{font-size:.88rem;color:#1e293b;margin-bottom:4px}
+.pdi-status{font-size:.75rem;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px}
+.pdi-aberto{background:#fef3c7;color:#92400e}
+.pdi-em_andamento{background:#dbeafe;color:#1d4ed8}
+.pdi-concluido{background:#d1fae5;color:#065f46}
 </style>
 </head>
 <body>
@@ -67,6 +87,7 @@ tr:hover td{background:#f8fafc}
 <button class="nav-tab" onclick="aba('indicadores',this)">Indicadores</button>
 <button class="nav-tab" onclick="aba('competencias',this)">Competencias</button>
 <button class="nav-tab" onclick="aba('vinculos',this)">Vinculos</button>
+<button class="nav-tab" onclick="aba('avaliar',this)">Avaliar Equipe</button>
 </div>
 <!-- MEMBROS -->
 <div id="membros" class="section active">
@@ -74,30 +95,38 @@ tr:hover td{background:#f8fafc}
 <div class="form-row"><div><label>E-mail</label><input type="email" id="novoEmail" placeholder="colaborador@email.com"/></div><div><label>Nome</label><input type="text" id="novoNome" placeholder="Nome completo"/></div></div>
 <div class="form-row"><div><label>Equipe</label><select id="novaEquipe"></select></div><div><label>Nivel / Papel</label><select id="novoPapel"></select></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="adicionarMembro()">Adicionar</button><div class="msg" id="msgMembro"></div></div>
-<div class="card"><h2>Membros da Equipe</h2><table><thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Nivel</th><th>Acoes</th></tr></thead><tbody id="listaEquipe"><tr><td colspan="4" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody></table></div></div>
+<div class="card"><h2>Membros da Equipe</h2><table><thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Nivel</th><th>Acoes</th></tr></thead><tbody id="tabelaMembros"></tbody></table></div>
+</div>
 <!-- NIVEIS -->
-<div id="niveis" class="section"><div class="card"><h2>Adicionar Nivel</h2>
-<div class="form-row"><div><label>Codigo</label><input type="text" id="novoNivelCod" placeholder="n1"/></div><div><label>Nome</label><input type="text" id="novoNivelNome" placeholder="N1 - Suporte Nivel 1"/></div></div>
-<div class="form-row"><div><label>Descricao</label><input type="text" id="novoNivelDesc"/></div><div><label>Ordem</label><input type="number" id="novoNivelOrdem" placeholder="1" min="0"/></div></div>
+<div id="niveis" class="section">
+<div class="card"><h2>Adicionar Nivel</h2>
+<div class="form-row"><div><label>Codigo</label><input type="text" id="novoNivCod" placeholder="ex: n3"/></div><div><label>Nome</label><input type="text" id="novoNivNome" placeholder="ex: Suporte Nivel 3"/></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="adicionarNivel()">Adicionar</button><div class="msg" id="msgNivel"></div></div>
-<div class="card"><h2>Niveis Cadastrados</h2><table><thead><tr><th>Codigo</th><th>Nome</th><th>Ordem</th><th>Acoes</th></tr></thead><tbody id="listaNiveis"><tr><td colspan="4" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody></table></div></div>
+<div class="card"><h2>Niveis Cadastrados</h2><table><thead><tr><th>Codigo</th><th>Nome</th><th>Acoes</th></tr></thead><tbody id="tabelaNiveis"></tbody></table></div>
+</div>
 <!-- EQUIPES -->
-<div id="equipes" class="section"><div class="card"><h2>Adicionar Equipe</h2>
-<div class="form-row"><div><label>Nome</label><input type="text" id="novaEquipeNome" placeholder="Ex: Cond21"/></div><div><label>Descricao</label><input type="text" id="novaEquipeDesc"/></div></div>
+<div id="equipes" class="section">
+<div class="card"><h2>Adicionar Equipe</h2>
+<div class="form-row"><div><label>Nome</label><input type="text" id="novaEqNome" placeholder="ex: GC"/></div><div><label>Descricao</label><input type="text" id="novaEqDesc" placeholder="opcional"/></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="adicionarEquipe()">Adicionar</button><div class="msg" id="msgEquipe"></div></div>
-<div class="card"><h2>Equipes Cadastradas</h2><table><thead><tr><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead><tbody id="listaEquipes"><tr><td colspan="3" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody></table></div></div>
-<!-- INDICADORES -->
-<div id="indicadores" class="section"><div class="card"><h2>Adicionar Indicador</h2>
+<div class="card"><h2>Equipes Cadastradas</h2><table><thead><tr><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead><tbody id="tabelaEquipes"></tbody></table></div>
+</div>
+<!-- INDICADORES (catalogo) -->
+<div id="indicadores" class="section">
+<div class="card"><h2>Adicionar Indicador</h2>
 <div class="form-row"><div><label>Nome</label><input type="text" id="novoIndNome" placeholder="Ex: NPS do cliente"/></div><div><label>Unidade</label><input type="text" id="novoIndUnidade" placeholder="%, pts, qtd..."/></div></div>
 <div class="form-row"><div><label>Meta Padrao</label><input type="number" id="novoIndMeta" placeholder="70"/></div><div><label>Descricao</label><input type="text" id="novoIndDesc"/></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="adicionarIndicador()">Adicionar</button><div class="msg" id="msgIndicador"></div></div>
-<div class="card"><h2>Indicadores Cadastrados</h2><table><thead><tr><th>Nome</th><th>Meta Padrao</th><th>Unidade</th><th>Ativo</th><th>Acoes</th></tr></thead><tbody id="listaIndicadores"><tr><td colspan="5" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody></table></div></div>
+<div class="card"><h2>Indicadores Cadastrados</h2><table><thead><tr><th>Nome</th><th>Meta Padrao</th><th>Unidade</th><th>Ativo</th><th>Acoes</th></tr></thead><tbody id="tabelaIndicadores"></tbody></table></div>
+</div>
 <!-- COMPETENCIAS -->
-<div id="competencias" class="section"><div class="card"><h2>Adicionar Competencia</h2>
-<div class="form-row"><div><label>Codigo</label><input type="text" id="novaCompCod" placeholder="C1"/></div><div><label>Nome</label><input type="text" id="novaCompNome" placeholder="Comunicacao"/></div></div>
-<div><label>Descricao</label><input type="text" id="novaCompDesc"/></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarCompetencia()">Adicionar</button><div class="msg" id="msgComp"></div></div>
-<div class="card"><h2>Competencias Cadastradas</h2><table><thead><tr><th>Codigo</th><th>Nome</th><th>Descricao</th><th>Ativa</th><th>Acoes</th></tr></thead><tbody id="listaComps"><tr><td colspan="5" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody></table></div></div>
+<div id="competencias" class="section">
+<div class="card"><h2>Adicionar Competencia</h2>
+<div class="form-row"><div><label>Codigo</label><input type="text" id="novaCompCod" placeholder="ex: C9"/></div><div><label>Nome</label><input type="text" id="novaCompNome" placeholder="ex: Lideranca"/></div></div>
+<label>Descricao</label><textarea id="novaCompDesc" rows="2" placeholder="Descricao da competencia"></textarea>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarCompetencia()">Adicionar</button><div class="msg" id="msgCompetencia"></div></div>
+<div class="card"><h2>Competencias Cadastradas</h2><table><thead><tr><th>Cod</th><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead><tbody id="tabelaCompetencias"></tbody></table></div>
+</div>
 <!-- VINCULOS -->
 <div id="vinculos" class="section">
 <div class="card"><h2>Vincular Competencia a Nivel</h2>
@@ -108,96 +137,589 @@ tr:hover td{background:#f8fafc}
 <div class="form-row"><div><label>Competencia</label><select id="vincCompMembro"></select></div><div><label>Membro</label><select id="vincMembroSel"></select></div></div>
 <button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompMembro()">Vincular</button><div class="msg" id="msgVincMembro"></div>
 <div style="margin-top:14px"><strong style="font-size:.85rem">Vinculos Membro:</strong><div id="listaVincMembro" class="chip-list" style="margin-top:8px"></div></div></div>
+                                                                                                                                                  </div>
+<!-- AVALIAR EQUIPE -->
+<div id="avaliar" class="section">
+<div class="card">
+<h2>Selecione um Membro</h2>
+<div class="member-grid" id="memberGrid"></div>
+<div id="avaliarConteudo" style="display:none">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+<span style="font-size:.85rem;color:#64748b">Membro selecionado:</span>
+<strong id="membroSelecionadoNome" style="color:#2563eb"></strong>
 </div>
-                               </div>
+<div class="sub-tabs">
+<button class="sub-tab active" onclick="subAba('avaliacoes',this)">Avaliacoes</button>
+<button class="sub-tab" onclick="subAba('registros_ind',this)">Indicadores</button>
+<button class="sub-tab" onclick="subAba('pdi',this)">PDI</button>
+</div>
+<!-- SUB: AVALIACOES -->
+<div id="avaliacoes" class="sub-section active">
+<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
+<h2>Nova Avaliacao do Gestor</h2>
+<div class="form-row"><div><label>Periodo (mes/ano)</label><input type="month" id="avPeriodo"/></div><div><label>Comentario</label><input type="text" id="avComentario" placeholder="Observacoes gerais..."/></div></div>
+<div class="comp-grid" id="compGrid" style="margin-top:14px"></div>
+<button class="btn btn-primary" style="margin-top:16px" onclick="salvarAvaliacao()">Salvar Avaliacao</button>
+<div class="msg" id="msgAvaliacao"></div>
+</div>
+<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0;margin-top:0">
+<h2>Historico de Avaliacoes</h2>
+<table><thead><tr><th>Periodo</th><th>Media</th><th>Comentario</th><th>Acoes</th></tr></thead><tbody id="tabelaAvaliacoes"></tbody></table>
+</div>
+</div>
+<!-- SUB: INDICADORES -->
+<div id="registros_ind" class="sub-section">
+<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
+<h2>Registros de Indicadores do Membro</h2>
+<table><thead><tr><th>Periodo</th><th>Indicador</th><th>Valor</th><th>Meta</th><th>Observacao</th></tr></thead><tbody id="tabelaRegInd"></tbody></table>
+</div>
+</div>
+<!-- SUB: PDI -->
+<div id="pdi" class="sub-section">
+<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
+<h2>Novo PDI</h2>
+<div class="form-row"><div><label>Objetivo</label><input type="text" id="pdiObjetivo" placeholder="Ex: Melhorar comunicacao com cliente"/></div><div><label>Prazo</label><input type="date" id="pdiPrazo"/></div></div>
+<label>Descricao / Acoes</label><textarea id="pdiDescricao" rows="3" placeholder="Descreva as acoes e recursos necessarios..."></textarea>
+<div class="form-row"><div><label>Competencia relacionada (opcional)</label><select id="pdiCompetencia"><option value="">-- nenhuma --</option></select></div><div><label>Status</label><select id="pdiStatus"><option value="aberto">Aberto</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluido</option></select></div></div>
+<button class="btn btn-purple" style="margin-top:14px" onclick="salvarPDI()">Salvar PDI</button>
+<div class="msg" id="msgPDI"></div>
+</div>
+<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0;margin-top:0">
+<h2>PDIs do Membro</h2>
+<div id="listaPDI"></div>
+</div>
+</div>
+</div>
+</div>
+                                                  </div>
 <!-- MODALS -->
-<div class="modal-overlay" id="modalMembro"><div class="modal"><h3>Editar Membro</h3><input type="hidden" id="editMembroId"/><label>Nome</label><input type="text" id="editMembroNome"/><label>E-mail</label><input type="email" id="editMembroEmail"/><label>Equipe</label><select id="editMembroEquipe"></select><label>Nivel / Papel</label><select id="editMembroPapel"></select><div class="modal-footer"><button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn btn-primary" onclick="salvarMembro()">Salvar</button></div><div class="msg" id="msgEditMembro"></div></div></div>
-<div class="modal-overlay" id="modalNivel"><div class="modal"><h3>Editar Nivel</h3><input type="hidden" id="editNivelId"/><label>Codigo</label><input type="text" id="editNivelCod"/><label>Nome</label><input type="text" id="editNivelNome"/><label>Descricao</label><input type="text" id="editNivelDesc"/><label>Ordem</label><input type="number" id="editNivelOrdem"/><div class="modal-footer"><button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalNivel')">Cancelar</button><button class="btn btn-primary" onclick="salvarNivel()">Salvar</button></div><div class="msg" id="msgEditNivel"></div></div></div>
-<div class="modal-overlay" id="modalEquipe"><div class="modal"><h3>Editar Equipe</h3><input type="hidden" id="editEquipeId"/><label>Nome</label><input type="text" id="editEquipeNome"/><label>Descricao</label><input type="text" id="editEquipeDesc"/><div class="modal-footer"><button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalEquipe')">Cancelar</button><button class="btn btn-primary" onclick="salvarEquipe()">Salvar</button></div><div class="msg" id="msgEditEquipe"></div></div></div>
-<div class="modal-overlay" id="modalIndicador"><div class="modal"><h3>Editar Indicador</h3><input type="hidden" id="editIndId"/><label>Nome</label><input type="text" id="editIndNome"/><label>Meta Padrao</label><input type="number" id="editIndMeta"/><label>Unidade</label><input type="text" id="editIndUnidade"/><label>Descricao</label><input type="text" id="editIndDesc"/><label>Ativo</label><select id="editIndAtivo"><option value="true">Sim</option><option value="false">Nao</option></select><div class="modal-footer"><button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalIndicador')">Cancelar</button><button class="btn btn-primary" onclick="salvarIndicador()">Salvar</button></div><div class="msg" id="msgEditInd"></div></div></div>
-<div class="modal-overlay" id="modalComp"><div class="modal"><h3>Editar Competencia</h3><input type="hidden" id="editCompId"/><label>Codigo</label><input type="text" id="editCompCod"/><label>Nome</label><input type="text" id="editCompNome"/><label>Descricao</label><input type="text" id="editCompDesc"/><label>Ativa</label><select id="editCompAtiva"><option value="true">Sim</option><option value="false">Nao</option></select><div class="modal-footer"><button class="btn" style="background:#e2e8f0;color:#374151" onclick="fecharModal('modalComp')">Cancelar</button><button class="btn btn-primary" onclick="salvarComp()">Salvar</button></div><div class="msg" id="msgEditComp"></div></div></div>
+<div class="modal-overlay" id="modalMembro"><div class="modal"><h3>Editar Membro</h3><input type="hidden" id="editMembroId"/><label>Nome</label><input type="text" id="editMembroNome"/><label>Equipe</label><select id="editMembroEquipe"></select><label>Nivel / Papel</label><select id="editMembroPapel"></select><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoMembro()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalMembro')">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="modalNivel"><div class="modal"><h3>Editar Nivel</h3><input type="hidden" id="editNivelId"/><label>Codigo</label><input type="text" id="editNivelCod"/><label>Nome</label><input type="text" id="editNivelNome"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoNivel()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalNivel')">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="modalEquipe"><div class="modal"><h3>Editar Equipe</h3><input type="hidden" id="editEquipeId"/><label>Nome</label><input type="text" id="editEquipeNome"/><label>Descricao</label><input type="text" id="editEquipeDesc"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoEquipe()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalEquipe')">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="modalIndicador"><div class="modal"><h3>Editar Indicador</h3><input type="hidden" id="editIndicadorId"/><label>Nome</label><input type="text" id="editIndicadorNome"/><label>Unidade</label><input type="text" id="editIndicadorUnidade"/><label>Meta Padrao</label><input type="number" id="editIndicadorMeta"/><label>Descricao</label><input type="text" id="editIndicadorDesc"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoIndicador()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalIndicador')">Cancelar</button></div></div></div>
+<div class="modal-overlay" id="modalCompetencia"><div class="modal"><h3>Editar Competencia</h3><input type="hidden" id="editCompetenciaId"/><label>Codigo</label><input type="text" id="editCompetenciaCod"/><label>Nome</label><input type="text" id="editCompetenciaNome"/><label>Descricao</label><textarea id="editCompetenciaDesc" rows="2"></textarea><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoCompetencia()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalCompetencia')">Cancelar</button></div></div></div>
+</div>
 <script>
-const SURL='https://zsfysyphhpsajxbkwywk.supabase.co';
-const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
-const sb=supabase.createClient(SURL,SKEY);
-let membrosCache={},niveisCache={},equipesCache={},indicadoresCache={},compsCache={};
-function showMsg(id,txt,tipo){const m=document.getElementById(id);if(!m)return;m.textContent=txt;m.className='msg '+tipo;}
-function aba(nome,el){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(nome).classList.add('active');el.classList.add('active');}
+const SUPA_URL = 'https://zsfysyphhpsajxbkwywk.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
+let sb, userSession, membroAtualId = null, avaliacaoStars = {};
+
+async function init(){
+  sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session){location.href='index.html';return;}
+  userSession = session;
+  const {data:p} = await sb.from('perfis').select('papel').eq('id',session.user.id).single();
+  if(!p || p.papel !== 'gestor'){alert('Acesso negado');location.href='index.html';return;}
+  carregarTudo();
+}
+
+function aba(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if(id==='membros') carregarMembros();
+  if(id==='niveis') carregarNiveis();
+  if(id==='equipes') carregarEquipes();
+  if(id==='indicadores') carregarIndicadores();
+  if(id==='competencias') carregarCompetencias();
+  if(id==='vinculos') carregarVinculos();
+  if(id==='avaliar') carregarMembrosAvaliar();
+}
+
+function subAba(id, el){
+  document.querySelectorAll('.sub-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if(id==='avaliacoes') carregarAvaliacoesMembro();
+  if(id==='registros_ind') carregarRegIndicadores();
+  if(id==='pdi') carregarPDI();
+}
+
+function sair(){sb.auth.signOut().then(()=>{location.href='index.html';});}
+function msg(id, txt, tipo){const el=document.getElementById(id);el.textContent=txt;el.className='msg '+tipo;if(tipo==='ok')setTimeout(()=>el.className='msg',3000);}
 function fecharModal(id){document.getElementById(id).classList.remove('open');}
 function abrirModal(id){document.getElementById(id).classList.add('open');}
-function badgePapel(p){const l={gestor:'Gestor',n1:'N1',n2:'N2',n3:'N3',rt:'RT',analista_op:'Analista Op.'};return '<span class="badge badge-'+p+'">'+( l[p]||p)+'</span>';}
-function preencherSelectEquipes(selId,extra){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML='';if(extra){extra.forEach(e=>{const o=document.createElement('option');o.value=e.v;o.textContent=e.t;sel.appendChild(o);});}Object.values(equipesCache).forEach(e=>{const o=document.createElement('option');o.value=e.nome;o.textContent=e.nome;sel.appendChild(o);});}
-function preencherSelectNiveis(selId){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML='';Object.values(niveisCache).sort((a,b)=>a.ordem-b.ordem).forEach(n=>{const o=document.createElement('option');o.value=n.codigo;o.textContent=n.nome;sel.appendChild(o);});}
-async function carregarEquipe(){const{data,error}=await sb.from('perfis').select('*').order('nome');if(error)return;membrosCache={};if(!data||!data.length){document.getElementById('listaEquipe').innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}data.forEach(m=>{membrosCache[m.id]=m;});document.getElementById('listaEquipe').innerHTML=data.map(m=>'<tr><td><strong>'+(m.nome||m.email)+'</strong><br><small style="color:#64748b">'+m.email+'</small></td><td>'+(m.equipe||'&mdash;')+'</td><td>'+badgePapel(m.papel)+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+m.id+'" onclick="abrirEditarMembro(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+m.id+'" onclick="removerMembro(this.dataset.id)">Remover</button></div></td></tr>').join('');}
-async function adicionarMembro(){const email=document.getElementById('novoEmail').value.trim();const nome=document.getElementById('novoNome').value.trim();const equipe=document.getElementById('novaEquipe').value;const papel=document.getElementById('novoPapel').value;if(!email||!nome){showMsg('msgMembro','Preencha e-mail e nome.','err');return;}const{error}=await sb.from('perfis').upsert({email,nome,equipe,papel},{onConflict:'email'});if(error){showMsg('msgMembro','Erro: '+error.message,'err');}else{showMsg('msgMembro','Membro adicionado! Peca para ele criar conta com este e-mail.','ok');carregarEquipe();document.getElementById('novoEmail').value='';document.getElementById('novoNome').value='';}}
-function abrirEditarMembro(id){const m=membrosCache[id];if(!m)return;document.getElementById('editMembroId').value=m.id;document.getElementById('editMembroNome').value=m.nome||'';document.getElementById('editMembroEmail').value=m.email||'';preencherSelectEquipes('editMembroEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);document.getElementById('editMembroEquipe').value=m.equipe||'';preencherSelectNiveis('editMembroPapel');document.getElementById('editMembroPapel').value=m.papel||'n1';document.getElementById('msgEditMembro').className='msg';abrirModal('modalMembro');}
-async function salvarMembro(){const id=document.getElementById('editMembroId').value;const nome=document.getElementById('editMembroNome').value.trim();const email=document.getElementById('editMembroEmail').value.trim();const equipe=document.getElementById('editMembroEquipe').value;const papel=document.getElementById('editMembroPapel').value;if(!email||!nome){showMsg('msgEditMembro','Preencha todos os campos.','err');return;}const{error}=await sb.from('perfis').update({nome,email,equipe,papel}).eq('id',id);if(error){showMsg('msgEditMembro','Erro: '+error.message,'err');}else{fecharModal('modalMembro');carregarEquipe();}}
-async function removerMembro(id){if(!confirm('Remover este membro?'))return;const{error}=await sb.from('perfis').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarEquipe();}
-async function carregarNiveis(){const{data,error}=await sb.from('niveis').select('*').order('ordem');if(error)return;niveisCache={};if(!data||!data.length){document.getElementById('listaNiveis').innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum nivel</td></tr>';return;}data.forEach(n=>{niveisCache[n.id]=n;});document.getElementById('listaNiveis').innerHTML=data.map(n=>'<tr><td><span class="badge badge-'+n.codigo+'">'+n.codigo+'</span></td><td>'+n.nome+'</td><td>'+n.ordem+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+n.id+'" onclick="abrirEditarNivel(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+n.id+'" onclick="removerNivel(this.dataset.id)">Excluir</button></div></td></tr>').join('');preencherSelectNiveis('novoPapel');preencherSelectNiveis('editMembroPapel');preencherSelectNiveis('vincNivelSel');}
-async function adicionarNivel(){const codigo=document.getElementById('novoNivelCod').value.trim();const nome=document.getElementById('novoNivelNome').value.trim();const descricao=document.getElementById('novoNivelDesc').value.trim();const ordem=parseInt(document.getElementById('novoNivelOrdem').value)||0;if(!codigo||!nome){showMsg('msgNivel','Preencha codigo e nome.','err');return;}const{error}=await sb.from('niveis').insert({codigo,nome,descricao,ordem});if(error){showMsg('msgNivel','Erro: '+error.message,'err');}else{showMsg('msgNivel','Nivel adicionado!','ok');carregarNiveis();document.getElementById('novoNivelCod').value='';document.getElementById('novoNivelNome').value='';document.getElementById('novoNivelDesc').value='';document.getElementById('novoNivelOrdem').value='';}}
-function abrirEditarNivel(id){const n=niveisCache[id];if(!n)return;document.getElementById('editNivelId').value=n.id;document.getElementById('editNivelCod').value=n.codigo||'';document.getElementById('editNivelNome').value=n.nome||'';document.getElementById('editNivelDesc').value=n.descricao||'';document.getElementById('editNivelOrdem').value=n.ordem||0;document.getElementById('msgEditNivel').className='msg';abrirModal('modalNivel');}
-async function salvarNivel(){const id=document.getElementById('editNivelId').value;const codigo=document.getElementById('editNivelCod').value.trim();const nome=document.getElementById('editNivelNome').value.trim();const descricao=document.getElementById('editNivelDesc').value.trim();const ordem=parseInt(document.getElementById('editNivelOrdem').value)||0;if(!codigo||!nome){showMsg('msgEditNivel','Preencha todos os campos.','err');return;}const{error}=await sb.from('niveis').update({codigo,nome,descricao,ordem}).eq('id',id);if(error){showMsg('msgEditNivel','Erro: '+error.message,'err');}else{fecharModal('modalNivel');carregarNiveis();}}
-async function removerNivel(id){if(!confirm('Excluir este nivel?'))return;const{error}=await sb.from('niveis').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarNiveis();}
-async function carregarEquipes(){const{data,error}=await sb.from('equipes').select('*').order('nome');if(error)return;equipesCache={};if(!data||!data.length){document.getElementById('listaEquipes').innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhuma equipe</td></tr>';return;}data.forEach(e=>{equipesCache[e.id]=e;});document.getElementById('listaEquipes').innerHTML=data.map(e=>'<tr><td>'+e.nome+'</td><td>'+(e.descricao||'&mdash;')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+e.id+'" onclick="abrirEditarEquipe(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+e.id+'" onclick="removerEquipe(this.dataset.id)">Excluir</button></div></td></tr>').join('');preencherSelectEquipes('novaEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);preencherSelectEquipes('editMembroEquipe',[{v:'Ambas',t:'Ambas (Cond21 + GC)'}]);}
-async function adicionarEquipe(){const nome=document.getElementById('novaEquipeNome').value.trim();const descricao=document.getElementById('novaEquipeDesc').value.trim();if(!nome){showMsg('msgEquipe','Preencha o nome.','err');return;}const{error}=await sb.from('equipes').insert({nome,descricao});if(error){showMsg('msgEquipe','Erro: '+error.message,'err');}else{showMsg('msgEquipe','Equipe adicionada!','ok');carregarEquipes();document.getElementById('novaEquipeNome').value='';document.getElementById('novaEquipeDesc').value='';}}
-function abrirEditarEquipe(id){const e=equipesCache[id];if(!e)return;document.getElementById('editEquipeId').value=e.id;document.getElementById('editEquipeNome').value=e.nome||'';document.getElementById('editEquipeDesc').value=e.descricao||'';document.getElementById('msgEditEquipe').className='msg';abrirModal('modalEquipe');}
-async function salvarEquipe(){const id=document.getElementById('editEquipeId').value;const nome=document.getElementById('editEquipeNome').value.trim();const descricao=document.getElementById('editEquipeDesc').value.trim();if(!nome){showMsg('msgEditEquipe','Preencha o nome.','err');return;}const{error}=await sb.from('equipes').update({nome,descricao}).eq('id',id);if(error){showMsg('msgEditEquipe','Erro: '+error.message,'err');}else{fecharModal('modalEquipe');carregarEquipes();}}
-async function removerEquipe(id){if(!confirm('Excluir esta equipe?'))return;const{error}=await sb.from('equipes').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarEquipes();}
-async function carregarIndicadores(){const{data,error}=await sb.from('tipos_indicadores').select('*').order('nome');if(error)return;indicadoresCache={};if(!data||!data.length){document.getElementById('listaIndicadores').innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum indicador</td></tr>';return;}data.forEach(i=>{indicadoresCache[i.id]=i;});document.getElementById('listaIndicadores').innerHTML=data.map(i=>'<tr><td>'+i.nome+'</td><td>'+(i.meta_padrao!=null?i.meta_padrao:'&mdash;')+'</td><td>'+(i.unidade||'&mdash;')+'</td><td>'+(i.ativo?'<span style="color:#16a34a">Sim</span>':'<span style="color:#dc2626">Nao</span>')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+i.id+'" onclick="abrirEditarIndicador(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+i.id+'" onclick="removerIndicador(this.dataset.id)">Excluir</button></div></td></tr>').join('');}
-async function adicionarIndicador(){const nome=document.getElementById('novoIndNome').value.trim();const unidade=document.getElementById('novoIndUnidade').value.trim();const meta_padrao=parseFloat(document.getElementById('novoIndMeta').value)||null;const descricao=document.getElementById('novoIndDesc').value.trim();if(!nome){showMsg('msgIndicador','Preencha o nome.','err');return;}const{error}=await sb.from('tipos_indicadores').insert({nome,unidade,meta_padrao,descricao});if(error){showMsg('msgIndicador','Erro: '+error.message,'err');}else{showMsg('msgIndicador','Indicador adicionado!','ok');carregarIndicadores();document.getElementById('novoIndNome').value='';document.getElementById('novoIndUnidade').value='';document.getElementById('novoIndMeta').value='';document.getElementById('novoIndDesc').value='';}}
-function abrirEditarIndicador(id){const i=indicadoresCache[id];if(!i)return;document.getElementById('editIndId').value=i.id;document.getElementById('editIndNome').value=i.nome||'';document.getElementById('editIndMeta').value=i.meta_padrao!=null?i.meta_padrao:'';document.getElementById('editIndUnidade').value=i.unidade||'';document.getElementById('editIndDesc').value=i.descricao||'';document.getElementById('editIndAtivo').value=String(i.ativo);document.getElementById('msgEditInd').className='msg';abrirModal('modalIndicador');}
-async function salvarIndicador(){const id=document.getElementById('editIndId').value;const nome=document.getElementById('editIndNome').value.trim();const meta_padrao=parseFloat(document.getElementById('editIndMeta').value)||null;const unidade=document.getElementById('editIndUnidade').value.trim();const descricao=document.getElementById('editIndDesc').value.trim();const ativo=document.getElementById('editIndAtivo').value==='true';if(!nome){showMsg('msgEditInd','Preencha o nome.','err');return;}const{error}=await sb.from('tipos_indicadores').update({nome,meta_padrao,unidade,descricao,ativo}).eq('id',id);if(error){showMsg('msgEditInd','Erro: '+error.message,'err');}else{fecharModal('modalIndicador');carregarIndicadores();}}
-async function removerIndicador(id){if(!confirm('Excluir este indicador?'))return;const{error}=await sb.from('tipos_indicadores').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarIndicadores();}
-async function carregarCompetencias(){const{data,error}=await sb.from('competencias').select('*').order('codigo');if(error)return;compsCache={};if(!data||!data.length){document.getElementById('listaComps').innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhuma competencia</td></tr>';return;}data.forEach(c=>{compsCache[c.id]=c;});document.getElementById('listaComps').innerHTML=data.map(c=>'<tr><td><strong>'+c.codigo+'</strong></td><td>'+c.nome+'</td><td>'+(c.descricao||'&mdash;')+'</td><td>'+(c.ativa?'<span style="color:#16a34a">Sim</span>':'<span style="color:#dc2626">Nao</span>')+'</td><td><div class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+c.id+'" onclick="abrirEditarComp(this.dataset.id)">Editar</button><button class="btn btn-sm btn-red" data-id="'+c.id+'" onclick="removerComp(this.dataset.id)">Excluir</button></div></td></tr>').join('');preencherSelectComps();}
-function preencherSelectComps(){['vincCompNivel','vincCompMembro'].forEach(selId=>{const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML='<option value="">Selecione...</option>';Object.values(compsCache).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.codigo+' - '+c.nome;sel.appendChild(o);});});}
-async function adicionarCompetencia(){const codigo=document.getElementById('novaCompCod').value.trim().toUpperCase();const nome=document.getElementById('novaCompNome').value.trim();const descricao=document.getElementById('novaCompDesc').value.trim();if(!codigo||!nome){showMsg('msgComp','Preencha codigo e nome.','err');return;}const{error}=await sb.from('competencias').insert({codigo,nome,descricao});if(error){showMsg('msgComp','Erro: '+error.message,'err');}else{showMsg('msgComp','Competencia adicionada!','ok');carregarCompetencias();document.getElementById('novaCompCod').value='';document.getElementById('novaCompNome').value='';document.getElementById('novaCompDesc').value='';}}
-function abrirEditarComp(id){const c=compsCache[id];if(!c)return;document.getElementById('editCompId').value=c.id;document.getElementById('editCompCod').value=c.codigo||'';document.getElementById('editCompNome').value=c.nome||'';document.getElementById('editCompDesc').value=c.descricao||'';document.getElementById('editCompAtiva').value=String(c.ativa);document.getElementById('msgEditComp').className='msg';abrirModal('modalComp');}
-async function salvarComp(){const id=document.getElementById('editCompId').value;const codigo=document.getElementById('editCompCod').value.trim().toUpperCase();const nome=document.getElementById('editCompNome').value.trim();const descricao=document.getElementById('editCompDesc').value.trim();const ativa=document.getElementById('editCompAtiva').value==='true';if(!codigo||!nome){showMsg('msgEditComp','Preencha codigo e nome.','err');return;}const{error}=await sb.from('competencias').update({codigo,nome,descricao,ativa}).eq('id',id);if(error){showMsg('msgEditComp','Erro: '+error.message,'err');}else{fecharModal('modalComp');carregarCompetencias();}}
-async function removerComp(id){if(!confirm('Excluir esta competencia?'))return;const{error}=await sb.from('competencias').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarCompetencias();}
+
+async function carregarTudo(){
+  await carregarMembros();
+  await carregarEquipesSelects();
+  await carregarNiveisSelects();
+  await carregarCompetenciasSelects();
+}
+
+async function carregarEquipesSelects(){
+  const {data} = await sb.from('equipes').select('*').order('nome');
+  const opts = data ? data.map(e=>'<option value="'+e.id+'">'+e.nome+'</option>').join('') : '';
+  const optsAmb = '<option value="ambas">Ambas (Cond21 + GC)</option>' + opts;
+  ['novaEquipe','editMembroEquipe'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML = id==='novaEquipe' ? optsAmb : opts;
+  });
+}
+
+async function carregarNiveisSelects(){
+  const {data} = await sb.from('niveis').select('*').order('nome');
+  const opts = data ? data.map(n=>'<option value="'+n.codigo+'">'+n.nome+'</option>').join('') : '';
+  ['novoPapel','editMembroPapel'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML = opts;
+  });
+}
+
+async function carregarCompetenciasSelects(){
+  const {data} = await sb.from('competencias').select('*').order('codigo');
+  const opts = data ? data.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
+  ['vincCompNivel','vincCompMembro','pdiCompetencia'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      if(id==='pdiCompetencia') el.innerHTML='<option value="">-- nenhuma --</option>'+opts;
+      else el.innerHTML = opts;
+    }
+  });
+}
+// MEMBROS
+async function carregarMembros(){
+  const {data} = await sb.from('perfis').select('*').order('nome');
+  const tbody = document.getElementById('tabelaMembros');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}
+  tbody.innerHTML = data.map(m=>{
+    const bClass = 'badge badge-'+(m.papel||'');
+    const eq = m.equipe||'—';
+    return '<tr><td><strong>'+m.nome+'</strong><br><small style="color:#94a3b8">'+m.id+'</small></td><td>'+eq+'</td><td><span class="'+bClass+'">'+nomePapel(m.papel)+'</span></td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||'')+'" data-equipe="'+encodeURIComponent(m.equipe||'')+'" data-papel="'+m.papel+'" onclick="abrirEditMembro(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+m.id+'" onclick="removerMembro(this)">Remover</button></td></tr>';
+  }).join('');
+  carregarMembrosSelectVinculos(data);
+}
+
+function nomePapel(p){const m={gestor:'Gestor',n1:'N1',n2:'N2',n3:'N3',rt:'RT',analista_op:'Analista Op.'};return m[p]||p||'—';}
+
+function carregarMembrosSelectVinculos(data){
+  const opts = data ? data.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('') : '';
+  const el = document.getElementById('vincMembroSel');
+  if(el) el.innerHTML = opts;
+}
+
+async function adicionarMembro(){
+  const email = document.getElementById('novoEmail').value.trim();
+  const nome = document.getElementById('novoNome').value.trim();
+  const equipe = document.getElementById('novaEquipe').value;
+  const papel = document.getElementById('novoPapel').value;
+  if(!email||!nome){msg('msgMembro','Preencha e-mail e nome.','err');return;}
+  const {data:eu} = await sb.auth.getUser();
+  const {data:adm,error:e1} = await sb.auth.admin ? {data:null,error:{message:'n/a'}} : {data:null,error:{message:'n/a'}};
+  const {error} = await sb.from('perfis').upsert({id:email,email,nome,papel,equipe},{onConflict:'email'});
+  if(error){
+    const {data:inv,error:e2} = await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+'/index.html'}});
+    if(e2){msg('msgMembro','Erro: '+e2.message,'err');return;}
+    const {error:e3} = await sb.from('perfis').upsert({email,nome,papel,equipe},{onConflict:'email'});
+    if(e3){msg('msgMembro','Convite enviado. Perfil sera criado no primeiro login.','ok');}
+    else {msg('msgMembro','Convite enviado para '+email,'ok');}
+  } else {msg('msgMembro','Membro adicionado!','ok');}
+  carregarMembros();
+}
+
+function abrirEditMembro(btn){
+  document.getElementById('editMembroId').value = btn.dataset.id;
+  document.getElementById('editMembroNome').value = decodeURIComponent(btn.dataset.nome);
+  document.getElementById('editMembroEquipe').value = decodeURIComponent(btn.dataset.equipe);
+  document.getElementById('editMembroPapel').value = btn.dataset.papel;
+  abrirModal('modalMembro');
+}
+
+async function salvarEdicaoMembro(){
+  const id = document.getElementById('editMembroId').value;
+  const nome = document.getElementById('editMembroNome').value.trim();
+  const equipe = document.getElementById('editMembroEquipe').value;
+  const papel = document.getElementById('editMembroPapel').value;
+  const {error} = await sb.from('perfis').update({nome,equipe,papel}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return;}
+  fecharModal('modalMembro');
+  carregarMembros();
+}
+
+async function removerMembro(btn){
+  if(!confirm('Remover este membro?'))return;
+  const id = btn.dataset.id;
+  await sb.from('perfis').delete().eq('id',id);
+  carregarMembros();
+}
+
+// NIVEIS
+async function carregarNiveis(){
+  const {data} = await sb.from('niveis').select('*').order('nome');
+  const tbody = document.getElementById('tabelaNiveis');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhum nivel</td></tr>';return;}
+  tbody.innerHTML = data.map(n=>'<tr><td>'+n.codigo+'</td><td>'+n.nome+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+n.id+'" data-cod="'+n.codigo+'" data-nome="'+encodeURIComponent(n.nome)+'" onclick="abrirEditNivel(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+n.id+'" onclick="removerNivel(this)">Remover</button></td></tr>').join('');
+}
+
+async function adicionarNivel(){
+  const codigo = document.getElementById('novoNivCod').value.trim().toLowerCase();
+  const nome = document.getElementById('novoNivNome').value.trim();
+  if(!codigo||!nome){msg('msgNivel','Preencha codigo e nome.','err');return;}
+  const {error} = await sb.from('niveis').insert({codigo,nome});
+  if(error){msg('msgNivel','Erro: '+error.message,'err');return;}
+  msg('msgNivel','Nivel adicionado!','ok');
+  carregarNiveis();carregarNiveisSelects();
+}
+
+function abrirEditNivel(btn){
+  document.getElementById('editNivelId').value = btn.dataset.id;
+  document.getElementById('editNivelCod').value = btn.dataset.cod;
+  document.getElementById('editNivelNome').value = decodeURIComponent(btn.dataset.nome);
+  abrirModal('modalNivel');
+}
+
+async function salvarEdicaoNivel(){
+  const id = document.getElementById('editNivelId').value;
+  const codigo = document.getElementById('editNivelCod').value.trim();
+  const nome = document.getElementById('editNivelNome').value.trim();
+  const {error} = await sb.from('niveis').update({codigo,nome}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return;}
+  fecharModal('modalNivel');carregarNiveis();carregarNiveisSelects();
+}
+
+async function removerNivel(btn){
+  if(!confirm('Remover este nivel?'))return;
+  await sb.from('niveis').delete().eq('id',btn.dataset.id);
+  carregarNiveis();
+  }
+// EQUIPES
+async function carregarEquipes(){
+  const {data} = await sb.from('equipes').select('*').order('nome');
+  const tbody = document.getElementById('tabelaEquipes');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhuma equipe</td></tr>';return;}
+  tbody.innerHTML = data.map(e=>'<tr><td>'+e.nome+'</td><td>'+(e.descricao||'—')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+e.id+'" data-nome="'+encodeURIComponent(e.nome)+'" data-desc="'+encodeURIComponent(e.descricao||'')+'" onclick="abrirEditEquipe(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+e.id+'" onclick="removerEquipe(this)">Remover</button></td></tr>').join('');
+}
+
+async function adicionarEquipe(){
+  const nome = document.getElementById('novaEqNome').value.trim();
+  const descricao = document.getElementById('novaEqDesc').value.trim();
+  if(!nome){msg('msgEquipe','Preencha o nome.','err');return;}
+  const {error} = await sb.from('equipes').insert({nome,descricao});
+  if(error){msg('msgEquipe','Erro: '+error.message,'err');return;}
+  msg('msgEquipe','Equipe adicionada!','ok');
+  carregarEquipes();carregarEquipesSelects();
+}
+
+function abrirEditEquipe(btn){
+  document.getElementById('editEquipeId').value = btn.dataset.id;
+  document.getElementById('editEquipeNome').value = decodeURIComponent(btn.dataset.nome);
+  document.getElementById('editEquipeDesc').value = decodeURIComponent(btn.dataset.desc);
+  abrirModal('modalEquipe');
+}
+
+async function salvarEdicaoEquipe(){
+  const id = document.getElementById('editEquipeId').value;
+  const nome = document.getElementById('editEquipeNome').value.trim();
+  const descricao = document.getElementById('editEquipeDesc').value.trim();
+  const {error} = await sb.from('equipes').update({nome,descricao}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return;}
+  fecharModal('modalEquipe');carregarEquipes();carregarEquipesSelects();
+}
+
+async function removerEquipe(btn){
+  if(!confirm('Remover esta equipe?'))return;
+  await sb.from('equipes').delete().eq('id',btn.dataset.id);
+  carregarEquipes();
+}
+
+// INDICADORES CATALOGO
+async function carregarIndicadores(){
+  const {data} = await sb.from('tipos_indicadores').select('*').order('nome');
+  const tbody = document.getElementById('tabelaIndicadores');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum indicador</td></tr>';return;}
+  tbody.innerHTML = data.map(i=>'<tr><td>'+i.nome+'</td><td>'+(i.meta_padrao||'—')+'</td><td>'+(i.unidade||'—')+'</td><td>'+(i.ativo?'Sim':'Nao')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+i.id+'" data-nome="'+encodeURIComponent(i.nome)+'" data-unidade="'+encodeURIComponent(i.unidade||'')+'" data-meta="'+(i.meta_padrao||'')+'" data-desc="'+encodeURIComponent(i.descricao||'')+'" onclick="abrirEditIndicador(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+i.id+'" onclick="removerIndicador(this)">Remover</button></td></tr>').join('');
+}
+
+async function adicionarIndicador(){
+  const nome = document.getElementById('novoIndNome').value.trim();
+  const unidade = document.getElementById('novoIndUnidade').value.trim();
+  const meta_padrao = parseFloat(document.getElementById('novoIndMeta').value)||null;
+  const descricao = document.getElementById('novoIndDesc').value.trim();
+  if(!nome){msg('msgIndicador','Preencha o nome.','err');return;}
+  const {error} = await sb.from('tipos_indicadores').insert({nome,unidade,meta_padrao,descricao,ativo:true});
+  if(error){msg('msgIndicador','Erro: '+error.message,'err');return;}
+  msg('msgIndicador','Indicador adicionado!','ok');
+  carregarIndicadores();
+}
+
+function abrirEditIndicador(btn){
+  document.getElementById('editIndicadorId').value = btn.dataset.id;
+  document.getElementById('editIndicadorNome').value = decodeURIComponent(btn.dataset.nome);
+  document.getElementById('editIndicadorUnidade').value = decodeURIComponent(btn.dataset.unidade);
+  document.getElementById('editIndicadorMeta').value = btn.dataset.meta;
+  document.getElementById('editIndicadorDesc').value = decodeURIComponent(btn.dataset.desc);
+  abrirModal('modalIndicador');
+}
+
+async function salvarEdicaoIndicador(){
+  const id = document.getElementById('editIndicadorId').value;
+  const nome = document.getElementById('editIndicadorNome').value.trim();
+  const unidade = document.getElementById('editIndicadorUnidade').value.trim();
+  const meta_padrao = parseFloat(document.getElementById('editIndicadorMeta').value)||null;
+  const descricao = document.getElementById('editIndicadorDesc').value.trim();
+  const {error} = await sb.from('tipos_indicadores').update({nome,unidade,meta_padrao,descricao}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return;}
+  fecharModal('modalIndicador');carregarIndicadores();
+}
+
+async function removerIndicador(btn){
+  if(!confirm('Remover este indicador?'))return;
+  await sb.from('tipos_indicadores').delete().eq('id',btn.dataset.id);
+  carregarIndicadores();
+}
+
+// COMPETENCIAS
+async function carregarCompetencias(){
+  const {data} = await sb.from('competencias').select('*').order('codigo');
+  const tbody = document.getElementById('tabelaCompetencias');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhuma competencia</td></tr>';return;}
+  tbody.innerHTML = data.map(c=>'<tr><td>'+c.codigo+'</td><td>'+c.nome+'</td><td>'+(c.descricao||'—')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+c.id+'" data-cod="'+c.codigo+'" data-nome="'+encodeURIComponent(c.nome)+'" data-desc="'+encodeURIComponent(c.descricao||'')+'" onclick="abrirEditCompetencia(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+c.id+'" onclick="removerCompetencia(this)">Remover</button></td></tr>').join('');
+}
+
+async function adicionarCompetencia(){
+  const codigo = document.getElementById('novaCompCod').value.trim().toUpperCase();
+  const nome = document.getElementById('novaCompNome').value.trim();
+  const descricao = document.getElementById('novaCompDesc').value.trim();
+  if(!codigo||!nome){msg('msgCompetencia','Preencha codigo e nome.','err');return;}
+  const {error} = await sb.from('competencias').insert({codigo,nome,descricao});
+  if(error){msg('msgCompetencia','Erro: '+error.message,'err');return;}
+  msg('msgCompetencia','Competencia adicionada!','ok');
+  carregarCompetencias();carregarCompetenciasSelects();
+}
+
+function abrirEditCompetencia(btn){
+  document.getElementById('editCompetenciaId').value = btn.dataset.id;
+  document.getElementById('editCompetenciaCod').value = btn.dataset.cod;
+  document.getElementById('editCompetenciaNome').value = decodeURIComponent(btn.dataset.nome);
+  document.getElementById('editCompetenciaDesc').value = decodeURIComponent(btn.dataset.desc);
+  abrirModal('modalCompetencia');
+}
+
+async function salvarEdicaoCompetencia(){
+  const id = document.getElementById('editCompetenciaId').value;
+  const codigo = document.getElementById('editCompetenciaCod').value.trim();
+  const nome = document.getElementById('editCompetenciaNome').value.trim();
+  const descricao = document.getElementById('editCompetenciaDesc').value.trim();
+  const {error} = await sb.from('competencias').update({codigo,nome,descricao}).eq('id',id);
+  if(error){alert('Erro: '+error.message);return;}
+  fecharModal('modalCompetencia');carregarCompetencias();carregarCompetenciasSelects();
+}
+
+async function removerCompetencia(btn){
+  if(!confirm('Remover esta competencia?'))return;
+  await sb.from('competencias').delete().eq('id',btn.dataset.id);
+  carregarCompetencias();
+  }
+// VINCULOS
 async function carregarVinculos(){
-const[rn,rm]=await Promise.all([
-sb.from('competencias_niveis').select('id,competencia_id,nivel_codigo,competencias(codigo,nome)'),
-sb.from('competencias_membros').select('id,competencia_id,perfil_id,competencias(codigo,nome),perfis(nome,email)')
-]);
-const lvn=document.getElementById('listaVincNivel');
-const lvm=document.getElementById('listaVincMembro');
-if(rn.data&&rn.data.length){
-lvn.innerHTML=rn.data.map(v=>'<div class="chip">'+v.competencias.codigo+' - '+v.nivel_codigo+'<button class="chip-btn" data-vincid="'+v.id+'" onclick="removerVincNivel(this.dataset.vincid)" title="Desvincular">&times;</button></div>').join('');
-}else{lvn.innerHTML='<small style="color:#94a3b8">Nenhum vinculo de nivel.</small>';}
-if(rm.data&&rm.data.length){
-lvm.innerHTML=rm.data.map(v=>'<div class="chip">'+v.competencias.codigo+' - '+(v.perfis.nome||v.perfis.email)+'<button class="chip-btn" data-vincid="'+v.id+'" onclick="removerVincMembro(this.dataset.vincid)" title="Desvincular">&times;</button></div>').join('');
-}else{lvm.innerHTML='<small style="color:#94a3b8">Nenhum vinculo de membro.</small>';}
-const selM=document.getElementById('vincMembroSel');
-selM.innerHTML='<option value="">Selecione...</option>';
-Object.values(membrosCache).forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=(m.nome||m.email);selM.appendChild(o);});
+  const {data:comps} = await sb.from('competencias').select('*').order('codigo');
+  const {data:niveis} = await sb.from('niveis').select('*').order('nome');
+  const {data:membros} = await sb.from('perfis').select('*').order('nome');
+  const compOptsN = comps ? comps.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
+  const compOptsM = compOptsN;
+  const nivOpts = niveis ? niveis.map(n=>'<option value="'+n.id+'">'+n.nome+'</option>').join('') : '';
+  const memOpts = membros ? membros.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('') : '';
+  document.getElementById('vincCompNivel').innerHTML = compOptsN;
+  document.getElementById('vincNivelSel').innerHTML = nivOpts;
+  document.getElementById('vincCompMembro').innerHTML = compOptsM;
+  document.getElementById('vincMembroSel').innerHTML = memOpts;
+  await carregarListaVincNivel();
+  await carregarListaVincMembro();
 }
+
+async function carregarListaVincNivel(){
+  const {data} = await sb.from('competencias_niveis').select('id,competencias(codigo,nome),niveis(nome)');
+  const el = document.getElementById('listaVincNivel');
+  if(!data||!data.length){el.innerHTML='<span style="color:#94a3b8;font-size:.82rem">Nenhum vinculo</span>';return;}
+  el.innerHTML = data.map(v=>{
+    const txt = (v.competencias?v.competencias.codigo:'?')+' -> '+(v.niveis?v.niveis.nome:'?');
+    return '<span class="chip">'+txt+'<button data-vincid="'+v.id+'" onclick="removerVincNivel(this)">x</button></span>';
+  }).join('');
+}
+
+async function carregarListaVincMembro(){
+  const {data} = await sb.from('competencias_membros').select('id,competencias(codigo,nome),perfis(nome)');
+  const el = document.getElementById('listaVincMembro');
+  if(!data||!data.length){el.innerHTML='<span style="color:#94a3b8;font-size:.82rem">Nenhum vinculo</span>';return;}
+  el.innerHTML = data.map(v=>{
+    const txt = (v.competencias?v.competencias.codigo:'?')+' -> '+(v.perfis?v.perfis.nome:'?');
+    return '<span class="chip">'+txt+'<button data-vincid="'+v.id+'" onclick="removerVincMembro(this)">x</button></span>';
+  }).join('');
+}
+
 async function vincularCompNivel(){
-const competencia_id=document.getElementById('vincCompNivel').value;
-const nivel_codigo=document.getElementById('vincNivelSel').value;
-if(!competencia_id||!nivel_codigo){showMsg('msgVincNivel','Selecione competencia e nivel.','err');return;}
-const{error}=await sb.from('competencias_niveis').insert({competencia_id,nivel_codigo});
-if(error){showMsg('msgVincNivel','Erro: '+error.message,'err');}else{showMsg('msgVincNivel','Vinculado!','ok');carregarVinculos();}
+  const comp_id = document.getElementById('vincCompNivel').value;
+  const nivel_id = document.getElementById('vincNivelSel').value;
+  if(!comp_id||!nivel_id){msg('msgVincNivel','Selecione competencia e nivel.','err');return;}
+  const {error} = await sb.from('competencias_niveis').insert({competencia_id:comp_id,nivel_id});
+  if(error){msg('msgVincNivel','Erro: '+error.message,'err');return;}
+  msg('msgVincNivel','Vinculo criado!','ok');
+  carregarListaVincNivel();
 }
-async function removerVincNivel(id){if(!confirm('Desvincular?'))return;const{error}=await sb.from('competencias_niveis').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarVinculos();}
+
 async function vincularCompMembro(){
-const competencia_id=document.getElementById('vincCompMembro').value;
-const perfil_id=document.getElementById('vincMembroSel').value;
-if(!competencia_id||!perfil_id){showMsg('msgVincMembro','Selecione competencia e membro.','err');return;}
-const{error}=await sb.from('competencias_membros').insert({competencia_id,perfil_id});
-if(error){showMsg('msgVincMembro','Erro: '+error.message,'err');}else{showMsg('msgVincMembro','Vinculado!','ok');carregarVinculos();}
+  const comp_id = document.getElementById('vincCompMembro').value;
+  const membro_id = document.getElementById('vincMembroSel').value;
+  if(!comp_id||!membro_id){msg('msgVincMembro','Selecione competencia e membro.','err');return;}
+  const {error} = await sb.from('competencias_membros').insert({competencia_id:comp_id,membro_id});
+  if(error){msg('msgVincMembro','Erro: '+error.message,'err');return;}
+  msg('msgVincMembro','Vinculo criado!','ok');
+  carregarListaVincMembro();
 }
-async function removerVincMembro(id){if(!confirm('Desvincular?'))return;const{error}=await sb.from('competencias_membros').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarVinculos();}
-async function sair(){await sb.auth.signOut();location.href='index.html';}
-async function init(){
-const{data:{session}}=await sb.auth.getSession();
-if(!session){location.href='index.html';return;}
-await Promise.all([carregarEquipes(),carregarNiveis()]);
-await carregarEquipe();
-await carregarIndicadores();
-await carregarCompetencias();
-await carregarVinculos();
+
+async function removerVincNivel(btn){
+  const id = btn.dataset.vincid;
+  await sb.from('competencias_niveis').delete().eq('id',id);
+  carregarListaVincNivel();
 }
-init();
+
+async function removerVincMembro(btn){
+  const id = btn.dataset.vincid;
+  await sb.from('competencias_membros').delete().eq('id',id);
+  carregarListaVincMembro();
+  }
+// AVALIAR EQUIPE
+async function carregarMembrosAvaliar(){
+  const {data} = await sb.from('perfis').select('*').order('nome');
+  const grid = document.getElementById('memberGrid');
+  if(!data||!data.length){grid.innerHTML='<p style="color:#94a3b8">Nenhum membro cadastrado</p>';return;}
+  grid.innerHTML = data.map(m=>{
+    return '<div class="member-card" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||m.id)+'" onclick="selecionarMembro(this)"><strong style="font-size:.88rem">'+m.nome+'</strong><br><span style="font-size:.75rem;color:#64748b">'+nomePapel(m.papel)+(m.equipe?' | '+m.equipe:'')+'</span></div>';
+  }).join('');
+  document.getElementById('avaliarConteudo').style.display='none';
+  membroAtualId = null;
+}
+
+function selecionarMembro(card){
+  document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  membroAtualId = card.dataset.id;
+  document.getElementById('membroSelecionadoNome').textContent = decodeURIComponent(card.dataset.nome);
+  document.getElementById('avaliarConteudo').style.display='block';
+  avaliacaoStars = {};
+  carregarCompGrid();
+  carregarAvaliacoesMembro();
+  carregarCompetenciasSelects();
+}
+
+async function carregarCompGrid(){
+  const {data} = await sb.from('competencias').select('*').order('codigo');
+  const grid = document.getElementById('compGrid');
+  if(!data||!data.length){grid.innerHTML='<p style="color:#94a3b8">Nenhuma competencia cadastrada</p>';return;}
+  avaliacaoStars = {};
+  grid.innerHTML = data.map(c=>{
+    avaliacaoStars[c.id] = 0;
+    const stars = [1,2,3,4,5].map(n=>'<span data-compid="'+c.id+'" data-val="'+n+'" onclick="setStar(this)">&#9733;</span>').join('');
+    return '<div class="comp-card"><h4>'+c.codigo+' - '+c.nome+'</h4><div class="star-row" id="stars-'+c.id+'">'+stars+'</div></div>';
+  }).join('');
+}
+
+function setStar(span){
+  const compId = span.dataset.compid;
+  const val = parseInt(span.dataset.val);
+  avaliacaoStars[compId] = val;
+  const row = document.getElementById('stars-'+compId);
+  row.querySelectorAll('span').forEach(s=>{
+    s.classList.toggle('filled', parseInt(s.dataset.val) <= val);
+  });
+}
+
+async function salvarAvaliacao(){
+  if(!membroAtualId){msg('msgAvaliacao','Selecione um membro.','err');return;}
+  const periodo = document.getElementById('avPeriodo').value;
+  const comentario = document.getElementById('avComentario').value.trim();
+  if(!periodo){msg('msgAvaliacao','Selecione o periodo.','err');return;}
+  const notas = Object.entries(avaliacaoStars).filter(([k,v])=>v>0);
+  if(!notas.length){msg('msgAvaliacao','Avalie pelo menos uma competencia.','err');return;}
+  const media = notas.reduce((s,[k,v])=>s+v,0)/notas.length;
+  const {data:av,error} = await sb.from('avaliacoes_gestor').insert({
+    colaborador_id:membroAtualId,
+    gestor_id:userSession.user.id,
+    periodo:periodo+'-01',
+    media_geral:parseFloat(media.toFixed(2)),
+    comentario
+  }).select().single();
+  if(error){msg('msgAvaliacao','Erro ao salvar: '+error.message,'err');return;}
+  msg('msgAvaliacao','Avaliacao salva!','ok');
+  carregarAvaliacoesMembro();
+}
+
+async function carregarAvaliacoesMembro(){
+  if(!membroAtualId) return;
+  const {data} = await sb.from('avaliacoes_gestor').select('*').eq('colaborador_id',membroAtualId).order('periodo',{ascending:false});
+  const tbody = document.getElementById('tabelaAvaliacoes');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhuma avaliacao registrada</td></tr>';return;}
+  tbody.innerHTML = data.map(a=>{
+    const per = a.periodo ? a.periodo.substring(0,7) : '—';
+    return '<tr><td>'+per+'</td><td>'+(a.media_geral||'—')+'</td><td>'+(a.comentario||'—')+'</td><td><button class="btn btn-sm btn-red" data-id="'+a.id+'" onclick="removerAvaliacao(this)">Remover</button></td></tr>';
+  }).join('');
+}
+
+async function removerAvaliacao(btn){
+  if(!confirm('Remover esta avaliacao?'))return;
+  await sb.from('avaliacoes_gestor').delete().eq('id',btn.dataset.id);
+  carregarAvaliacoesMembro();
+}
+
+// REGISTROS INDICADORES
+async function carregarRegIndicadores(){
+  if(!membroAtualId) return;
+  const {data} = await sb.from('registros_indicadores').select('*,tipos_indicadores(nome,unidade,meta_padrao)').eq('analista_id',membroAtualId).order('periodo',{ascending:false}).limit(50);
+  const tbody = document.getElementById('tabelaRegInd');
+  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum registro encontrado</td></tr>';return;}
+  tbody.innerHTML = data.map(r=>{
+    const per = r.periodo ? r.periodo.substring(0,7) : '—';
+    const ind = r.tipos_indicadores;
+    return '<tr><td>'+per+'</td><td>'+(ind?ind.nome:r.indicador_nome||'—')+'</td><td>'+r.valor+(ind&&ind.unidade?' '+ind.unidade:'')+'</td><td>'+(ind&&ind.meta_padrao?ind.meta_padrao+(ind.unidade?' '+ind.unidade:''):'—')+'</td><td>'+(r.observacao||'—')+'</td></tr>';
+  }).join('');
+}
+
+// PDI
+async function salvarPDI(){
+  if(!membroAtualId){msg('msgPDI','Selecione um membro.','err');return;}
+  const objetivo = document.getElementById('pdiObjetivo').value.trim();
+  const prazo = document.getElementById('pdiPrazo').value;
+  const descricao = document.getElementById('pdiDescricao').value.trim();
+  const comp_id = document.getElementById('pdiCompetencia').value||null;
+  const status = document.getElementById('pdiStatus').value;
+  if(!objetivo){msg('msgPDI','Preencha o objetivo.','err');return;}
+  const {error} = await sb.from('pdis').insert({
+    colaborador_id:membroAtualId,
+    gestor_id:userSession.user.id,
+    objetivo,prazo:prazo||null,descricao,
+    competencia_id:comp_id,status
+  });
+  if(error){msg('msgPDI','Erro: '+error.message,'err');return;}
+  msg('msgPDI','PDI salvo!','ok');
+  document.getElementById('pdiObjetivo').value='';
+  document.getElementById('pdiDescricao').value='';
+  document.getElementById('pdiPrazo').value='';
+  carregarPDI();
+}
+
+async function carregarPDI(){
+  if(!membroAtualId) return;
+  const {data} = await sb.from('pdis').select('*,competencias(codigo,nome)').eq('colaborador_id',membroAtualId).order('created_at',{ascending:false});
+  const el = document.getElementById('listaPDI');
+  if(!data||!data.length){el.innerHTML='<p style="color:#94a3b8;font-size:.85rem">Nenhum PDI cadastrado para este membro</p>';return;}
+  el.innerHTML = data.map(p=>{
+    const comp = p.competencias ? ' | '+p.competencias.codigo+' - '+p.competencias.nome : '';
+    const prazo = p.prazo ? ' | Prazo: '+p.prazo : '';
+    const statusCls = 'pdi-status pdi-'+(p.status||'aberto');
+    return '<div class="pdi-item"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4>'+p.objetivo+'</h4><small style="color:#94a3b8">'+prazo.replace(' | ','')+comp+'</small></div><button class="btn btn-sm btn-red" data-id="'+p.id+'" onclick="removerPDI(this)">Remover</button></div>'+(p.descricao?'<p style="font-size:.83rem;margin-top:6px;color:#374151">'+p.descricao+'</p>':'')+'<span class="'+statusCls+'">'+p.status+'</span></div>';
+  }).join('');
+}
+
+async function removerPDI(btn){
+  if(!confirm('Remover este PDI?'))return;
+  await sb.from('pdis').delete().eq('id',btn.dataset.id);
+  carregarPDI();
+}
+
+window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
