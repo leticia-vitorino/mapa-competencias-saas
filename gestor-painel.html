@@ -1,716 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Painel do Gestor</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Competencias</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:#f1f5f9;color:#1e293b}
-header{background:#2563eb;color:#fff;padding:14px 24px;display:flex;justify-content:space-between;align-items:center}
-header h1{font-size:1.1rem}
-.btn{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:.88rem}
-.btn-outline{background:transparent;border:1px solid #fff;color:#fff}
-.btn-primary{background:#2563eb;color:#fff;font-weight:600}
-.btn-primary:hover{background:#1d4ed8}
-.btn-sm{padding:4px 10px;font-size:.8rem}
-.btn-red{background:#dc2626;color:#fff}
-.btn-yellow{background:#d97706;color:#fff}
-.btn-green{background:#16a34a;color:#fff}
-.btn-purple{background:#7c3aed;color:#fff}
-.container{max-width:1200px;margin:0 auto;padding:20px 16px}
-.nav-tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e2e8f0;flex-wrap:wrap}
-.nav-tab{padding:9px 16px;cursor:pointer;border:none;background:none;font-size:.85rem;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
-.nav-tab.active{color:#2563eb;border-bottom-color:#2563eb;font-weight:600}
-.section{display:none}.section.active{display:block}
-.card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px}
-.card h2{font-size:.85rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
-label{display:block;font-size:.83rem;color:#374151;margin-bottom:3px;margin-top:10px}
-input,select,textarea{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:.9rem;outline:none}
-input:focus,select:focus,textarea:focus{border-color:#2563eb}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.msg{margin-top:10px;padding:9px 12px;border-radius:6px;font-size:.85rem;display:none}
-.msg.ok{background:#d1fae5;color:#065f46;display:block}
-.msg.err{background:#fee2e2;color:#991b1b;display:block}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th{background:#f8fafc;padding:9px 12px;text-align:left;font-size:.78rem;color:#64748b;text-transform:uppercase;border-bottom:2px solid #e2e8f0}
-td{padding:9px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-tr:hover td{background:#f8fafc}
-.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
-.badge-gestor{background:#dbeafe;color:#1d4ed8}
-.badge-n1{background:#d1fae5;color:#065f46}
-.badge-n2{background:#fef3c7;color:#92400e}
-.badge-n3{background:#fce7f3;color:#9d174d}
-.badge-rt{background:#f3e8ff;color:#6b21a8}
-.badge-analista_op{background:#ede9fe;color:#5b21b6}
-.acoes{display:flex;gap:6px;flex-wrap:wrap}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:440px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
-.modal h3{font-size:1rem;margin-bottom:14px;color:#1e293b}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{background:#ede9fe;color:#5b21b6;padding:4px 10px;border-radius:20px;font-size:.78rem;display:flex;align-items:center;gap:5px}
-.chip button{background:none;border:none;cursor:pointer;color:#7c3aed;font-size:.85rem;padding:0 2px}
-.sub-tabs{display:flex;gap:2px;margin-bottom:14px;border-bottom:1.5px solid #e2e8f0;flex-wrap:wrap}
-.sub-tab{padding:7px 14px;cursor:pointer;border:none;background:none;font-size:.83rem;color:#64748b;border-bottom:2px solid transparent;margin-bottom:-1.5px}
-.sub-tab.active{color:#7c3aed;border-bottom-color:#7c3aed;font-weight:600}
-.sub-section{display:none}.sub-section.active{display:block}
-.star-row{display:flex;gap:4px;font-size:1.3rem;cursor:pointer}
-.star-row span{color:#d1d5db;transition:color .1s}
-.star-row span.filled{color:#f59e0b}
-.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:8px}
-.comp-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px}
-.comp-card h4{font-size:.82rem;color:#374151;margin-bottom:6px}
-.member-card{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;cursor:pointer;transition:border-color .15s}
-.member-card:hover,.member-card.selected{border-color:#2563eb;background:#eff6ff}
-.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px}
-.pdi-item{border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px}
-.pdi-item h4{font-size:.88rem;color:#1e293b;margin-bottom:4px}
-.pdi-status{font-size:.75rem;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:4px}
-.pdi-aberto{background:#fef3c7;color:#92400e}
-.pdi-em_andamento{background:#dbeafe;color:#1d4ed8}
-.pdi-concluido{background:#d1fae5;color:#065f46}
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f4f6fb;--surface:#fff;--border:#e2e8f0;--text:#1a2332;--muted:#64748b;--teal:#1a2332;--teal2:#0f4c75;--amber:#d97706;--red:#dc2626;--green:#16a34a}body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}.topbar{background:var(--teal);color:#fff;display:flex;align-items:center;padding:0 24px;height:56px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}.topbar-logo{font-weight:700;font-size:15px;white-space:nowrap;display:flex;align-items:center;gap:8px}.topbar-logo span{background:#d97706;color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600}.topbar-user{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:13px;color:#94a3b8}.topbar-user strong{color:#fff}.btn-logout{background:transparent;border:1px solid #334155;color:#94a3b8;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px}.btn-logout:hover{background:#334155;color:#fff}.nav-tabs{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 24px;gap:4px}.nav-tab{padding:14px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;background:none;border-left:none;border-right:none;border-top:none}.nav-tab:hover{color:var(--text)}.nav-tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}.layout{display:flex;height:calc(100vh - 96px);overflow:hidden;width:100%}.sidebar{width:260px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}.main-content{flex:1;overflow-y:auto;padding:24px}.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}.sidebar-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:#64748b;text-transform:uppercase;margin-bottom:8px}.sidebar-filters{display:flex;gap:6px;flex-wrap:wrap}.filter-btn{padding:4px 12px;border:1px solid var(--border);border-radius:20px;background:#f8fafc;font-size:12px;cursor:pointer;transition:all .15s}.filter-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}.sidebar-list{flex:1;overflow-y:auto;padding:8px}.member-card{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff;position:relative}.member-card:hover{border-color:#94a3b8;box-shadow:0 2px 8px rgba(0,0,0,.06)}.member-card.active{border-color:var(--teal);background:#f0f9ff;box-shadow:0 2px 12px rgba(15,76,117,.12)}.member-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;padding-right:28px}.member-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center;margin-bottom:4px}.level-badge{background:var(--teal);color:#fff;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700}.adherence-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden}.adherence-fill{height:100%;border-radius:2px;transition:width .3s}.adherence-label{font-size:10px;color:var(--muted);margin-top:3px}.btn-remove-member{position:absolute;top:8px;right:8px;background:none;border:none;color:#cbd5e1;cursor:pointer;font-size:14px;padding:2px}.btn-remove-member:hover{color:var(--red)}.sidebar-add{border-top:1px solid var(--border);padding:12px}.add-form{display:flex;flex-direction:column;gap:8px}.add-form input,.add-form select{padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:#fff;width:100%}.btn-add{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;width:100%}.btn-add:hover{background:var(--teal2)}.member-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px}.member-info h2{font-size:24px;font-weight:700}.member-info .meta{font-size:13px;color:var(--muted);margin-top:4px}.weights-pill{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);margin-top:8px}.donuts{display:flex;gap:20px;flex-wrap:wrap}.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}.donut-ring{width:72px;height:72px;position:relative}.donut-ring svg{transform:rotate(-90deg)}.donut-ring .track{fill:none;stroke:#e2e8f0;stroke-width:8}.donut-ring .fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dasharray .6s ease}.donut-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}.donut-label{font-size:11px;color:var(--muted);text-align:center}.section-header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;margin-bottom:8px;border-bottom:2px solid}.section-header h3{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700}.section-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}.section-weight{font-size:12px;color:var(--muted);font-family:monospace}.comp-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;border-left:3px solid transparent}.comp-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08);border-color:#94a3b8}.comp-icon{font-size:16px;width:28px;text-align:center;flex-shrink:0}.comp-info{flex:1;min-width:0}.comp-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}.comp-desc{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pdi-tag{background:#fef3c7;color:#92400e;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:600}.score-btns{display:flex;align-items:center;gap:6px;flex-shrink:0}.score-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid #cbd5e1;background:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--muted)}.score-btn:hover{border-color:var(--teal);color:var(--teal)}.score-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}.score-btn.na{font-size:14px;color:#94a3b8}.score-btn.na.active{background:#94a3b8;border-color:#94a3b8;color:#fff}.alvo-indicator{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-left:8px;white-space:nowrap}.alvo-dot{width:8px;height:8px;border-radius:50%}.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px)}.modal{background:#fff;border-radius:16px;width:520px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}.modal-header{background:var(--teal);color:#fff;padding:20px 24px 16px;border-radius:16px 16px 0 0}.modal-meta{font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}.modal-title{font-size:20px;font-weight:700}.modal-desc{font-size:13px;color:#94a3b8;margin-top:6px}.modal-body{padding:20px 24px}.regua-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:12px}.regua-row{display:flex;gap:12px;padding:12px;border-radius:8px;margin-bottom:6px}.regua-row.atual{background:#f0f9ff;border:1.5px solid var(--teal)}.regua-row.alvo{background:#fffbeb;border:1.5px solid var(--amber)}.regua-row.atual-alvo{background:#f0fdf4;border:1.5px solid var(--green)}.nivel-badge{width:64px;flex-shrink:0;background:var(--teal);color:#fff;border-radius:6px;padding:6px;text-align:center;font-size:10px;font-weight:700;line-height:1.3}.nivel-text{font-size:13px;color:var(--text);line-height:1.5}.modal-close-btn{float:right;background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}.modal-close-btn:hover{background:rgba(255,255,255,.3)}.tab-pane{display:none}.tab-pane.active{display:block}.auto-banner{background:linear-gradient(135deg,#f0f9ff,#fffbeb);border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--muted)}.auto-counters{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}.auto-counter{border-radius:10px;padding:16px;text-align:center;border:1px solid}.auto-counter .num{font-size:28px;font-weight:700;display:block;margin-bottom:4px}.auto-counter .lbl{font-size:12px}.auto-counter.alinhado{background:#f0fdf4;border-color:#86efac;color:var(--green)}.auto-counter.superestima{background:#fffbeb;border-color:#fcd34d;color:#92400e}.auto-counter.subestima{background:#f8fafc;border-color:#cbd5e1;color:#475569}.auto-row{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f1f5f9;gap:12px}.auto-comp{flex:1;font-size:13px;font-weight:500}.auto-scores{display:flex;align-items:center;gap:4px;flex-shrink:0}.auto-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid #e2e8f0;background:#fff;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s}.auto-btn.gestor.active{background:var(--teal);border-color:var(--teal);color:#fff}.auto-btn.self.active{background:var(--amber);border-color:var(--amber);color:#fff}.auto-delta{min-width:100px;text-align:right;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;flex-shrink:0}.auto-delta.sup{background:#fef3c7;color:#92400e}.auto-delta.sub{background:#f1f5f9;color:#475569}.auto-delta.ali{background:#f0fdf4;color:var(--green)}.gap-table{width:100%;border-collapse:collapse}.gap-table th{padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#f8fafc;border-bottom:2px solid var(--border);text-align:left}.gap-table th.member-col{text-align:center;min-width:80px}.gap-table td{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle}.gap-table tr.cat-row td{background:#f8fafc;font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);padding:6px 12px;letter-spacing:.08em}.gap-cell{display:flex;justify-content:center;align-items:center}.gap-score{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}.pdi-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.pdi-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}.pdi-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.pdi-title{font-size:13px;font-weight:700;color:var(--teal)}.pdi-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pdi-form textarea{grid-column:1/-1;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;resize:vertical;min-height:60px;font-family:inherit}.pdi-form input,.pdi-form select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px}.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px}.ind-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center}.ind-card .val{font-size:28px;font-weight:700;color:var(--teal)}.ind-card .lbl{font-size:12px;color:var(--muted);margin-top:4px}.hist-item{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px}.hist-date{font-size:11px;color:var(--muted);white-space:nowrap;min-width:90px}.hist-body{flex:1}.hist-title{font-size:13px;font-weight:600}.hist-scores{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}.hist-score-pill{font-size:11px;padding:2px 8px;border-radius:20px;background:#f1f5f9;color:var(--muted)}.config-section{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}.config-title{font-size:14px;font-weight:700;margin-bottom:16px}.config-table{width:100%;border-collapse:collapse}.config-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 12px;border-bottom:2px solid var(--border);text-align:left}.config-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle}.btn{padding:8px 16px;border-radius:8px;border:none;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal2)}.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#b91c1c}.btn-ghost{background:#f1f5f9;color:var(--text)}.btn-ghost:hover{background:#e2e8f0}.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px}.login-page{min-height:100vh;background:var(--teal);display:flex;align-items:center;justify-content:center}.login-card{background:#fff;border-radius:20px;padding:40px;width:400px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.3)}.login-logo{text-align:center;margin-bottom:28px}.login-logo h1{font-size:22px;font-weight:700;color:var(--teal)}.login-logo p{font-size:13px;color:var(--muted);margin-top:6px}.login-form{display:flex;flex-direction:column;gap:14px}.login-form label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:5px}.login-form input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px}.login-form input:focus{outline:none;border-color:var(--teal)}.login-btn{background:var(--teal);color:#fff;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:600;cursor:pointer}.login-btn:hover{background:var(--teal2)}.login-error{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;display:none}.login-error.show{display:block}.empty{text-align:center;padding:60px 20px;color:var(--muted)}.empty-icon{font-size:40px;margin-bottom:12px}.empty h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:6px}.empty p{font-size:13px}.toast{position:fixed;bottom:24px;right:24px;background:var(--teal);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;z-index:999;transform:translateY(80px);opacity:0;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,.2)}.toast.show{transform:translateY(0);opacity:1}.toast.error{background:var(--red)}@media(max-width:768px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;max-height:280px}.donuts{gap:12px}.donut-ring{width:60px;height:60px}}
 </style>
 </head>
 <body>
-<header>
-<h1>Painel do Gestor</h1>
-<button class="btn btn-outline" onclick="sair()">Sair</button>
-</header>
-<div class="container">
-<div class="nav-tabs">
-<button class="nav-tab active" onclick="aba('membros',this)">Membros</button>
-<button class="nav-tab" onclick="aba('niveis',this)">Niveis</button>
-<button class="nav-tab" onclick="aba('equipes',this)">Equipes</button>
-<button class="nav-tab" onclick="aba('indicadores',this)">Indicadores</button>
-<button class="nav-tab" onclick="aba('competencias',this)">Competencias</button>
-<button class="nav-tab" onclick="aba('vinculos',this)">Vinculos</button>
-<button class="nav-tab" onclick="aba('avaliar',this)">Avaliar Equipe</button>
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo"><h1>&#127775; Mapa de Competencias</h1><p>Suporte consultivo &middot; escala 1&ndash;5 &middot; metodo BARS</p></div>
+    <div class="login-form">
+      <div><label>E-mail</label><input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email"></div>
+      <div><label>Senha</label><input type="password" id="loginPassword" placeholder="Senha" autocomplete="current-password"></div>
+      <div id="loginError" class="login-error"></div>
+      <button class="login-btn" id="loginBtn" onclick="fazerLogin()">Entrar</button>
+    </div>
+  </div>
 </div>
-<!-- MEMBROS -->
-<div id="membros" class="section active">
-<div class="card"><h2>Adicionar Membro</h2>
-<div class="form-row"><div><label>E-mail</label><input type="email" id="novoEmail" placeholder="colaborador@email.com"/></div><div><label>Nome</label><input type="text" id="novoNome" placeholder="Nome completo"/></div></div>
-<div class="form-row"><div><label>Equipe</label><select id="novaEquipe"></select></div><div><label>Nivel / Papel</label><select id="novoPapel"></select></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarMembro()">Adicionar</button><div class="msg" id="msgMembro"></div></div>
-<div class="card"><h2>Membros da Equipe</h2><table><thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Nivel</th><th>Acoes</th></tr></thead><tbody id="tabelaMembros"></tbody></table></div>
+<div id="appPage" style="display:none">
+  <div class="topbar">
+    <div class="topbar-logo">&#127775; Mapa de Competencias <span>GESTOR</span></div>
+    <div style="flex:1;font-size:11px;color:#64748b;padding-left:16px">Suporte consultivo &middot; escala 1&ndash;5 &middot; metodo BARS &middot; salvo na nuvem</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="exportarDados()">Exportar</button>
+      <button class="btn btn-ghost btn-sm" onclick="importarDados()">Importar</button>
+      <button class="btn btn-ghost btn-sm" onclick="imprimirPDF()">Imprimir/PDF</button>
+    </div>
+    <div class="topbar-user"><strong id="topbarUserName"></strong><button class="btn-logout" onclick="sair()">Sair</button></div>
+  </div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" data-view="matriz" onclick="mudarView(this)">Matriz &amp; Avaliacoes</button>
+    <button class="nav-tab" data-view="config" onclick="mudarView(this)">Configuracoes</button>
+  </div>
+  <div id="viewMatriz" style="display:flex">
+    <div class="layout">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">Equipe</div>
+          <div class="sidebar-filters" id="sidebarFilters"><button class="filter-btn active" data-eq="todos" onclick="filterEq(this)">Todos</button></div>
+        </div>
+        <div class="sidebar-list" id="memberList"></div>
+        <div class="sidebar-add">
+          <div class="sidebar-title" style="margin-bottom:8px">Adicionar colaborador</div>
+          <div class="add-form">
+            <input type="text" id="addName" placeholder="Nome completo">
+            <input type="email" id="addEmail" placeholder="E-mail (opcional)">
+            <select id="addNivel"><option value="">Nivel/Papel</option></select>
+            <select id="addEquipe"><option value="">Equipe</option></select>
+            <button class="btn-add" onclick="addMembro()">+ Adicionar membro</button>
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div id="noMemberMsg" class="empty"><div class="empty-icon">&#128101;</div><h3>Nenhum membro selecionado</h3><p>Selecione um colaborador na lista ao lado</p></div>
+        <div id="memberPanel" style="display:none">
+          <div class="member-header">
+            <div class="member-info"><h2 id="memberName"></h2><div class="meta" id="memberMeta"></div><div class="weights-pill" id="weightsInfo"></div></div>
+            <div class="donuts" id="donuts"></div>
+          </div>
+          <div style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border)">
+            <button class="nav-tab active" data-tab="avaliacao" onclick="mudarTab(this)">Avaliacao</button>
+            <button class="nav-tab" data-tab="autoconhecimento" onclick="mudarTab(this)">Autoconhecimento</button>
+            <button class="nav-tab" data-tab="mapagaps" onclick="mudarTab(this)">Mapa de gaps</button>
+            <button class="nav-tab" data-tab="pdi" onclick="mudarTab(this)">PDI</button>
+            <button class="nav-tab" data-tab="historico" onclick="mudarTab(this)">Historico</button>
+            <button class="nav-tab" data-tab="indicadores" onclick="mudarTab(this)">Indicadores</button>
+          </div>
+          <div id="tabAvaliacao" class="tab-pane active"></div>
+          <div id="tabAutoconhecimento" class="tab-pane"></div>
+          <div id="tabMapagaps" class="tab-pane"></div>
+          <div id="tabPdi" class="tab-pane"></div>
+          <div id="tabHistorico" class="tab-pane"></div>
+          <div id="tabIndicadores" class="tab-pane"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="viewConfig" style="display:none;padding:24px;max-width:900px;margin:0 auto">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">Configuracoes</h2>
+    <div id="configContent"></div>
+  </div>
 </div>
-<!-- NIVEIS -->
-<div id="niveis" class="section">
-<div class="card"><h2>Adicionar Nivel</h2>
-<div class="form-row"><div><label>Codigo</label><input type="text" id="novoNivCod" placeholder="ex: n3"/></div><div><label>Nome</label><input type="text" id="novoNivNome" placeholder="ex: Suporte Nivel 3"/></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarNivel()">Adicionar</button><div class="msg" id="msgNivel"></div></div>
-<div class="card"><h2>Niveis Cadastrados</h2><table><thead><tr><th>Codigo</th><th>Nome</th><th>Acoes</th></tr></thead><tbody id="tabelaNiveis"></tbody></table></div>
+<div id="modalRegua" style="display:none" class="modal-overlay" onclick="if(event.target===this)fecharModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close-btn" onclick="fecharModal()">&#215;</button>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-title" id="modalTitulo"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+    </div>
+    <div class="modal-body">
+      <div class="regua-title">REGUA DE PROFICIENCIA &middot; DO BASICO AO AVANCADO</div>
+      <div id="modalReguaContent"></div>
+    </div>
+  </div>
 </div>
-<!-- EQUIPES -->
-<div id="equipes" class="section">
-<div class="card"><h2>Adicionar Equipe</h2>
-<div class="form-row"><div><label>Nome</label><input type="text" id="novaEqNome" placeholder="ex: GC"/></div><div><label>Descricao</label><input type="text" id="novaEqDesc" placeholder="opcional"/></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarEquipe()">Adicionar</button><div class="msg" id="msgEquipe"></div></div>
-<div class="card"><h2>Equipes Cadastradas</h2><table><thead><tr><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead><tbody id="tabelaEquipes"></tbody></table></div>
-</div>
-<!-- INDICADORES (catalogo) -->
-<div id="indicadores" class="section">
-<div class="card"><h2>Adicionar Indicador</h2>
-<div class="form-row"><div><label>Nome</label><input type="text" id="novoIndNome" placeholder="Ex: NPS do cliente"/></div><div><label>Unidade</label><input type="text" id="novoIndUnidade" placeholder="%, pts, qtd..."/></div></div>
-<div class="form-row"><div><label>Meta Padrao</label><input type="number" id="novoIndMeta" placeholder="70"/></div><div><label>Descricao</label><input type="text" id="novoIndDesc"/></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarIndicador()">Adicionar</button><div class="msg" id="msgIndicador"></div></div>
-<div class="card"><h2>Indicadores Cadastrados</h2><table><thead><tr><th>Nome</th><th>Meta Padrao</th><th>Unidade</th><th>Ativo</th><th>Acoes</th></tr></thead><tbody id="tabelaIndicadores"></tbody></table></div>
-</div>
-<!-- COMPETENCIAS -->
-<div id="competencias" class="section">
-<div class="card"><h2>Adicionar Competencia</h2>
-<div class="form-row"><div><label>Codigo</label><input type="text" id="novaCompCod" placeholder="ex: C9"/></div><div><label>Nome</label><input type="text" id="novaCompNome" placeholder="ex: Lideranca"/></div></div>
-<label>Descricao</label><textarea id="novaCompDesc" rows="2" placeholder="Descricao da competencia"></textarea>
-<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarCompetencia()">Adicionar</button><div class="msg" id="msgCompetencia"></div></div>
-<div class="card"><h2>Competencias Cadastradas</h2><table><thead><tr><th>Cod</th><th>Nome</th><th>Descricao</th><th>Acoes</th></tr></thead><tbody id="tabelaCompetencias"></tbody></table></div>
-</div>
-<!-- VINCULOS -->
-<div id="vinculos" class="section">
-<div class="card"><h2>Vincular Competencia a Nivel</h2>
-<div class="form-row"><div><label>Competencia</label><select id="vincCompNivel"></select></div><div><label>Nivel</label><select id="vincNivelSel"></select></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompNivel()">Vincular</button><div class="msg" id="msgVincNivel"></div>
-<div style="margin-top:14px"><strong style="font-size:.85rem">Vinculos Nivel:</strong><div id="listaVincNivel" class="chip-list" style="margin-top:8px"></div></div></div>
-<div class="card"><h2>Vincular Competencia a Membro</h2>
-<div class="form-row"><div><label>Competencia</label><select id="vincCompMembro"></select></div><div><label>Membro</label><select id="vincMembroSel"></select></div></div>
-<button class="btn btn-primary" style="margin-top:14px" onclick="vincularCompMembro()">Vincular</button><div class="msg" id="msgVincMembro"></div>
-<div style="margin-top:14px"><strong style="font-size:.85rem">Vinculos Membro:</strong><div id="listaVincMembro" class="chip-list" style="margin-top:8px"></div></div></div>
-</div>
-<!-- AVALIAR EQUIPE -->
-<div id="avaliar" class="section">
-<div class="card">
-<h2>Selecione um Membro</h2>
-<div class="member-grid" id="memberGrid"></div>
-<div id="avaliarConteudo" style="display:none">
-<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-<span style="font-size:.85rem;color:#64748b">Membro selecionado:</span>
-<strong id="membroSelecionadoNome" style="color:#2563eb"></strong>
-</div>
-<div class="sub-tabs">
-<button class="sub-tab active" onclick="subAba('avaliacoes',this)">Avaliacoes</button>
-<button class="sub-tab" onclick="subAba('registros_ind',this)">Indicadores</button>
-<button class="sub-tab" onclick="subAba('pdi',this)">PDI</button>
-</div>
-<!-- SUB: AVALIACOES -->
-<div id="avaliacoes" class="sub-section active">
-<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
-<h2>Nova Avaliacao do Gestor</h2>
-<div class="form-row"><div><label>Periodo (mes/ano)</label><input type="month" id="avPeriodo"/></div><div><label>Comentario (opcional)</label><input type="text" id="avComentario" placeholder="Observacoes gerais..."/></div></div>
-<p style="font-size:.82rem;color:#64748b;margin-top:10px">Avalie as competencias (1 a 5 estrelas):</p>
-<div class="comp-grid" id="compGrid" style="margin-top:8px"></div>
-<button class="btn btn-primary" style="margin-top:16px" onclick="salvarAvaliacao()">Salvar Avaliacao</button>
-<div class="msg" id="msgAvaliacao"></div>
-</div>
-<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0;margin-top:0">
-<h2>Historico de Avaliacoes</h2>
-<table><thead><tr><th>Periodo</th><th>Nota Media</th><th>Comentario</th><th>Acoes</th></tr></thead><tbody id="tabelaAvaliacoes"></tbody></table>
-</div>
-</div>
-<!-- SUB: INDICADORES -->
-<div id="registros_ind" class="sub-section">
-<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
-<h2>Registros de Indicadores do Membro</h2>
-<table><thead><tr><th>Periodo</th><th>Indicador</th><th>Resultado</th><th>Meta</th></tr></thead><tbody id="tabelaRegInd"></tbody></table>
-</div>
-</div>
-<!-- SUB: PDI -->
-<div id="pdi" class="sub-section">
-<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0">
-<h2>Novo PDI / Plano de Acao</h2>
-<div class="form-row"><div><label>Objetivo / Acao</label><input type="text" id="pdiAcao" placeholder="Ex: Melhorar comunicacao com cliente"/></div><div><label>Prazo</label><input type="date" id="pdiPrazo"/></div></div>
-<div><label>Status</label><select id="pdiStatus"><option value="aberto">Aberto</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluido</option></select></div>
-<button class="btn btn-purple" style="margin-top:14px" onclick="salvarPDI()">Salvar PDI</button>
-<div class="msg" id="msgPDI"></div>
-</div>
-<div class="card" style="box-shadow:none;border:1.5px solid #e2e8f0;margin-top:0">
-<h2>PDIs do Membro</h2>
-<div id="listaPDI"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- MODALS -->
-<div class="modal-overlay" id="modalMembro"><div class="modal"><h3>Editar Membro</h3><input type="hidden" id="editMembroId"/><label>Nome</label><input type="text" id="editMembroNome"/><label>Equipe</label><select id="editMembroEquipe"></select><label>Nivel / Papel</label><select id="editMembroPapel"></select><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoMembro()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalMembro')">Cancelar</button></div></div></div>
-<div class="modal-overlay" id="modalNivel"><div class="modal"><h3>Editar Nivel</h3><input type="hidden" id="editNivelId"/><label>Codigo</label><input type="text" id="editNivelCod"/><label>Nome</label><input type="text" id="editNivelNome"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoNivel()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalNivel')">Cancelar</button></div></div></div>
-<div class="modal-overlay" id="modalEquipe"><div class="modal"><h3>Editar Equipe</h3><input type="hidden" id="editEquipeId"/><label>Nome</label><input type="text" id="editEquipeNome"/><label>Descricao</label><input type="text" id="editEquipeDesc"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoEquipe()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalEquipe')">Cancelar</button></div></div></div>
-<div class="modal-overlay" id="modalIndicador"><div class="modal"><h3>Editar Indicador</h3><input type="hidden" id="editIndicadorId"/><label>Nome</label><input type="text" id="editIndicadorNome"/><label>Unidade</label><input type="text" id="editIndicadorUnidade"/><label>Meta Padrao</label><input type="number" id="editIndicadorMeta"/><label>Descricao</label><input type="text" id="editIndicadorDesc"/><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoIndicador()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalIndicador')">Cancelar</button></div></div></div>
-<div class="modal-overlay" id="modalCompetencia"><div class="modal"><h3>Editar Competencia</h3><input type="hidden" id="editCompetenciaId"/><label>Codigo</label><input type="text" id="editCompetenciaCod"/><label>Nome</label><input type="text" id="editCompetenciaNome"/><label>Descricao</label><textarea id="editCompetenciaDesc" rows="2"></textarea><div class="modal-btns"><button class="btn btn-primary" onclick="salvarEdicaoCompetencia()">Salvar</button><button class="btn" style="background:#e2e8f0" onclick="fecharModal('modalCompetencia')">Cancelar</button></div></div></div>
-</div>
+<input type="file" id="importInput" style="display:none" accept=".json" onchange="processarImport(this)">
+<div id="toast" class="toast"></div>
 <script>
-const SUPA_URL = 'https://zsfysyphhpsajxbkwywk.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
-let sb, userSession, membroAtualId = null, avaliacaoStars = {};
+const SUPA_URL='https://zsfysyphhpsajxbkwywk.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+const BIB={comportamental:{label:'Comportamental',color:'#1a2332',icon:'&#128172;',peso:{N1:45,N2:40,N3:25,RT:20,AO:30},items:[{id:'A1',nome:'Comunicacao multicanal',desc:'Clareza adaptada a cada canal e interlocutor.',n1:'Responde de forma compreensivel no rotineiro, mas gera retrabalho por mensagens longas ou ambiguas.',n2:'Adapta o tom ao canal e confirma o entendimento na maioria dos atendimentos.',n3:'Escreve claro e estruturado, resume o proximo passo ao final e raramente gera re-pergunta.',n4:'Traduz temas tecnicos em linguagem do cliente com precisao e ajusta o registro a cada interlocutor.',n5:'Performance estavel independente do volume; e referencia interna para clareza de comunicacao.'},{id:'A2',nome:'Empatia e foco em CX',desc:'Cliente se sente cuidado, nao so resolvido.',n1:'Resolve o problema, mas a interacao e percebida como fria ou mecanica.',n2:'Demonstra interesse genuino e valida o impacto do problema na maioria dos casos.',n3:'Gera sensacao de cuidado consistente; cliente raramente escala por sentir-se ignorado.',n4:'Antecipa o impacto emocional da situacao e ajusta a abordagem proativamente.',n5:'Referencia de CX da equipe; clientes pedem especificamente seu atendimento.'},{id:'A3',nome:'Inteligencia emocional e conflitos',desc:'Conduzir tensao sem escalar o conflito.',n1:'Tem dificuldade em manter a postura em situacoes de pressao ou clientes agressivos.',n2:'Mantem a calma na maioria dos conflitos, mas ocasionalmente escala desnecessariamente.',n3:'Desescala conflitos de forma consistente e transforma tensao em dialogo produtivo.',n4:'Atua como mediador natural em situacoes de alto estresse envolvendo multiplos stakeholders.',n5:'Treina outros na gestao de conflitos; e acionado em casos criticos pela equipe.'},{id:'A4',nome:'Resiliencia sob pressao e volume',desc:'Qualidade constante sob fila e volume.',n1:'A qualidade do atendimento cai visivelmente em dias de alto volume.',n2:'Mantem padrao razoavel sob pressao com alguns desvios isolados.',n3:'Performance estavel mesmo em picos; raramente comete erros por pressao.',n4:'Ainda melhora outros ao redor em dias criticos; serve de ancora para a equipe.',n5:'Referencia de produtividade e qualidade independente do contexto.'},{id:'A5',nome:'Postura consultiva e proatividade',desc:'Antecipar, educar e recomendar.',n1:'Espera o cliente trazer o problema; nao costuma ir alem do solicitado.',n2:'Ocasionalmente oferece informacoes adicionais relevantes.',n3:'Consistentemente educa o cliente, previne recorrencias e recomenda melhorias.',n4:'Identifica padroes e propoe melhorias de processo antes de ser solicitado.',n5:'Referencia de postura consultiva; eleva o padrao da equipe.'},{id:'A6',nome:'Ownership e fluxo de caso',desc:'O caso e meu ate resolver ou passar com contexto.',n1:'Frequentemente abandona casos sem atualizacao ou contexto.',n2:'Acompanha a maioria dos casos, mas com lacunas de comunicacao.',n3:'Mantem ownership completo; cliente sempre sabe o status.',n4:'Garante continuidade mesmo em transicoes complexas de turno ou equipe.',n5:'Referencia de ownership; nunca perde um fio e lidera revisoes de processo.'},{id:'A7',nome:'Aprendizado continuo',desc:'Acompanhar um produto que muda e aprender com o erro.',n1:'Reage ao produto em vez de se antecipar; erros se repetem.',n2:'Absorve mudancas quando comunicadas formalmente.',n3:'Acompanha atualizacoes proativamente e adapta o workflow antes que impacte clientes.',n4:'Compartilha aprendizados com a equipe e contribui para a base de conhecimento.',n5:'Gera conhecimento novo; produto/squad o consulta sobre impactos operacionais.'},{id:'A8',nome:'Trabalho em equipe e colaboracao',desc:'Contribuir alem do proprio ticket.',n1:'Foca apenas no proprio trabalho; raramente colabora espontaneamente.',n2:'Colabora quando solicitado com boa qualidade.',n3:'Colabora proativamente e fortalece o desempenho coletivo.',n4:'Identifica gaps da equipe e age para cobri-los sem esperar instrucao.',n5:'Referencia de colaboracao; sua saida geraria impacto perceptivel no coletivo.'},{id:'A9',nome:'Etica e confidencialidade',desc:'Confianca como base do atendimento.',n1:'Ja apresentou comportamentos que geraram desconfianca interna ou com clientes.',n2:'Age com etica mas sem cuidado explicito com dados sensiveis.',n3:'Trata informacoes confidentiais com rigor; nunca expoe dados indevidamente.',n4:'Orienta outros sobre boas praticas e previne vazamentos de informacao.',n5:'Referencia de confianca; e acionado em situacoes criticas de compliance.'}]},tecnico:{label:'Tecnico',color:'#d97706',icon:'&#128270;',peso:{N1:35,N2:40,N3:45,RT:55,AO:35},items:[{id:'B1',nome:'Diagnostico e resolucao',desc:'Do relato confuso a causa-raiz.',n1:'Resolve o conhecido seguindo roteiro; tende a chutar no atipico.',n2:'Confirma o problema e reproduz antes de agir na maioria dos casos.',n3:'Distingue sintoma de causa-raiz e isola variaveis com autonomia.',n4:'Investiga causa-raiz profunda, inclusive comportamento de sistema.',n5:'Referencia tecnica; e consultado pela engenharia em casos criticos.'},{id:'B2',nome:'Dominio do produto',desc:'Conhecer a fundo modulos, regras e limites.',n1:'Conhece os fluxos basicos, mas erra em configuracoes intermediarias.',n2:'Domina os modulos do seu escopo com raras lacunas.',n3:'Conhece profundamente o produto e seus limites; raramente precisa escalar por desconhecimento.',n4:'Conhece interacoes entre modulos e casos extremos; encontra workarounds eficazes.',n5:'Referencia de produto; squad o consulta antes de documentar comportamentos.'},{id:'B3',nome:'Investigacao tecnica e evidencias',desc:'Evidencia que sustenta o diagnostico e habilita o DEV.',n1:'Escalona sem evidencias ou com descricao insuficiente.',n2:'Coleta logs e prints basicos, mas perde contexto importante.',n3:'Produz pacotes de evidencia completos que minimizam idas e vindas com DEV.',n4:'Antecipa quais dados o DEV vai pedir e entrega tudo de primeira.',n5:'Cria templates e guias que elevam a qualidade media da equipe.'},{id:'B4',nome:'Ponte com Engenharia e validacao',desc:'Traduzir, cobrar e validar a correcao antes de devolver.',n1:'Repassa ao DEV sem traducao e nao acompanha o status.',n2:'Faz a ponte na maioria das vezes, mas perde o fio em casos longos.',n3:'Traduz tecnicamente, acompanha o ciclo e valida antes de fechar.',n4:'Contribui com hipoteses tecnicas; acelera o ciclo DEV-CS.',n5:'Participa de squads de produto como voz do CS.'},{id:'B5',nome:'Ferramentas operacionais',desc:'Zoho, Blip e Vsphone com fluencia e classificacao correta.',n1:'Usa as ferramentas com erros frequentes de classificacao ou fluxo.',n2:'Opera as ferramentas com qualidade na maioria das situacoes.',n3:'Fluencia completa; classificacoes corretas e uso eficiente de shortcuts.',n4:'Explora funcionalidades avancadas e sugere melhorias de uso.',n5:'Referencia de ferramentas; treina novatos e reporta bugs com contexto.'},{id:'B6',nome:'Gestao de tempo e SLA',desc:'Velocidade e qualidade dentro do SLA.',n1:'Frequentemente estoura SLA ou prioriza mal.',n2:'Cumpre SLA na maioria das vezes com desvios pontuais.',n3:'SLA quase nunca e estourado; prioriza com criterio.',n4:'Gerencia filas complexas sem orientacao e ainda ajuda colegas.',n5:'Referencia de produtividade sustentavel; compartilha sistema de gestao.'}]},negocio:{label:'Negocio / dominio',color:'#16a34a',icon:'&#128202;',peso:{N1:20,N2:20,N3:30,RT:25,AO:35},items:[{id:'C1',nome:'Negocio do cliente',desc:'Entender o porque por tras do pedido.',n1:'Resolve o pedido literal sem contexto de negocio.',n2:'Conecta o pedido ao contexto do cliente com alguma consistencia.',n3:'Compreende o modelo de negocio e usa esse contexto para priorizar e comunicar.',n4:'Antecipa impactos de negocio e propoe solucoes alinhadas ao objetivo do cliente.',n5:'Referencia de conhecimento de vertical; onboarda novos clientes do segmento.'},{id:'C2',nome:'Visao de produto e melhoria',desc:'Transformar recorrencia em melhoria do produto.',n1:'Nao registra padroes; trata cada caso como unico.',n2:'Registra ocorrencias, mas raramente propoe melhorias.',n3:'Identifica padroes e encaminha feedbacks estruturados ao produto.',n4:'Lidera iniciativas de melhoria com dados e validacao de impacto.',n5:'Parceiro do time de produto; suas sugestoes geram roadmap.'},{id:'C3',nome:'Mentalidade de dados',desc:'Ler o indicador e agir sobre ele.',n1:'Nao usa metricas para orientar decisoes.',n2:'Monitora metricas basicas quando solicitado.',n3:'Usa dados para priorizar acoes e justificar decisoes no dia a dia.',n4:'Produz analises que geram mudancas de processo.',n5:'Referencia analitica; cria dashboards e treina outros.'},{id:'C4',nome:'Seguranca da informacao e LGPD',desc:'Zelo com dado sensivel como padrao.',n1:'Ja expoe dados sensiveis por descuido.',n2:'Age com cuidado, mas sem sistematica.',n3:'Protege dados por padrao e orienta clientes sobre privacidade.',n4:'Lidera praticas de seguranca na equipe.',n5:'Referencia de compliance; auditoria interna sem ressalvas.'}]}};
+const PESOS={N1:{comp:45,tec:35,neg:20},N2:{comp:40,tec:40,neg:20},N3:{comp:25,tec:45,neg:30},RT:{comp:20,tec:55,neg:25},AO:{comp:30,tec:35,neg:35}};
+const FAIXAS={N1:'1-3',N2:'2-4',N3:'3-4',RT:'4-5',AO:'3-5'};
+const NM={n1:'N1',n2:'N2',n3:'N3',rt:'RT',analista_op:'AO',gestor:'GC'};
+let S={user:null,membros:[],equipes:[],niveis:[],scores:{},autoScores:{},pdiItems:{},historicos:{},mid:null,tab:'avaliacao',feq:'todos'};
+function sc(s,a){if(s===null||s===undefined)return'#94a3b8';var d=s-a;if(d>=0)return'#16a34a';if(d>=-1)return'#d97706';return'#dc2626';}
+function donut(val,col){var r=30,c=2*Math.PI*r,d=c*(val/100);return'<svg width="72" height="72" viewBox="0 0 72 72"><circle class="track" cx="36" cy="36" r="'+r+'"/><circle class="fill" cx="36" cy="36" r="'+r+'" stroke="'+col+'" stroke-dasharray="'+d+' '+c+'" stroke-dashoffset="0"/></svg>';}
+function calcS(mid){var m=S.membros.find(function(x){return x.id===mid;});if(!m)return{comp:0,tec:0,neg:0,geral:0};var nk=NM[m.nivel_codigo]||'N1',pw=PESOS[nk]||PESOS.N1,scores=S.scores[mid]||{};function cc(ck){var it=BIB[ck].items;var soma=0,n=0;it.forEach(function(c){var v=scores[c.id];if(v&&v>0){soma+=v;n++;}});return n>0?Math.round((soma/n/5)*100):0;}var comp=cc('comportamental'),tec=cc('tecnico'),neg=cc('negocio');return{comp:comp,tec:tec,neg:neg,geral:Math.round(comp*(pw.comp/100)+tec*(pw.tec/100)+neg*(pw.neg/100))};}
+function gS(mid,cid){var s=S.scores[mid]||{};return s[cid]!==undefined?s[cid]:null;}
+function gAS(mid,cid){var s=S.autoScores[mid]||{};return s[cid]!==undefined?s[cid]:null;}
+function gA(mid,cid){var m=S.membros.find(function(x){return x.id===mid;});if(!m)return 3;var nk=NM[m.nivel_codigo]||'N1';return parseInt((FAIXAS[nk]||'1-3').split('-')[1])||3;}
+function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' error':'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+async function fazerLogin(){var e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value,errEl=document.getElementById('loginError'),btn=document.getElementById('loginBtn');errEl.className='login-error';btn.textContent='Entrando...';btn.disabled=true;var r=await sb.auth.signInWithPassword({email:e,password:p});btn.textContent='Entrar';btn.disabled=false;if(r.error){errEl.textContent=r.error.message;errEl.className='login-error show';return;}S.user=r.data.user;await init();}
+async function sair(){await sb.auth.signOut();location.reload();}
+async function init(){document.getElementById('loginPage').style.display='none';document.getElementById('appPage').style.display='block';var meta=S.user.user_metadata||{};document.getElementById('topbarUserName').textContent=meta.nome||S.user.email;await Promise.all([loadEquipes(),loadNiveis(),loadMembros()]);await Promise.all([loadScores(),loadAutoScores(),loadPDI(),loadHist()]);renderSidebar();renderConfig();}
+async function loadEquipes(){var r=await sb.from('equipes').select('*').order('nome');if(r.data)S.equipes=r.data;var fc=document.getElementById('sidebarFilters');fc.innerHTML='<button class="filter-btn active" data-eq="todos" onclick="filterEq(this)">Todos</button>';(r.data||[]).forEach(function(eq){fc.innerHTML+='<button class="filter-btn" data-eq="'+eq.id+'" onclick="filterEq(this)">'+eq.nome+'</button>';});var sel=document.getElementById('addEquipe');sel.innerHTML='<option value="">Equipe</option>';(r.data||[]).forEach(function(eq){sel.innerHTML+='<option value="'+eq.id+'">'+eq.nome+'</option>';});}
+async function loadNiveis(){var r=await sb.from('niveis').select('*').order('ordem');if(r.data)S.niveis=r.data;var sel=document.getElementById('addNivel');sel.innerHTML='<option value="">Nivel/Papel</option>';(r.data||[]).forEach(function(nv){sel.innerHTML+='<option value="'+nv.id+'" data-codigo="'+nv.codigo+'">'+nv.nome+'</option>';});}
+async function loadMembros(){var r=await sb.from('membros_matriz').select('*').order('nome');if(r.error){S.membros=[];return;}S.membros=(r.data||[]).filter(function(m){return m.gestor_id===S.user.id;});}
+async function loadScores(){var r=await sb.from('avaliacoes_matrix').select('*').eq('gestor_id',S.user.id);if(r.error)return;var s={};(r.data||[]).forEach(function(row){if(!s[row.membro_id])s[row.membro_id]={};s[row.membro_id][row.competencia_id]=row.score;});S.scores=s;}
+async function loadAutoScores(){var r=await sb.from('autoavaliacoes_matrix').select('*');if(r.error)return;var s={};(r.data||[]).forEach(function(row){if(!s[row.membro_id])s[row.membro_id]={};s[row.membro_id][row.competencia_id]=row.score;});S.autoScores=s;}
+async function loadPDI(){var r=await sb.from('pdi_matrix').select('*').eq('gestor_id',S.user.id).order('criado_em');if(r.error)return;var pdi={};(r.data||[]).forEach(function(row){if(!pdi[row.membro_id])pdi[row.membro_id]=[];pdi[row.membro_id].push(row);});S.pdiItems=pdi;}
+async function loadHist(){var r=await sb.from('historico_matrix').select('*').eq('gestor_id',S.user.id).order('criado_em',{ascending:false});if(r.error)return;var h={};(r.data||[]).forEach(function(row){if(!h[row.membro_id])h[row.membro_id]=[];h[row.membro_id].push(row);});S.historicos=h;}
+async function saveScore(mid,cid,val){if(!S.scores[mid])S.scores[mid]={};S.scores[mid][cid]=val;sb.from('avaliacoes_matrix').upsert({membro_id:mid,competencia_id:cid,score:val,gestor_id:S.user.id,atualizado_em:new Date().toISOString()},{onConflict:'membro_id,competencia_id'});}
+async function saveAutoScore(mid,cid,val){if(!S.autoScores[mid])S.autoScores[mid]={};S.autoScores[mid][cid]=val;sb.from('autoavaliacoes_matrix').upsert({membro_id:mid,competencia_id:cid,score:val,atualizado_em:new Date().toISOString()},{onConflict:'membro_id,competencia_id'});}
+async function saveHist(mid){var s=calcS(mid),snap={membro_id:mid,gestor_id:S.user.id,scores:JSON.stringify(S.scores[mid]||{}),comp:s.comp,tec:s.tec,neg:s.neg,geral:s.geral,criado_em:new Date().toISOString()};var r=await sb.from('historico_matrix').insert(snap);if(!r.error){if(!S.historicos[mid])S.historicos[mid]=[];S.historicos[mid].unshift(snap);toast('Historico salvo!');if(S.tab==='historico')renderHist(mid);}}
+async function addMembro(){var nome=document.getElementById('addName').value.trim(),email=document.getElementById('addEmail').value.trim(),ns=document.getElementById('addNivel'),nid=ns.value,ncod=ns.selectedOptions[0]?ns.selectedOptions[0].dataset.codigo:'n1',eqid=document.getElementById('addEquipe').value;if(!nome){toast('Informe o nome',true);return;}var novo={nome:nome,email:email||null,nivel_id:nid||null,nivel_codigo:ncod||'n1',equipe_id:eqid||null,gestor_id:S.user.id,criado_em:new Date().toISOString()};var r=await sb.from('membros_matriz').insert(novo).select().single();var id;if(r.error){novo.id='local-'+Date.now();S.membros.push(novo);id=novo.id;}else{S.membros.push(r.data);id=r.data.id;}document.getElementById('addName').value='';document.getElementById('addEmail').value='';renderSidebar();renderConfig();selectMembro(id);toast('Membro adicionado!');}
+async function delMembro(id){if(!confirm('Remover?'))return;S.membros=S.membros.filter(function(m){return m.id!==id;});if(S.mid===id){S.mid=null;document.getElementById('memberPanel').style.display='none';document.getElementById('noMemberMsg').style.display='block';}sb.from('membros_matriz').delete().eq('id',id);renderSidebar();renderConfig();toast('Membro removido.');}
+function renderSidebar(){var list=document.getElementById('memberList'),filt=S.membros.filter(function(m){return S.feq==='todos'||m.equipe_id===S.feq;});if(!filt.length){list.innerHTML='<div class="empty" style="padding:20px"><div class="empty-icon">&#128101;</div><p>Nenhum membro</p></div>';return;}list.innerHTML=filt.map(function(m){var s=calcS(m.id),c=s.geral>=75?'#16a34a':s.geral>=50?'#d97706':'#dc2626',eq=S.equipes.find(function(e){return e.id===m.equipe_id;})||{},nk=NM[m.nivel_codigo]||'N1';return'<div class="member-card'+(S.mid===m.id?' active':'')+'" data-id="'+m.id+'" onclick="selM(event)"><button class="btn-remove-member" data-id="'+m.id+'" onclick="event.stopPropagation();delM(this)">&times;</button><div class="member-name">'+m.nome+'</div><div class="member-meta"><span class="level-badge">'+nk+'</span>'+(eq.nome||'')+'</div><div class="adherence-bar"><div class="adherence-fill" style="width:'+s.geral+'%;background:'+c+'"></div></div><div class="adherence-label">aderencia geral &middot; '+s.geral+'%</div></div>';}).join('');}
+function selM(e){selectMembro(e.currentTarget.dataset.id);}
+function delM(el){delMembro(el.dataset.id);}
+function filterEq(btn){document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');S.feq=btn.dataset.eq;renderSidebar();}
+function selectMembro(id){S.mid=id;S.tab='avaliacao';renderSidebar();var m=S.membros.find(function(x){return x.id===id;});if(!m)return;document.getElementById('noMemberMsg').style.display='none';document.getElementById('memberPanel').style.display='block';var nk=NM[m.nivel_codigo]||'N1',pw=PESOS[nk]||PESOS.N1,fa=FAIXAS[nk]||'1-3',eq=S.equipes.find(function(e){return e.id===m.equipe_id;})||{};document.getElementById('memberName').textContent=m.nome;document.getElementById('memberMeta').innerHTML='equipe '+(eq.nome||'&mdash;')+' &middot; papel '+nk+' &middot; faixa-alvo '+fa;document.getElementById('weightsInfo').innerHTML='Pesos '+nk+' &middot; comportamental '+pw.comp+'% &middot; tecnico '+pw.tec+'% &middot; negocio '+pw.neg+'%';renderDonuts(id);document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.remove('active');});document.querySelector('[data-tab="avaliacao"]').classList.add('active');document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});document.getElementById('tabAvaliacao').classList.add('active');renderAval(id);}
+function renderDonuts(mid){var s=calcS(mid),cats=[{k:'comp',lbl:'Comportamental',c:'#1a2332'},{k:'tec',lbl:'Tecnico',c:'#d97706'},{k:'neg',lbl:'Negocio',c:'#16a34a'},{k:'geral',lbl:'Geral',c:s.geral>=75?'#16a34a':s.geral>=50?'#d97706':'#dc2626'}];document.getElementById('donuts').innerHTML=cats.map(function(cat){return'<div class="donut-wrap"><div class="donut-ring">'+donut(s[cat.k],cat.c)+'<div class="donut-val">'+s[cat.k]+'</div></div><div class="donut-label">'+cat.lbl+'</div></div>';}).join('');}
+function mudarTab(btn){document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');S.tab=btn.dataset.tab;document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});document.getElementById('tab'+S.tab.charAt(0).toUpperCase()+S.tab.slice(1)).classList.add('active');renderTab();}
+function mudarView(tab){document.querySelectorAll('.nav-tabs .nav-tab').forEach(function(t){t.classList.remove('active');});tab.classList.add('active');var vm=document.getElementById('viewMatriz'),vc=document.getElementById('viewConfig');if(tab.dataset.view==='matriz'){vm.style.display='flex';vc.style.display='none';}else{vm.style.display='none';vc.style.display='block';}}
+function renderTab(){var mid=S.mid;if(!mid)return;var t=S.tab;if(t==='avaliacao')renderAval(mid);else if(t==='autoconhecimento')renderAuto(mid);else if(t==='mapagaps')renderGaps();else if(t==='pdi')renderPDI(mid);else if(t==='historico')renderHist(mid);else if(t==='indicadores')renderInd(mid);}
+function renderAval(mid){var el=document.getElementById('tabAvaliacao'),m=S.membros.find(function(x){return x.id===mid;});if(!m){el.innerHTML='';return;}var nk=NM[m.nivel_codigo]||'N1',html='';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck],pw=cat.peso[nk]||0;html+='<div class="section-header" style="border-color:'+cat.color+'"><h3><span class="section-dot" style="background:'+cat.color+'"></span>'+cat.label+'</h3><span class="section-weight">peso '+pw+'% neste nivel</span></div>';cat.items.forEach(function(comp){var nota=gS(mid,comp.id),alvo=gA(mid,comp.id),isNA=nota===-1,hasPDI=(S.pdiItems[mid]||[]).some(function(p){return p.competencia_id===comp.id&&p.status!=='concluido';});html+='<div class="comp-card" style="border-left-color:'+cat.color+'" data-cid="'+comp.id+'" data-mid="'+mid+'" onclick="openM(event)"><div class="comp-icon">'+cat.icon+'</div><div class="comp-info"><div class="comp-name">'+comp.nome+(hasPDI?' <span class="pdi-tag">PDI</span>':'')+'</div><div class="comp-desc">'+comp.desc+'</div></div><div class="score-btns" onclick="event.stopPropagation()">';for(var n=1;n<=5;n++){html+='<button class="score-btn'+(nota===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setBt(this)">'+n+'</button>';}html+='<button class="score-btn na'+(isNA?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" onclick="togNA(this)">&mdash;</button>';if(!isNA&&nota!==null)html+='<div class="alvo-indicator"><span class="alvo-dot" style="background:'+sc(nota,alvo)+'"></span>alvo '+alvo+'</div>';else if(isNA)html+='<div class="alvo-indicator" style="color:#94a3b8">nao se aplica</div>';html+='</div></div>';});});if(!html)html='<div class="empty"><div class="empty-icon">&#127919;</div><h3>Avalie as competencias</h3></div>';el.innerHTML=html+'<div style="margin-top:20px;text-align:right"><button class="btn btn-ghost" data-mid="'+mid+'" onclick="saveHistBtn(this)">&#128190; Salvar snapshot</button></div>';}
+function setBt(btn){var mid=btn.dataset.mid,cid=btn.dataset.cid,n=parseInt(btn.dataset.n);saveScore(mid,cid,n);renderAval(mid);renderDonuts(mid);renderSidebar();}
+function togNA(btn){var mid=btn.dataset.mid,cid=btn.dataset.cid,cur=gS(mid,cid);saveScore(mid,cid,cur===-1?null:-1);renderAval(mid);renderDonuts(mid);}
+function openM(e){openModal(e.currentTarget.dataset.cid,e.currentTarget.dataset.mid);}
+function openModal(cid,mid){var comp=null;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){if(c.id===cid)comp=c;});});if(!comp)return;var nota=gS(mid,cid),alvo=gA(mid,cid),ck=cid.startsWith('A')?'comportamental':cid.startsWith('B')?'tecnico':'negocio',cat=BIB[ck];document.getElementById('modalMeta').textContent=cid+' · '+cat.label;document.getElementById('modalTitulo').textContent=comp.nome;document.getElementById('modalDesc').textContent=comp.desc;var lvs=[{label:'N1',sub:'basico',text:comp.n1},{label:'N2',sub:'em consol.',text:comp.n2},{label:'N3',sub:'proficiente',text:comp.n3},{label:'N4',sub:'avancado',text:comp.n4},{label:'N5',sub:'referencia',text:comp.n5}];var ni=nota&&nota>0?nota:null;document.getElementById('modalReguaContent').innerHTML=lvs.map(function(lv,i){var n=i+1,isA=ni===n,isT=alvo===n,isAT=isA&&isT,rc='',lx='';if(isAT){rc=' atual-alvo';lx='- atual & alvo';}else if(isA){rc=' atual';lx='- atual';}else if(isT){rc=' alvo';lx='- alvo';}return'<div class="regua-row'+rc+'"><div class="nivel-badge">'+lv.label+'<br>'+lv.sub+(lx?'<br><em>'+lx+'</em>':'')+'</div><div class="nivel-text">'+lv.text+'</div></div>';}).join('');document.getElementById('modalRegua').style.display='flex';}
+function fecharModal(){document.getElementById('modalRegua').style.display='none';}
+function renderAuto(mid){var el=document.getElementById('tabAutoconhecimento'),scores=S.scores[mid]||{},asc=S.autoScores[mid]||{},ali=0,sup=0,sub=0;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){var g=scores[c.id],a=asc[c.id];if(g&&g>0&&a&&a>0){var d=a-g;if(d===0)ali++;else if(d>0)sup++;else sub++;}});});var html='<div class="auto-banner">Autoavaliacao &middot; <strong>Petroleo = sua avaliacao (gestor)</strong> &middot; <strong style="color:var(--amber)">Ambar = como a pessoa se ve</strong></div><div class="auto-counters"><div class="auto-counter alinhado"><span class="num">'+ali+'</span><span class="lbl">alinhado</span></div><div class="auto-counter superestima"><span class="num">'+sup+'</span><span class="lbl">superestima</span></div><div class="auto-counter subestima"><span class="num">'+sub+'</span><span class="lbl">subestima</span></div></div>';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck];html+='<div class="section-header" style="border-color:'+cat.color+';margin-top:16px"><h3><span class="section-dot" style="background:'+cat.color+'"></span>'+cat.label+'</h3></div>';cat.items.forEach(function(comp){var gv=scores[comp.id],sv=asc[comp.id],delta='',dcls='ali';if(gv&&gv>0&&sv&&sv>0){var d=sv-gv;if(d>0){delta='superestima +'+d;dcls='sup';}else if(d<0){delta='subestima '+d;dcls='sub';}else{delta='alinhado';dcls='ali';}}html+='<div class="auto-row"><div class="auto-comp">'+comp.nome+'</div><div class="auto-scores"><span style="font-size:11px;color:var(--muted);margin-right:4px">Gestor:</span>';for(var n=1;n<=5;n++)html+='<button class="auto-btn gestor'+(gv===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setAB(this,true)">'+n+'</button>';html+='<span style="font-size:11px;color:var(--amber);margin:0 4px">Auto:</span>';for(var n=1;n<=5;n++)html+='<button class="auto-btn self'+(sv===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setAB(this,false)">'+n+'</button>';html+='</div>';if(delta)html+='<div class="auto-delta '+dcls+'">'+delta+'</div>';html+='</div>';});});el.innerHTML=html;}
+function setAB(btn,isG){var mid=btn.dataset.mid,cid=btn.dataset.cid,n=parseInt(btn.dataset.n);if(isG)saveScore(mid,cid,n);else saveAutoScore(mid,cid,n);renderAuto(mid);renderDonuts(mid);renderSidebar();}
+function renderGaps(){var el=document.getElementById('tabMapagaps'),mb=S.membros;if(!mb.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128506;</div><h3>Nenhum membro</h3></div>';return;}var th='<tr><th>Competencia</th>'+mb.map(function(m){var nk=NM[m.nivel_codigo]||'N1',eq=S.equipes.find(function(e){return e.id===m.equipe_id;})||{};return'<th class="member-col">'+m.nome+'<br><span style="font-weight:400;font-size:10px">'+nk+' &middot; '+(eq.nome||'')+'</span></th>';}).join('')+'</tr>',rows='';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck];rows+='<tr class="cat-row"><td colspan="'+(mb.length+1)+'">'+cat.label.toUpperCase()+'</td></tr>';cat.items.forEach(function(comp){rows+='<tr><td><span style="font-size:11px;color:var(--muted)">'+comp.id+'</span><br>'+comp.nome+'</td>';mb.forEach(function(m){var nota=gS(m.id,comp.id),alvo=gA(m.id,comp.id),bg='#e2e8f0',fc='#64748b';if(nota&&nota>0){bg=sc(nota,alvo);fc='#fff';}rows+='<td><div class="gap-cell"><div class="gap-score" style="background:'+bg+';color:'+fc+'">'+(nota&&nota>0?nota:nota===-1?'N/A':'-')+'</div></div></td>';});rows+='</tr>';});});el.innerHTML='<div style="overflow-x:auto"><table class="gap-table"><thead>'+th+'</thead><tbody>'+rows+'</tbody></table></div>';}
+function renderPDI(mid){var el=document.getElementById('tabPdi'),itens=S.pdiItems[mid]||[],html='<div class="pdi-section-header"><h3 style="font-size:16px;font-weight:700">Plano de Desenvolvimento</h3><button class="btn btn-primary btn-sm" data-mid="'+mid+'" onclick="addPDIBtn(this)">+ Nova acao</button></div>';if(!itens.length)html+='<div class="empty"><div class="empty-icon">&#127919;</div><h3>Nenhuma acao de PDI</h3></div>';else itens.forEach(function(item){html+='<div class="pdi-card"><div class="pdi-card-header"><span class="pdi-title">Acao de Desenvolvimento</span><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" data-mid="'+mid+'" data-iid="'+item.id+'" onclick="savePDIBtn(this)">Salvar</button><button class="btn btn-danger btn-sm" data-mid="'+mid+'" data-iid="'+item.id+'" onclick="delPDIBtn(this)">Remover</button></div></div><div class="pdi-form"><textarea placeholder="Descricao..." id="pdi-desc-'+item.id+'">'+(item.descricao||'')+'</textarea><div><label style="font-size:11px;color:var(--muted)">Prazo</label><input type="date" id="pdi-prazo-'+item.id+'" value="'+(item.prazo||'')+'"></div><div><label style="font-size:11px;color:var(--muted)">Status</label><select id="pdi-status-'+item.id+'"><option value="pendente"'+(item.status==='pendente'?' selected':'')+'>Pendente</option><option value="em andamento"'+(item.status==='em andamento'?' selected':'')+'>Em andamento</option><option value="concluido"'+(item.status==='concluido'?' selected':'')+'>Concluido</option></select></div></div></div>';});el.innerHTML=html;}
+function addPDI(mid){if(!S.pdiItems[mid])S.pdiItems[mid]=[];var n={id:'pdi-'+Date.now(),membro_id:mid,gestor_id:S.user.id,descricao:'',prazo:'',status:'pendente',criado_em:new Date().toISOString()};S.pdiItems[mid].push(n);renderPDI(mid);}
+function savePDI(mid,iid){var item=(S.pdiItems[mid]||[]).find(function(i){return i.id===iid;});if(!item)return;item.descricao=document.getElementById('pdi-desc-'+iid).value;item.prazo=document.getElementById('pdi-prazo-'+iid).value;item.status=document.getElementById('pdi-status-'+iid).value;sb.from('pdi_matrix').upsert(item,{onConflict:'id'});toast('PDI salvo!');}
+function delPDI(mid,iid){S.pdiItems[mid]=(S.pdiItems[mid]||[]).filter(function(i){return i.id!==iid;});sb.from('pdi_matrix').delete().eq('id',iid);renderPDI(mid);}
+function renderHist(mid){var el=document.getElementById('tabHistorico'),hist=S.historicos[mid]||[];if(!hist.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128190;</div><h3>Nenhum snapshot</h3><p>Salve snapshots para acompanhar a evolucao</p></div>';return;}el.innerHTML=hist.map(function(h){var d=new Date(h.criado_em),ds=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return'<div class="hist-item"><div class="hist-date">'+ds+'</div><div class="hist-body"><div class="hist-title">Avaliacao salva</div><div class="hist-scores"><span class="hist-score-pill">Comp: '+h.comp+'%</span><span class="hist-score-pill">Tec: '+h.tec+'%</span><span class="hist-score-pill">Neg: '+h.neg+'%</span><span class="hist-score-pill" style="background:#1a2332;color:#fff;font-weight:600">Geral: '+h.geral+'%</span></div></div></div>';}).join('');}
+function renderInd(mid){var el=document.getElementById('tabIndicadores'),s=calcS(mid),hist=S.historicos[mid]||[],pdiT=(S.pdiItems[mid]||[]).length,pdiC=(S.pdiItems[mid]||[]).filter(function(i){return i.status==='concluido';}).length,cA=0,cAv=0;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){cA++;var v=gS(mid,c.id);if(v&&v>0)cAv++;});});el.innerHTML='<div class="ind-grid"><div class="ind-card"><div class="val" style="color:#1a2332">'+s.comp+'%</div><div class="lbl">Score Comportamental</div></div><div class="ind-card"><div class="val" style="color:#d97706">'+s.tec+'%</div><div class="lbl">Score Tecnico</div></div><div class="ind-card"><div class="val" style="color:#16a34a">'+s.neg+'%</div><div class="lbl">Score Negocio</div></div><div class="ind-card"><div class="val">'+s.geral+'%</div><div class="lbl">Aderencia Geral</div></div><div class="ind-card"><div class="val">'+cAv+'/'+cA+'</div><div class="lbl">Competencias Avaliadas</div></div><div class="ind-card"><div class="val">'+pdiC+'/'+pdiT+'</div><div class="lbl">PDI Concluido</div></div><div class="ind-card"><div class="val">'+hist.length+'</div><div class="lbl">Snapshots</div></div></div>';}
+function renderConfig(){var el=document.getElementById('configContent');if(!el)return;var mh='<div class="config-section"><div class="config-title">Membros</div><table class="config-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Nivel</th><th>Equipe</th><th>Acoes</th></tr></thead><tbody>';if(!S.membros.length)mh+='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Nenhum membro</td></tr>';else S.membros.forEach(function(m){var nk=NM[m.nivel_codigo]||'N1',eq=S.equipes.find(function(e){return e.id===m.equipe_id;})||{};mh+='<tr><td><strong>'+m.nome+'</strong></td><td style="color:var(--muted)">'+(m.email||'&mdash;')+'</td><td><span class="level-badge">'+nk+'</span></td><td>'+(eq.nome||'&mdash;')+'</td><td><button class="btn btn-danger btn-sm" data-mid="'+m.id+'" onclick="delMembroBtn(this)">Remover</button></td></tr>';});mh+='</tbody></table></div>';var eh='<div class="config-section"><div class="config-title">Equipes</div><table class="config-table"><thead><tr><th>Nome</th><th>Descricao</th></tr></thead><tbody>';S.equipes.forEach(function(eq){eh+='<tr><td><strong>'+eq.nome+'</strong></td><td style="color:var(--muted)">'+(eq.descricao||'&mdash;')+'</td></tr>';});eh+='</tbody></table></div>';var nh='<div class="config-section"><div class="config-title">Niveis &amp; Pesos</div><table class="config-table"><thead><tr><th>Nivel</th><th>Nome</th><th>Pesos (C/T/N)</th><th>Faixa-alvo</th></tr></thead><tbody>';S.niveis.forEach(function(nv){var nk=NM[nv.codigo]||nv.codigo.toUpperCase(),pw=PESOS[nk]||{comp:'-',tec:'-',neg:'-'},fa=FAIXAS[nk]||'-';nh+='<tr><td><span class="level-badge">'+nk+'</span></td><td>'+nv.nome+'</td><td style="color:var(--muted)">'+pw.comp+'%/'+pw.tec+'%/'+pw.neg+'%</td><td>'+fa+'</td></tr>';});nh+='</tbody></table></div>';el.innerHTML=mh+eh+nh;}
+function exportarDados(){var data={versao:1,exportado:new Date().toISOString(),membros:S.membros,scores:S.scores,autoScores:S.autoScores,pdiItems:S.pdiItems};var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mapa-'+new Date().toISOString().slice(0,10)+'.json';a.click();}
+function importarDados(){document.getElementById('importInput').click();}
+function processarImport(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(data.scores)Object.assign(S.scores,data.scores);if(data.autoScores)Object.assign(S.autoScores,data.autoScores);if(data.pdiItems)Object.assign(S.pdiItems,data.pdiItems);if(S.mid)renderTab();renderSidebar();toast('Importado!');}catch(err){toast('Erro: '+err.message,true);}};reader.readAsText(file);input.value='';}
+function imprimirPDF(){window.print();}
 
-async function init(){
-  sb = supabase.createClient(SUPA_URL, SUPA_KEY);
-  const {data:{session}} = await sb.auth.getSession();
-  if(!session){location.href='index.html';return;}
-  userSession = session;
-  const {data:p} = await sb.from('perfis').select('papel').eq('id',session.user.id).single();
-  if(!p || p.papel !== 'gestor'){alert('Acesso negado');location.href='index.html';return;}
-  carregarTudo();
-}
-
-function aba(id, el){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  el.classList.add('active');
-  if(id==='membros') carregarMembros();
-  if(id==='niveis') carregarNiveis();
-  if(id==='equipes') carregarEquipes();
-  if(id==='indicadores') carregarIndicadores();
-  if(id==='competencias') carregarCompetencias();
-  if(id==='vinculos') carregarVinculos();
-  if(id==='avaliar') carregarMembrosAvaliar();
-}
-
-function subAba(id, el){
-  document.querySelectorAll('.sub-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  el.classList.add('active');
-  if(id==='avaliacoes') carregarAvaliacoesMembro();
-  if(id==='registros_ind') carregarRegIndicadores();
-  if(id==='pdi') carregarPDI();
-}
-
-function sair(){sb.auth.signOut().then(()=>{location.href='index.html';});}
-function msg(id, txt, tipo){const el=document.getElementById(id);el.textContent=txt;el.className='msg '+tipo;if(tipo==='ok')setTimeout(()=>el.className='msg',3000);}
-function fecharModal(id){document.getElementById(id).classList.remove('open');}
-function abrirModal(id){document.getElementById(id).classList.add('open');}
-
-async function carregarTudo(){
-  await carregarMembros();
-  await carregarEquipesSelects();
-  await carregarNiveisSelects();
-  await carregarCompetenciasSelects();
-}
-
-async function carregarEquipesSelects(){
-  const {data} = await sb.from('equipes').select('*').order('nome');
-  const opts = data ? data.map(e=>'<option value="'+e.id+'">'+e.nome+'</option>').join('') : '';
-  const optsAmb = '<option value="ambas">Ambas (Cond21 + GC)</option>' + opts;
-  ['novaEquipe','editMembroEquipe'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML = id==='novaEquipe' ? optsAmb : opts;
-  });
-}
-
-async function carregarNiveisSelects(){
-  const {data} = await sb.from('niveis').select('*').order('nome');
-  const opts = data ? data.map(n=>'<option value="'+n.codigo+'">'+n.nome+'</option>').join('') : '';
-  ['novoPapel','editMembroPapel'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML = opts;
-  });
-}
-
-async function carregarCompetenciasSelects(){
-  const {data} = await sb.from('competencias').select('*').order('codigo');
-  const opts = data ? data.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
-  ['vincCompNivel','vincCompMembro'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.innerHTML = opts;
-  });
-}
-// MEMBROS
-async function carregarMembros(){
-  const {data} = await sb.from('perfis').select('*').order('nome');
-  const tbody = document.getElementById('tabelaMembros');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}
-  tbody.innerHTML = data.map(m=>{
-    const bClass = 'badge badge-'+(m.papel||'');
-    const eq = m.equipe||'—';
-    return '<tr><td><strong>'+m.nome+'</strong><br><small style="color:#94a3b8">'+m.id+'</small></td><td>'+eq+'</td><td><span class="'+bClass+'">'+nomePapel(m.papel)+'</span></td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||'')+'" data-equipe="'+encodeURIComponent(m.equipe||'')+'" data-papel="'+m.papel+'" onclick="abrirEditMembro(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+m.id+'" onclick="removerMembro(this)">Remover</button></td></tr>';
-  }).join('');
-  carregarMembrosSelectVinculos(data);
-}
-
-function nomePapel(p){const m={gestor:'Gestor',n1:'N1',n2:'N2',n3:'N3',rt:'RT',analista_op:'Analista Op.'};return m[p]||p||'—';}
-
-function carregarMembrosSelectVinculos(data){
-  const opts = data ? data.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('') : '';
-  const el = document.getElementById('vincMembroSel');
-  if(el) el.innerHTML = opts;
-}
-
-async function adicionarMembro(){
-  const email = document.getElementById('novoEmail').value.trim();
-  const nome = document.getElementById('novoNome').value.trim();
-  const equipe = document.getElementById('novaEquipe').value;
-  const papel = document.getElementById('novoPapel').value;
-  if(!email||!nome){msg('msgMembro','Preencha e-mail e nome.','err');return;}
-  const {error} = await sb.from('perfis').upsert({id:email,email,nome,papel,equipe},{onConflict:'email'});
-  if(error){
-    const {error:e2} = await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+'/index.html'}});
-    if(e2){msg('msgMembro','Erro: '+e2.message,'err');return;}
-    msg('msgMembro','Convite enviado para '+email+'. O perfil sera criado no primeiro login.','ok');
-  } else {msg('msgMembro','Membro adicionado!','ok');}
-  carregarMembros();
-}
-
-function abrirEditMembro(btn){
-  document.getElementById('editMembroId').value = btn.dataset.id;
-  document.getElementById('editMembroNome').value = decodeURIComponent(btn.dataset.nome);
-  document.getElementById('editMembroEquipe').value = decodeURIComponent(btn.dataset.equipe);
-  document.getElementById('editMembroPapel').value = btn.dataset.papel;
-  abrirModal('modalMembro');
-}
-
-async function salvarEdicaoMembro(){
-  const id = document.getElementById('editMembroId').value;
-  const nome = document.getElementById('editMembroNome').value.trim();
-  const equipe = document.getElementById('editMembroEquipe').value;
-  const papel = document.getElementById('editMembroPapel').value;
-  const {error} = await sb.from('perfis').update({nome,equipe,papel}).eq('id',id);
-  if(error){alert('Erro: '+error.message);return;}
-  fecharModal('modalMembro');
-  carregarMembros();
-}
-
-async function removerMembro(btn){
-  if(!confirm('Remover este membro?'))return;
-  const id = btn.dataset.id;
-  await sb.from('perfis').delete().eq('id',id);
-  carregarMembros();
-}
-
-// NIVEIS
-async function carregarNiveis(){
-  const {data} = await sb.from('niveis').select('*').order('nome');
-  const tbody = document.getElementById('tabelaNiveis');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhum nivel</td></tr>';return;}
-  tbody.innerHTML = data.map(n=>'<tr><td>'+n.codigo+'</td><td>'+n.nome+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+n.id+'" data-cod="'+n.codigo+'" data-nome="'+encodeURIComponent(n.nome)+'" onclick="abrirEditNivel(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+n.id+'" onclick="removerNivel(this)">Remover</button></td></tr>').join('');
-}
-
-async function adicionarNivel(){
-  const codigo = document.getElementById('novoNivCod').value.trim().toLowerCase();
-  const nome = document.getElementById('novoNivNome').value.trim();
-  if(!codigo||!nome){msg('msgNivel','Preencha codigo e nome.','err');return;}
-  const {error} = await sb.from('niveis').insert({codigo,nome});
-  if(error){msg('msgNivel','Erro: '+error.message,'err');return;}
-  msg('msgNivel','Nivel adicionado!','ok');
-  carregarNiveis();carregarNiveisSelects();
-}
-
-function abrirEditNivel(btn){
-  document.getElementById('editNivelId').value = btn.dataset.id;
-  document.getElementById('editNivelCod').value = btn.dataset.cod;
-  document.getElementById('editNivelNome').value = decodeURIComponent(btn.dataset.nome);
-  abrirModal('modalNivel');
-}
-
-async function salvarEdicaoNivel(){
-  const id = document.getElementById('editNivelId').value;
-  const codigo = document.getElementById('editNivelCod').value.trim();
-  const nome = document.getElementById('editNivelNome').value.trim();
-  const {error} = await sb.from('niveis').update({codigo,nome}).eq('id',id);
-  if(error){alert('Erro: '+error.message);return;}
-  fecharModal('modalNivel');carregarNiveis();carregarNiveisSelects();
-}
-
-async function removerNivel(btn){
-  if(!confirm('Remover este nivel?'))return;
-  await sb.from('niveis').delete().eq('id',btn.dataset.id);
-  carregarNiveis();
-  }
-// EQUIPES
-async function carregarEquipes(){
-  const {data} = await sb.from('equipes').select('*').order('nome');
-  const tbody = document.getElementById('tabelaEquipes');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="3" style="text-align:center;color:#94a3b8">Nenhuma equipe</td></tr>';return;}
-  tbody.innerHTML = data.map(e=>'<tr><td>'+e.nome+'</td><td>'+(e.descricao||'—')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+e.id+'" data-nome="'+encodeURIComponent(e.nome)+'" data-desc="'+encodeURIComponent(e.descricao||'')+'" onclick="abrirEditEquipe(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+e.id+'" onclick="removerEquipe(this)">Remover</button></td></tr>').join('');
-}
-
-async function adicionarEquipe(){
-  const nome = document.getElementById('novaEqNome').value.trim();
-  const descricao = document.getElementById('novaEqDesc').value.trim();
-  if(!nome){msg('msgEquipe','Preencha o nome.','err');return;}
-  const {error} = await sb.from('equipes').insert({nome,descricao});
-  if(error){msg('msgEquipe','Erro: '+error.message,'err');return;}
-  msg('msgEquipe','Equipe adicionada!','ok');
-  carregarEquipes();carregarEquipesSelects();
-}
-
-function abrirEditEquipe(btn){
-  document.getElementById('editEquipeId').value = btn.dataset.id;
-  document.getElementById('editEquipeNome').value = decodeURIComponent(btn.dataset.nome);
-  document.getElementById('editEquipeDesc').value = decodeURIComponent(btn.dataset.desc);
-  abrirModal('modalEquipe');
-}
-
-async function salvarEdicaoEquipe(){
-  const id = document.getElementById('editEquipeId').value;
-  const nome = document.getElementById('editEquipeNome').value.trim();
-  const descricao = document.getElementById('editEquipeDesc').value.trim();
-  const {error} = await sb.from('equipes').update({nome,descricao}).eq('id',id);
-  if(error){alert('Erro: '+error.message);return;}
-  fecharModal('modalEquipe');carregarEquipes();carregarEquipesSelects();
-}
-
-async function removerEquipe(btn){
-  if(!confirm('Remover esta equipe?'))return;
-  await sb.from('equipes').delete().eq('id',btn.dataset.id);
-  carregarEquipes();
-}
-
-// INDICADORES CATALOGO
-async function carregarIndicadores(){
-  const {data} = await sb.from('tipos_indicadores').select('*').order('nome');
-  const tbody = document.getElementById('tabelaIndicadores');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#94a3b8">Nenhum indicador</td></tr>';return;}
-  tbody.innerHTML = data.map(i=>'<tr><td>'+i.nome+'</td><td>'+(i.meta_padrao||'—')+'</td><td>'+(i.unidade||'—')+'</td><td>'+(i.ativo?'Sim':'Nao')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+i.id+'" data-nome="'+encodeURIComponent(i.nome)+'" data-unidade="'+encodeURIComponent(i.unidade||'')+'" data-meta="'+(i.meta_padrao||'')+'" data-desc="'+encodeURIComponent(i.descricao||'')+'" onclick="abrirEditIndicador(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+i.id+'" onclick="removerIndicador(this)">Remover</button></td></tr>').join('');
-}
-
-async function adicionarIndicador(){
-  const nome = document.getElementById('novoIndNome').value.trim();
-  const unidade = document.getElementById('novoIndUnidade').value.trim();
-  const meta_padrao = parseFloat(document.getElementById('novoIndMeta').value)||null;
-  const descricao = document.getElementById('novoIndDesc').value.trim();
-  if(!nome){msg('msgIndicador','Preencha o nome.','err');return;}
-  const {error} = await sb.from('tipos_indicadores').insert({nome,unidade,meta_padrao,descricao,ativo:true});
-  if(error){msg('msgIndicador','Erro: '+error.message,'err');return;}
-  msg('msgIndicador','Indicador adicionado!','ok');
-  carregarIndicadores();
-}
-
-function abrirEditIndicador(btn){
-  document.getElementById('editIndicadorId').value = btn.dataset.id;
-  document.getElementById('editIndicadorNome').value = decodeURIComponent(btn.dataset.nome);
-  document.getElementById('editIndicadorUnidade').value = decodeURIComponent(btn.dataset.unidade);
-  document.getElementById('editIndicadorMeta').value = btn.dataset.meta;
-  document.getElementById('editIndicadorDesc').value = decodeURIComponent(btn.dataset.desc);
-  abrirModal('modalIndicador');
-}
-
-async function salvarEdicaoIndicador(){
-  const id = document.getElementById('editIndicadorId').value;
-  const nome = document.getElementById('editIndicadorNome').value.trim();
-  const unidade = document.getElementById('editIndicadorUnidade').value.trim();
-  const meta_padrao = parseFloat(document.getElementById('editIndicadorMeta').value)||null;
-  const descricao = document.getElementById('editIndicadorDesc').value.trim();
-  const {error} = await sb.from('tipos_indicadores').update({nome,unidade,meta_padrao,descricao}).eq('id',id);
-  if(error){alert('Erro: '+error.message);return;}
-  fecharModal('modalIndicador');carregarIndicadores();
-}
-
-async function removerIndicador(btn){
-  if(!confirm('Remover este indicador?'))return;
-  await sb.from('tipos_indicadores').delete().eq('id',btn.dataset.id);
-  carregarIndicadores();
-}
-
-// COMPETENCIAS
-async function carregarCompetencias(){
-  const {data} = await sb.from('competencias').select('*').order('codigo');
-  const tbody = document.getElementById('tabelaCompetencias');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhuma competencia</td></tr>';return;}
-  tbody.innerHTML = data.map(c=>'<tr><td>'+c.codigo+'</td><td>'+c.nome+'</td><td>'+(c.descricao||'—')+'</td><td class="acoes"><button class="btn btn-sm btn-yellow" data-id="'+c.id+'" data-cod="'+c.codigo+'" data-nome="'+encodeURIComponent(c.nome)+'" data-desc="'+encodeURIComponent(c.descricao||'')+'" onclick="abrirEditCompetencia(this)">Editar</button><button class="btn btn-sm btn-red" data-id="'+c.id+'" onclick="removerCompetencia(this)">Remover</button></td></tr>').join('');
-}
-
-async function adicionarCompetencia(){
-  const codigo = document.getElementById('novaCompCod').value.trim().toUpperCase();
-  const nome = document.getElementById('novaCompNome').value.trim();
-  const descricao = document.getElementById('novaCompDesc').value.trim();
-  if(!codigo||!nome){msg('msgCompetencia','Preencha codigo e nome.','err');return;}
-  const {error} = await sb.from('competencias').insert({codigo,nome,descricao});
-  if(error){msg('msgCompetencia','Erro: '+error.message,'err');return;}
-  msg('msgCompetencia','Competencia adicionada!','ok');
-  carregarCompetencias();carregarCompetenciasSelects();
-}
-
-function abrirEditCompetencia(btn){
-  document.getElementById('editCompetenciaId').value = btn.dataset.id;
-  document.getElementById('editCompetenciaCod').value = btn.dataset.cod;
-  document.getElementById('editCompetenciaNome').value = decodeURIComponent(btn.dataset.nome);
-  document.getElementById('editCompetenciaDesc').value = decodeURIComponent(btn.dataset.desc);
-  abrirModal('modalCompetencia');
-}
-
-async function salvarEdicaoCompetencia(){
-  const id = document.getElementById('editCompetenciaId').value;
-  const codigo = document.getElementById('editCompetenciaCod').value.trim();
-  const nome = document.getElementById('editCompetenciaNome').value.trim();
-  const descricao = document.getElementById('editCompetenciaDesc').value.trim();
-  const {error} = await sb.from('competencias').update({codigo,nome,descricao}).eq('id',id);
-  if(error){alert('Erro: '+error.message);return;}
-  fecharModal('modalCompetencia');carregarCompetencias();carregarCompetenciasSelects();
-}
-
-async function removerCompetencia(btn){
-  if(!confirm('Remover esta competencia?'))return;
-  await sb.from('competencias').delete().eq('id',btn.dataset.id);
-  carregarCompetencias();
-  }
-// VINCULOS
-async function carregarVinculos(){
-  const {data:comps} = await sb.from('competencias').select('*').order('codigo');
-  const {data:niveis} = await sb.from('niveis').select('*').order('nome');
-  const {data:membros} = await sb.from('perfis').select('*').order('nome');
-  const compOpts = comps ? comps.map(c=>'<option value="'+c.id+'">'+c.codigo+' - '+c.nome+'</option>').join('') : '';
-  const nivOpts = niveis ? niveis.map(n=>'<option value="'+n.id+'">'+n.nome+'</option>').join('') : '';
-  const memOpts = membros ? membros.map(m=>'<option value="'+m.id+'">'+m.nome+'</option>').join('') : '';
-  document.getElementById('vincCompNivel').innerHTML = compOpts;
-  document.getElementById('vincNivelSel').innerHTML = nivOpts;
-  document.getElementById('vincCompMembro').innerHTML = compOpts;
-  document.getElementById('vincMembroSel').innerHTML = memOpts;
-  await carregarListaVincNivel();
-  await carregarListaVincMembro();
-}
-
-async function carregarListaVincNivel(){
-  const {data} = await sb.from('competencias_niveis').select('id,competencias(codigo,nome),niveis(nome)');
-  const el = document.getElementById('listaVincNivel');
-  if(!data||!data.length){el.innerHTML='<span style="color:#94a3b8;font-size:.82rem">Nenhum vinculo</span>';return;}
-  el.innerHTML = data.map(v=>{
-    const txt = (v.competencias?v.competencias.codigo:'?')+' -> '+(v.niveis?v.niveis.nome:'?');
-    return '<span class="chip">'+txt+'<button data-vincid="'+v.id+'" onclick="removerVincNivel(this)">x</button></span>';
-  }).join('');
-}
-
-async function carregarListaVincMembro(){
-  const {data} = await sb.from('competencias_membros').select('id,competencias(codigo,nome),perfis(nome)');
-  const el = document.getElementById('listaVincMembro');
-  if(!data||!data.length){el.innerHTML='<span style="color:#94a3b8;font-size:.82rem">Nenhum vinculo</span>';return;}
-  el.innerHTML = data.map(v=>{
-    const txt = (v.competencias?v.competencias.codigo:'?')+' -> '+(v.perfis?v.perfis.nome:'?');
-    return '<span class="chip">'+txt+'<button data-vincid="'+v.id+'" onclick="removerVincMembro(this)">x</button></span>';
-  }).join('');
-}
-
-async function vincularCompNivel(){
-  const comp_id = document.getElementById('vincCompNivel').value;
-  const nivel_id = document.getElementById('vincNivelSel').value;
-  if(!comp_id||!nivel_id){msg('msgVincNivel','Selecione competencia e nivel.','err');return;}
-  const {error} = await sb.from('competencias_niveis').insert({competencia_id:comp_id,nivel_id});
-  if(error){msg('msgVincNivel','Erro: '+error.message,'err');return;}
-  msg('msgVincNivel','Vinculo criado!','ok');
-  carregarListaVincNivel();
-}
-
-async function vincularCompMembro(){
-  const comp_id = document.getElementById('vincCompMembro').value;
-  const membro_id = document.getElementById('vincMembroSel').value;
-  if(!comp_id||!membro_id){msg('msgVincMembro','Selecione competencia e membro.','err');return;}
-  const {error} = await sb.from('competencias_membros').insert({competencia_id:comp_id,membro_id});
-  if(error){msg('msgVincMembro','Erro: '+error.message,'err');return;}
-  msg('msgVincMembro','Vinculo criado!','ok');
-  carregarListaVincMembro();
-}
-
-async function removerVincNivel(btn){
-  await sb.from('competencias_niveis').delete().eq('id',btn.dataset.vincid);
-  carregarListaVincNivel();
-}
-
-async function removerVincMembro(btn){
-  await sb.from('competencias_membros').delete().eq('id',btn.dataset.vincid);
-  carregarListaVincMembro();
-}
-
-// AVALIAR EQUIPE
-async function carregarMembrosAvaliar(){
-  const {data} = await sb.from('perfis').select('*').order('nome');
-  const grid = document.getElementById('memberGrid');
-  if(!data||!data.length){grid.innerHTML='<p style="color:#94a3b8">Nenhum membro cadastrado</p>';return;}
-  grid.innerHTML = data.map(m=>'<div class="member-card" data-id="'+m.id+'" data-nome="'+encodeURIComponent(m.nome||m.id)+'" onclick="selecionarMembro(this)"><strong style="font-size:.88rem">'+m.nome+'</strong><br><span style="font-size:.75rem;color:#64748b">'+nomePapel(m.papel)+(m.equipe?' | '+m.equipe:'')+'</span></div>').join('');
-  document.getElementById('avaliarConteudo').style.display='none';
-  membroAtualId = null;
-}
-
-function selecionarMembro(card){
-  document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('selected'));
-  card.classList.add('selected');
-  membroAtualId = card.dataset.id;
-  document.getElementById('membroSelecionadoNome').textContent = decodeURIComponent(card.dataset.nome);
-  document.getElementById('avaliarConteudo').style.display='block';
-  avaliacaoStars = {};
-  // Reset to first sub-tab
-  document.querySelectorAll('.sub-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('avaliacoes').classList.add('active');
-  document.querySelector('.sub-tab').classList.add('active');
-  carregarCompGrid();
-  carregarAvaliacoesMembro();
-}
-
-async function carregarCompGrid(){
-  const {data} = await sb.from('competencias').select('*').order('codigo');
-  const grid = document.getElementById('compGrid');
-  if(!data||!data.length){grid.innerHTML='<p style="color:#94a3b8">Nenhuma competencia cadastrada</p>';return;}
-  avaliacaoStars = {};
-  grid.innerHTML = data.map(c=>{
-    avaliacaoStars[c.id] = 0;
-    const stars = [1,2,3,4,5].map(n=>'<span data-compid="'+c.id+'" data-val="'+n+'" onclick="setStar(this)">&#9733;</span>').join('');
-    return '<div class="comp-card"><h4>'+c.codigo+' - '+c.nome+'</h4><div class="star-row" id="stars-'+c.id+'">'+stars+'</div></div>';
-  }).join('');
-}
-
-function setStar(span){
-  const compId = span.dataset.compid;
-  const val = parseInt(span.dataset.val);
-  avaliacaoStars[compId] = val;
-  const row = document.getElementById('stars-'+compId);
-  row.querySelectorAll('span').forEach(s=>{
-    s.classList.toggle('filled', parseInt(s.dataset.val) <= val);
-  });
-  }
-// AVALIACOES - usa colunas: colaborador_id, gestor_id, periodo, nota
-async function salvarAvaliacao(){
-  if(!membroAtualId){msg('msgAvaliacao','Selecione um membro.','err');return;}
-  const periodo = document.getElementById('avPeriodo').value;
-  const comentario = document.getElementById('avComentario').value.trim();
-  if(!periodo){msg('msgAvaliacao','Selecione o periodo.','err');return;}
-  const notas = Object.entries(avaliacaoStars).filter(([k,v])=>v>0);
-  if(!notas.length){msg('msgAvaliacao','Avalie pelo menos uma competencia.','err');return;}
-  const media = notas.reduce((s,[k,v])=>s+v,0)/notas.length;
-  const insertData = {
-    colaborador_id:membroAtualId,
-    gestor_id:userSession.user.id,
-    periodo:periodo+'-01',
-    nota:parseFloat(media.toFixed(2))
-  };
-  const {error} = await sb.from('avaliacoes_gestor').insert(insertData);
-  if(error){msg('msgAvaliacao','Erro ao salvar: '+error.message,'err');return;}
-  msg('msgAvaliacao','Avaliacao salva! Nota media: '+media.toFixed(1),'ok');
-  if(comentario) console.log('Comentario (campo nao existe ainda):', comentario);
-  carregarAvaliacoesMembro();
-}
-
-async function carregarAvaliacoesMembro(){
-  if(!membroAtualId) return;
-  const {data} = await sb.from('avaliacoes_gestor').select('*').eq('colaborador_id',membroAtualId).order('periodo',{ascending:false});
-  const tbody = document.getElementById('tabelaAvaliacoes');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhuma avaliacao registrada</td></tr>';return;}
-  tbody.innerHTML = data.map(a=>{
-    const per = a.periodo ? a.periodo.substring(0,7) : '—';
-    const nota = a.nota || a.media_geral || '—';
-    return '<tr><td>'+per+'</td><td>'+nota+'</td><td>—</td><td><button class="btn btn-sm btn-red" data-id="'+a.id+'" onclick="removerAvaliacao(this)">Remover</button></td></tr>';
-  }).join('');
-}
-
-async function removerAvaliacao(btn){
-  if(!confirm('Remover esta avaliacao?'))return;
-  await sb.from('avaliacoes_gestor').delete().eq('id',btn.dataset.id);
-  carregarAvaliacoesMembro();
-}
-
-// REGISTROS INDICADORES - usa colunas: colaborador_id, indicador_id, periodo, meta
-async function carregarRegIndicadores(){
-  if(!membroAtualId) return;
-  const {data} = await sb.from('registros_indicadores').select('*').eq('colaborador_id',membroAtualId).order('periodo',{ascending:false}).limit(50);
-  const tbody = document.getElementById('tabelaRegInd');
-  if(!data||!data.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum registro encontrado</td></tr>';return;}
-  tbody.innerHTML = data.map(r=>{
-    const per = r.periodo ? r.periodo.substring(0,7) : '—';
-    return '<tr><td>'+per+'</td><td>'+(r.indicador_id||'—')+'</td><td>'+(r.resultado||r.valor||r.meta||'—')+'</td><td>'+(r.meta||'—')+'</td></tr>';
-  }).join('');
-}
-
-// PDI - usa colunas: colaborador_id, gestor_id, prazo, status, acao
-async function salvarPDI(){
-  if(!membroAtualId){msg('msgPDI','Selecione um membro.','err');return;}
-  const acao = document.getElementById('pdiAcao').value.trim();
-  const prazo = document.getElementById('pdiPrazo').value;
-  const status = document.getElementById('pdiStatus').value;
-  if(!acao){msg('msgPDI','Preencha o objetivo/acao.','err');return;}
-  const {error} = await sb.from('pdis').insert({
-    colaborador_id:membroAtualId,
-    gestor_id:userSession.user.id,
-    acao,
-    prazo:prazo||null,
-    status
-  });
-  if(error){msg('msgPDI','Erro: '+error.message,'err');return;}
-  msg('msgPDI','PDI salvo!','ok');
-  document.getElementById('pdiAcao').value='';
-  document.getElementById('pdiPrazo').value='';
-  carregarPDI();
-}
-
-async function carregarPDI(){
-  if(!membroAtualId) return;
-  const {data} = await sb.from('pdis').select('*').eq('colaborador_id',membroAtualId).order('id',{ascending:false});
-  const el = document.getElementById('listaPDI');
-  if(!data||!data.length){el.innerHTML='<p style="color:#94a3b8;font-size:.85rem">Nenhum PDI cadastrado para este membro</p>';return;}
-  el.innerHTML = data.map(p=>{
-    const prazo = p.prazo ? 'Prazo: '+p.prazo : '';
-    const statusCls = 'pdi-status pdi-'+(p.status||'aberto');
-    return '<div class="pdi-item"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h4>'+(p.acao||p.objetivo||'PDI')+'</h4><small style="color:#94a3b8">'+prazo+'</small></div><button class="btn btn-sm btn-red" data-id="'+p.id+'" onclick="removerPDI(this)">Remover</button></div><span class="'+statusCls+'">'+(p.status||'aberto')+'</span></div>';
-  }).join('');
-}
-
-async function removerPDI(btn){
-  if(!confirm('Remover este PDI?'))return;
-  await sb.from('pdis').delete().eq('id',btn.dataset.id);
-  carregarPDI();
-}
-
-window.addEventListener('DOMContentLoaded', init);
+function saveHistBtn(btn){saveHist(btn.dataset.mid);}
+function addPDIBtn(btn){addPDI(btn.dataset.mid);}
+function savePDIBtn(btn){savePDI(btn.dataset.mid,btn.dataset.iid);}
+function delPDIBtn(btn){delPDI(btn.dataset.mid,btn.dataset.iid);}
+function delMembroBtn(btn){delMembro(btn.dataset.mid);}
+(async function(){var r=await sb.auth.getSession();if(r.data&&r.data.session){S.user=r.data.session.user;await init();}})();
 </script>
 </body>
 </html>
