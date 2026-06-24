@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matriz de Competências & PDI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#1a2332;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.topbar{background:#1a2332;color:#fff;display:flex;align-items:center;padding:0 20px;height:52px;gap:16px;position:sticky;top:0;z-index:100}
+.topbar-logo{font-weight:700;font-size:14px;white-space:nowrap}
+.topbar-sub{font-size:11px;color:#94a3b8;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-actions{display:flex;gap:8px;flex-shrink:0}
+.btn{padding:6px 14px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s}
+.btn:hover{background:#f1f5f9}
+.btn-primary{background:#0f4c75;color:#fff;border-color:#0f4c75}
+.btn-primary:hover{background:#0a3a5c}
+.btn-warning{background:#d97706;color:#fff;border-color:#d97706}
+.btn-sm{padding:4px 10px;font-size:11px}
+.layout{display:flex;height:calc(100vh - 52px)}
+.sidebar{width:270px;background:#fff;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar-header{padding:14px 16px 8px;border-bottom:1px solid #e2e8f0}
+.sidebar-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:#64748b;text-transform:uppercase;margin-bottom:10px}
+.sidebar-filters{display:flex;gap:6px}
+.filter-btn{padding:4px 12px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc;font-size:12px;cursor:pointer;transition:all .15s}
+.filter-btn.active{background:#1a2332;color:#fff;border-color:#1a2332}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px}
+.member-card{border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .15s;background:#fff;position:relative}
+.member-card:hover{border-color:#94a3b8;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.member-card.active{border-color:#0f4c75;background:#f0f9ff}
+.member-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.member-name{font-weight:600;font-size:13px;color:#1a2332;flex:1;padding-right:8px}
+.member-badge{background:#e2e8f0;color:#475569;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.member-badge.n1{background:#dbeafe;color:#1d4ed8}
+.member-badge.n2{background:#dcfce7;color:#166534}
+.member-badge.n3{background:#fef3c7;color:#92400e}
+.member-badge.rt{background:#f3e8ff;color:#6b21a8}
+.member-badge.ao{background:#ffe4e6;color:#9f1239}
+.member-team{font-size:11px;color:#64748b;margin-bottom:8px}
+.adherence-bar{height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;margin-bottom:4px}
+.adherence-fill{height:100%;background:#10b981;border-radius:2px;transition:width .4s}
+.adherence-fill.low{background:#f59e0b}
+.adherence-fill.critical{background:#ef4444}
+.adherence-label{font-size:10px;color:#64748b}
+.member-remove{position:absolute;top:8px;right:8px;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;border-radius:4px;display:none}
+.member-card:hover .member-remove{display:block}
+.member-remove:hover{color:#ef4444;background:#fef2f2}
+.add-member-form{padding:12px 16px;border-top:1px solid #e2e8f0}
+.add-member-form input,.add-member-form select{width:100%;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;margin-bottom:6px}
+.add-member-form input:focus,.add-member-form select:focus{outline:none;border-color:#0f4c75}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tabs-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 20px;display:flex;gap:4px;overflow-x:auto;flex-shrink:0}
+.tab-btn{padding:14px 16px;font-size:13px;font-weight:500;color:#64748b;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.tab-btn.active{color:#0f4c75;border-bottom-color:#0f4c75;font-weight:600}
+.tab-btn:hover:not(.active){color:#1a2332}
+.tab-content{flex:1;overflow-y:auto;padding:24px}
+.member-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px}
+.member-info h2{font-size:22px;font-weight:700;color:#1a2332;margin-bottom:4px}
+.member-meta{font-size:12px;color:#64748b;margin-bottom:6px}
+.pesos-badge{display:inline-block;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;padding:3px 12px;font-size:11px;color:#475569}
+.scores-row{display:flex;gap:16px;align-items:center}
+.score-circle{text-align:center}
+.score-donut{position:relative;display:inline-block}
+.score-donut svg{transform:rotate(-90deg)}
+.score-donut .track{fill:none;stroke:#e2e8f0;stroke-width:6}
+.score-donut .fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700}
+.score-label{font-size:10px;color:#64748b;margin-top:4px}
+.score-circle.geral .score-label{font-weight:600;color:#1a2332;font-size:12px}
+.category-section{margin-bottom:28px}
+.category-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid}
+.category-header.comp{border-color:#0d7c66}
+.category-header.tec{border-color:#d97706}
+.category-header.neg{border-color:#059669}
+.category-dot{width:12px;height:12px;border-radius:50%;margin-right:8px;flex-shrink:0}
+.category-dot.comp{background:#0d7c66}
+.category-dot.tec{background:#d97706}
+.category-dot.neg{background:#059669}
+.category-title{font-size:15px;font-weight:700;display:flex;align-items:center}
+.category-weight{font-size:11px;color:#64748b;font-family:monospace}
+.comp-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .15s}
+.comp-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.comp-card.comp-border{border-left:4px solid #0d7c66}
+.comp-card.tec-border{border-left:4px solid #d97706}
+.comp-card.neg-border{border-left:4px solid #059669}
+.comp-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;color:#94a3b8}
+.comp-info{flex:1;min-width:0}
+.comp-name{font-size:13px;font-weight:600;color:#1a2332;cursor:pointer;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.comp-name:hover{color:#0f4c75;text-decoration:underline}
+.comp-desc{font-size:11px;color:#64748b;margin-top:2px}
+.tag-pdi{background:#fef3c7;color:#92400e;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;border:1px solid #fcd34d}
+.comp-scoring{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.score-btns{display:flex;gap:3px}
+.score-btn{width:28px;height:28px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.score-btn:hover{border-color:#0f4c75;background:#eff6ff}
+.score-btn.active-1{background:#fef2f2;border-color:#ef4444;color:#ef4444}
+.score-btn.active-2{background:#fff7ed;border-color:#f97316;color:#f97316}
+.score-btn.active-3{background:#fefce8;border-color:#eab308;color:#eab308}
+.score-btn.active-4{background:#f0fdf4;border-color:#22c55e;color:#22c55e}
+.score-btn.active-5{background:#ecfdf5;border-color:#10b981;color:#10b981}
+.na-btn{padding:0 8px;height:28px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:6px;font-size:11px;color:#94a3b8;cursor:pointer}
+.na-btn.active{background:#f1f5f9;border-color:#94a3b8;color:#475569;font-weight:600}
+.alvo-info{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b;white-space:nowrap}
+.alvo-dot{width:10px;height:10px;border-radius:50%}
+.alvo-dot.green{background:#10b981}
+.alvo-dot.yellow{background:#f59e0b}
+.alvo-dot.red{background:#ef4444}
+.alvo-dot.gray{background:#94a3b8}
+.na-label{font-size:12px;color:#94a3b8;font-style:italic}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:14px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-header{background:#1a2332;color:#fff;padding:16px 20px;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:space-between}
+.modal-title{font-size:17px;font-weight:700}
+.modal-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+.modal-close{background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;padding:0 4px;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-body{padding:20px}
+.modal-comp-desc{font-size:13px;color:#64748b;margin-bottom:16px}
+.regua-title{font-size:10px;font-weight:700;letter-spacing:.08em;color:#d97706;text-transform:uppercase;margin-bottom:12px}
+.regua-row{display:flex;gap:12px;margin-bottom:10px;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0}
+.regua-row.atual{background:#ffe4e6;border-color:#fca5a5}
+.regua-row.alvo{background:#ecfdf5;border-color:#86efac}
+.regua-row.atual-alvo{background:#ecfdf5;border-color:#86efac}
+.regua-nivel{min-width:64px;text-align:center;padding:6px 4px;border-radius:6px;color:#fff;font-size:10px;font-weight:700;line-height:1.3;flex-shrink:0}
+.regua-nivel.n1{background:#94a3b8}
+.regua-nivel.n2{background:#64748b}
+.regua-nivel.n3{background:#1a2332}
+.regua-nivel.n4{background:#0f4c75}
+.regua-nivel.n5{background:#0d7c66}
+.regua-text{font-size:13px;color:#374151;line-height:1.5}
+.auto-summary{display:flex;gap:12px;margin-bottom:20px}
+.auto-card{flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;text-align:center}
+.auto-card-num{font-size:28px;font-weight:700;margin-bottom:4px}
+.auto-card-label{font-size:12px;color:#64748b}
+.auto-card.alinhado .auto-card-num{color:#10b981}
+.auto-card.alinhado{border-color:#86efac;background:#f0fdf4}
+.auto-card.superestima .auto-card-num{color:#f59e0b}
+.auto-card.superestima{border-color:#fcd34d;background:#fffbeb}
+.auto-card.subestima .auto-card-num{color:#64748b}
+.auto-card.subestima{border-color:#cbd5e1;background:#f8fafc}
+.auto-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9}
+.auto-row:last-child{border:none}
+.auto-comp-name{flex:1;font-size:13px;font-weight:500}
+.auto-scores{display:flex;gap:4px;align-items:center}
+.auto-score-btn{width:26px;height:26px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.auto-score-btn.gestor{background:#1a2332;color:#fff;border-color:#1a2332}
+.auto-score-btn.auto{background:#d97706;color:#fff;border-color:#d97706}
+.auto-delta{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px;white-space:nowrap}
+.auto-delta.alinhado{background:#f0fdf4;color:#10b981}
+.auto-delta.superestima{background:#fffbeb;color:#f59e0b}
+.auto-delta.subestima{background:#f8fafc;color:#64748b}
+.auto-note{font-size:12px;color:#64748b;margin-bottom:16px;padding:12px;background:#f8fafc;border-radius:8px;border-left:3px solid #94a3b8}
+.gaps-table{width:100%;border-collapse:collapse;font-size:12px}
+.gaps-table th{padding:10px 12px;background:#f8fafc;font-weight:600;color:#64748b;border:1px solid #e2e8f0;text-align:center;white-space:nowrap}
+.gaps-table th:first-child{text-align:left;min-width:200px}
+.gaps-table td{padding:8px 12px;border:1px solid #e2e8f0;text-align:center;vertical-align:middle}
+.gaps-table td:first-child{text-align:left;font-weight:500;font-size:12px}
+.gaps-table .category-row td{background:#f1f5f9;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#475569}
+.gaps-cell{width:36px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;margin:0 auto}
+.gaps-cell.c1{background:#ef4444}
+.gaps-cell.c2{background:#f97316}
+.gaps-cell.c3{background:#eab308;color:#1a2332}
+.gaps-cell.c4{background:#22c55e}
+.gaps-cell.c5{background:#10b981}
+.gaps-cell.cn{background:#e2e8f0;color:#94a3b8}
+.gaps-member-header{font-weight:700;font-size:12px}
+.gaps-member-sub{font-size:10px;color:#94a3b8;font-weight:400}
+.pdi-tag-small{font-size:9px;color:#92400e;background:#fef3c7;padding:1px 4px;border-radius:3px;vertical-align:middle;margin-left:4px}
+.pdi-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px}
+.pdi-card h4{font-size:13px;font-weight:700;margin-bottom:8px;color:#0f4c75}
+.pdi-card textarea{width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;resize:vertical;min-height:80px;font-family:inherit}
+.pdi-card input,.pdi-card select{width:100%;padding:6px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;background:#fff;font-family:inherit}
+.ind-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px}
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.ind-item{padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0}
+.ind-item label{font-size:11px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.ind-item input{width:100%;padding:6px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:13px}
+.hist-entry{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px}
+.hist-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.hist-period{font-weight:700;font-size:14px}
+.hist-scores{display:flex;gap:12px}
+.hist-score-item{text-align:center;font-size:12px}
+.hist-score-val{font-size:18px;font-weight:700;color:#0f4c75}
+.lib-section{margin-bottom:20px}
+.lib-section h4{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
+.lib-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:6px;cursor:pointer;transition:all .15s;background:#fff}
+.lib-item:hover{border-color:#0f4c75;background:#f0f9ff}
+.lib-item.selected{border-color:#10b981;background:#f0fdf4}
+.lib-item-check{width:18px;height:18px;border-radius:4px;border:2px solid #cbd5e1;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.lib-item.selected .lib-item-check{background:#10b981;border-color:#10b981;color:#fff}
+.lib-item-text{flex:1;min-width:0}
+.lib-item-name{font-size:13px;font-weight:600}
+.lib-item-desc{font-size:11px;color:#64748b}
+.lib-search{width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:12px}
+.empty{padding:60px 20px;text-align:center;color:#94a3b8}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:14px;font-weight:500}
+.empty-sub{font-size:12px;margin-top:4px}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a2332;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:300;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media print{.sidebar,.topbar,.tabs-bar,.topbar-actions,.member-remove,.add-member-form,.comp-scoring{display:none!important}.layout{display:block}.main{overflow:visible}.tab-content{overflow:visible;padding:10px}.tab-pane{display:block!important}.comp-card{break-inside:avoid}}
+</style>
+</head><body>
+<div class="topbar">
+  <div class="topbar-logo">&#9632; Matriz de competencias &amp; PDI</div>
+  <div class="topbar-sub">Suporte consultivo &middot; escala 1-5 &middot; metodo BARS &middot; salvo automaticamente neste navegador</div>
+  <div class="topbar-actions">
+    <button class="btn btn-sm" onclick="exportarDados()">Exportar</button>
+    <button class="btn btn-sm" onclick="document.getElementById('importInput').click()">Importar</button>
+    <input type="file" id="importInput" accept=".json" style="display:none" onchange="importarDados(this)">
+    <button class="btn btn-sm" onclick="imprimirPDF()">Imprimir / PDF</button>
+    <button class="btn btn-sm btn-warning" onclick="confirmarLimpar()">Limpar exemplos</button>
+    <button class="btn btn-sm" onclick="abrirBiblioteca()">Biblioteca</button>
+    <a href="gestor-painel.html" class="btn btn-sm">Painel Gestor</a>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Equipe</div>
+      <div class="sidebar-filters">
+        <button class="filter-btn active" data-filter="todos" onclick="setFilter('todos')">Todos</button>
+        <button class="filter-btn" data-filter="Cond21" onclick="setFilter('Cond21')">Cond21</button>
+        <button class="filter-btn" data-filter="GC" onclick="setFilter('GC')">GC</button>
+      </div>
+    </div>
+    <div class="sidebar-list" id="sidebarList"></div>
+    <div class="add-member-form">
+      <input type="text" id="newMemberName" placeholder="Nome do colaborador">
+      <select id="newMemberLevel">
+        <option value="N1">N1 - Suporte Nivel 1</option>
+        <option value="N2">N2 - Suporte Nivel 2</option>
+        <option value="N3">N3 - Suporte Nivel 3</option>
+        <option value="RT">RT - Responsavel Tecnico</option>
+        <option value="AO">Analista Operacional</option>
+      </select>
+      <select id="newMemberTeam">
+        <option value="Cond21">Cond21</option>
+        <option value="GC">GC</option>
+        <option value="Ambas">Ambas</option>
+      </select>
+      <button class="btn btn-sm btn-primary" onclick="addMember()" style="width:100%">+ Adicionar membro</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="avaliacao" onclick="setTab('avaliacao')">Avaliacao</button>
+      <button class="tab-btn" data-tab="indicadores" onclick="setTab('indicadores')">Indicadores</button>
+      <button class="tab-btn" data-tab="historico" onclick="setTab('historico')">Historico</button>
+      <button class="tab-btn" data-tab="autoconhecimento" onclick="setTab('autoconhecimento')">Autoconhecimento</button>
+      <button class="tab-btn" data-tab="mapa" onclick="setTab('mapa')">Mapa de gaps</button>
+      <button class="tab-btn" data-tab="pdi" onclick="setTab('pdi')">PDI</button>
+    </div>
+    <div class="tab-content">
+      <div id="tab-avaliacao" class="tab-pane"></div>
+      <div id="tab-indicadores" class="tab-pane" style="display:none"></div>
+      <div id="tab-historico" class="tab-pane" style="display:none"></div>
+      <div id="tab-autoconhecimento" class="tab-pane" style="display:none"></div>
+      <div id="tab-mapa" class="tab-pane" style="display:none"></div>
+      <div id="tab-pdi" class="tab-pane" style="display:none"></div>
+    </div>
+  </div>
+</div>
+<div id="modalRegua" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div><div class="modal-sub" id="modalSub"></div><div class="modal-title" id="modalTitle"></div></div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-comp-desc" id="modalDesc"></div>
+      <div class="regua-title">Regua de proficiencia &middot; do basico ao avancado</div>
+      <div id="modalReguas"></div>
+    </div>
+  </div>
+</div>
+<div id="modalBib" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeBib()">
+  <div class="modal-box" style="max-width:680px">
+    <div class="modal-header">
+      <div><div class="modal-title">Biblioteca de Competencias</div><div class="modal-sub">Selecione as competencias para ativar na matriz</div></div>
+      <button class="modal-close" onclick="closeBib()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" class="lib-search" id="libSearch" placeholder="Buscar competencia..." oninput="renderBib()">
+      <div id="bibContent"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px">
+        <button class="btn" onclick="closeBib()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarBib()">Salvar selecao</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div><script>
+var BIBLIOTECA={comportamental:{label:'Comportamental',color:'#0d7c66',cls:'comp',icon:'&#128172;',peso:{N1:45,N2:40,N3:25,RT:20,AO:30},items:[
+{id:'A1',nome:'Comunicacao multicanal',desc:'Clareza adaptada a cada canal e interlocutor.',n1:'Responde de forma compreensivel no rotineiro, mas gera retrabalho por mensagens longas ou ambiguas.',n2:'Adapta o tom ao canal e confirma o entendimento na maioria dos atendimentos.',n3:'Escreve claro e estruturado, resume o proximo passo ao final e raramente gera re-pergunta.',n4:'Traduz temas tecnicos em linguagem do cliente com precisao e ajusta o registro a cada interlocutor.',n5:'Referencia de comunicacao na equipe; elabora templates e melhores praticas adotadas por outros.'},
+{id:'A2',nome:'Empatia e foco em CX',desc:'Cliente se sente cuidado, nao so resolvido.',n1:'Resolve o problema, mas o cliente nao se sente acolhido.',n2:'Demonstra empatia em situacoes padrao; perde o fio em casos de alta tensao.',n3:'Valida o sentimento antes de resolver; o CSAT reflete consistencia.',n4:'Transforma situacao critica em fidelizacao; antecipa insatisfacao latente.',n5:'Benchmarked internamente como referencia de CX; influencia rituais da equipe.'},
+{id:'A3',nome:'Inteligencia emocional e conflitos',desc:'Conduzir tensao sem escalar o conflito.',n1:'Perde o equilibrio em clientes agressivos; escala ou encerra antes do tempo.',n2:'Mantem a calma na maioria dos casos, mas precisa de apoio em conflitos complexos.',n3:'Desativa tensao com linguagem empatica e limites claros; raras escalas desnecessarias.',n4:'Conduz conflitos graves de forma autonoma; seu tom reduz escalas de outros ao redor.',n5:'Coach informal; treina colegas em gestao de conflito a partir de situacoes reais.'},
+{id:'A4',nome:'Resiliencia sob pressao e volume',desc:'Qualidade constante sob fila e volume.',n1:'Qualidade cai em picos; erros aumentam e backlog pessoal cresce.',n2:'Mantem ritmo em picos moderados, mas performa abaixo em situacoes extremas.',n3:'Sustenta qualidade e SLA mesmo em picos; adapta prioridades sem orientacao.',n4:'Performance estavél independente do volume; exemplo positivo para a equipe.',n5:'Lidera esforco coletivo em picos criticos; propoe e implementa ajustes de processo.'},
+{id:'A5',nome:'Postura consultiva e proatividade',desc:'Antecipar, educar e recomendar.',n1:'Responde apenas ao que o cliente perguntou explicitamente.',n2:'Eventualmente antecipa uma duvida relacionada, mas nao e consistente.',n3:'Orienta o proximo passo, alerta riscos e sugere melhor uso do produto.',n4:'Identifica padrao de uso ineficiente e propoe ajuste antes que gere problema.',n5:'Age como advisor; clientes o buscam proativamente para decisoes de produto.'},
+{id:'A6',nome:'Ownership e fluxo de caso',desc:'O caso e meu ate resolver ou passar com contexto.',n1:'Abandona casos sem atualizacao; cliente precisa repetir contexto a cada contato.',n2:'Mantem ownership nos casos simples; perde o fio nos complexos.',n3:'Acompanha o caso ate a resolucao ou entrega com contexto completo para quem assume.',n4:'Gerencia multiplos casos complexos em paralelo sem perder nenhum fio.',n5:'Cria ou aprimora o fluxo de acompanhamento de casos da equipe.'},
+{id:'A7',nome:'Aprendizado continuo',desc:'Acompanhar um produto que muda e aprender com o erro.',n1:'Nao acompanha comunicados de produto; repete erros ja sinalizados.',n2:'Le os comunicados, mas demora a incorporar na pratica.',n3:'Incorpora novidades rapidamente; aprende com o proprio erro e aplica melhoria.',n4:'Busca aprendizado alem do comunicado; compartilha descobertas com a equipe.',n5:'Acelera o aprendizado da equipe; cria guias, mini-treinamentos ou resumos de lancamentos.'},
+{id:'A8',nome:'Trabalho em equipe e colaboracao',desc:'Contribuir ativamente para o coletivo.',n1:'Foco exclusivo nas proprias demandas; raramente apoia colegas.',n2:'Apoia quando solicitado; nao toma iniciativa de colaboracao.',n3:'Compartilha aprendizados proativamente e apoia colegas em dificuldade.',n4:'Integra bem novos membros; cria pontes entre subgrupos da equipe.',n5:'Catalisador de sinergia; transforma interacoes individuais em melhoria coletiva.'},
+{id:'A9',nome:'Etica e confidencialidade',desc:'Tratar informacoes sensiveis com responsabilidade.',n1:'Ocasionalmente compartilha informacoes alem do necessario.',n2:'Segue as regras basicas, mas nao reflete sobre riscos implicitos.',n3:'Identifica informacao sensivel e trata com discricao por padrao.',n4:'Antecipa riscos de vazamento e alerta a equipe preventivamente.',n5:'Referencia em conduta etica; forma colegas em privacidade e sigilo.'}
+]},
+tecnico:{label:'Tecnico',color:'#d97706',cls:'tec',icon:'&#128270;',peso:{N1:35,N2:40,N3:45,RT:55,AO:40},items:[
+{id:'B1',nome:'Diagnostico e resolucao',desc:'Do relato confuso a causa-raiz.',n1:'Resolve o conhecido seguindo roteiro; tende a chutar no atipico.',n2:'Confirma o problema e reproduz antes de agir na maioria dos casos.',n3:'Distingue sintoma de causa-raiz e isola variaveis com autonomia.',n4:'Investiga causa-raiz profunda, inclusive comportamento de sistema.',n5:'Metodiza o diagnostico; seu framework vira referencia para casos novos.'},
+{id:'B2',nome:'Dominio do produto',desc:'Conhecer a fundo modulos, regras e limites.',n1:'Conhece os modulos principais, mas trava em configuracoes menos usadas.',n2:'Cobre a maioria dos modulos com seguranca; busca ajuda nos casos complexos.',n3:'Domina o produto de ponta a ponta; raramente precisa consultar documentacao basica.',n4:'Conhece edge cases e comportamentos nao documentados; fonte interna de referencia.',n5:'Compila conhecimento em base de conhecimento; acelera o onboarding de novos membros.'},
+{id:'B3',nome:'Investigacao tecnica e evidencias',desc:'Evidencia que sustenta o diagnostico e habilita o DEV.',n1:'Abre chamado com descricao vaga; DEV devolve por falta de informacao.',n2:'Coleta evidencias basicas, mas as vezes faltam logs ou passo-a-passo de reproducao.',n3:'Entrega chamados completos com logs, passos de reproducao e hipotese de causa-raiz.',n4:'Investiga no nivel de API e banco de dados para confirmar hipotese antes de acionar DEV.',n5:'Define o template de chamado tecnico adotado pela equipe.'},
+{id:'B4',nome:'Ponte com Engenharia e validacao',desc:'Traduzir, cobrar e validar a correcao antes de devolver.',n1:'Repassa o caso ao DEV sem acompanhar; devolve ao cliente sem validar a correcao.',n2:'Cobra o DEV quando lembrado; valida superficialmente antes de devolver.',n3:'Acompanha o ciclo completo; valida a correcao no ambiente do cliente antes de fechar.',n4:'Antecipa regressoes relacionadas e as valida proativamente; reduz reabertura.',n5:'Propoe melhorias no processo de handoff Suporte-Engenharia que reduzem tempo de resolucao.'},
+{id:'B5',nome:'Ferramentas operacionais',desc:'Zoho, Blip e Vsphone com fluencia e classificacao correta.',n1:'Usa as ferramentas basicas, mas erra na classificacao e nos fluxos menos comuns.',n2:'Opera as ferramentas corretamente na maioria dos casos; erros de classificacao sao raros.',n3:'Domina todos os fluxos das ferramentas; classificacao sempre precisa e oportuna.',n4:'Usa features avancadas e identifica melhorias de configuracao.',n5:'Forma colegas; e o ponto de referencia para duvidas operacionais e novas funcionalidades.'},
+{id:'B6',nome:'Gestao de tempo e SLA',desc:'Velocidade e qualidade dentro do SLA.',n1:'Frequentemente perde o SLA ou resolve com qualidade baixa para ganhar velocidade.',n2:'Cumpre o SLA na maioria dos casos; faz tradeoff consciente apenas em casos excepcionais.',n3:'Equilibra velocidade e qualidade; negocia prazo com o cliente quando necessario.',n4:'Otimiza fluxo pessoal para nunca perder SLA mesmo em pico; indice de retrabalho baixo.',n5:'Analisa dados de SLA da equipe e propoe ajustes de processo com impacto mensuravel.'},
+{id:'B7',nome:'Documentacao tecnica',desc:'Registrar solucoes para evitar retrabalho.',n1:'Nao registra solucoes encontradas; equipe resolve o mesmo problema varias vezes.',n2:'Documenta quando solicitado; qualidade variavel.',n3:'Documenta solucoes novas por padrao com passos claros e reproduziveis.',n4:'Mantem e atualiza a base de conhecimento; identifica documentacao desatualizada.',n5:'Arquiteta a base de conhecimento tecnico da equipe; seu padrao de documentacao e adotado por todos.'},
+{id:'B8',nome:'Configuracao e parametrizacao',desc:'Configurar o produto para atender o caso do cliente.',n1:'Executa configuracoes simples; precisa de ajuda nas parametrizacoes complexas.',n2:'Configura a maioria dos cenarios; busca apoio nas configuracoes avancadas.',n3:'Executa qualquer configuracao padrao de forma autonoma e correta.',n4:'Otimiza configuracoes para necessidades especificas do cliente; previne erros futuros.',n5:'Cria playbooks de configuracao; e referencia para casos fora do padrao.'}
+]},
+negocio:{label:'Negocio / dominio',color:'#059669',cls:'neg',icon:'&#128200;',peso:{N1:20,N2:20,N3:30,RT:25,AO:30},items:[
+{id:'C1',nome:'Negocio do cliente',desc:'Entender o porque por tras do pedido.',n1:'Trata o pedido de forma literal sem entender o contexto do negocio do cliente.',n2:'Entende o segmento do cliente, mas nao conecta o problema ao impacto no negocio.',n3:'Identifica o impacto do problema no negocio do cliente e prioriza de acordo.',n4:'Usa o contexto do negocio do cliente para antecipar problemas futuros.',n5:'Parceiro estrategico; clientes compartilham roadmap de negocio proativamente.'},
+{id:'C2',nome:'Visao de produto e melhoria',desc:'Transformar recorrencia em melhoria do produto.',n1:'Nao conecta recorrencias a problemas de produto; cada caso e tratado isoladamente.',n2:'Percebe recorrencias, mas raramente estrutura o feedback de forma acionavel.',n3:'Identifica padrao, estrutura feedback claro e encaminha para o canal correto.',n4:'Quantifica impacto da recorrencia; seu feedback influencia o backlog de produto.',n5:'Co-cria solucao com o time de produto; e convidado a participar de discovery.'},
+{id:'C3',nome:'Mentalidade de dados',desc:'Ler o indicador e agir sobre ele.',n1:'Nao usa metricas para avaliar o proprio desempenho.',n2:'Olha os dados quando apresentados, mas nao os busca proativamente.',n3:'Monitora os proprios indicadores e ajusta comportamento baseado nos dados.',n4:'Usa dados para propor melhorias; correlaciona variaveis de desempenho.',n5:'Analisa indicadores da equipe e propoe experimentos com hipotese e metricas de sucesso.'},
+{id:'C4',nome:'Seguranca da informacao LGPD',desc:'Zelo com dado sensivel como padrao.',n1:'Compartilha dados do cliente sem verificar necessidade ou canal adequado.',n2:'Segue as regras basicas; nao reflete sobre riscos nao documentados.',n3:'Identifica dado sensivel e aplica a politica correta de forma autonoma.',n4:'Antecipa riscos e alerta colegas e gestao preventivamente.',n5:'Referencia em seguranca; capacita a equipe e contribui para a politica interna.'},
+{id:'C5',nome:'Conhecimento regulatorio do setor',desc:'Entender o contexto legal e regulatorio do cliente.',n1:'Desconhece as principais obrigacoes regulatorias do setor do cliente.',n2:'Conhece os requisitos basicos, mas nao os conecta ao caso em atendimento.',n3:'Aplica o conhecimento regulatorio ao orientar o cliente sobre limitacoes e possibilidades.',n4:'Antecipa implicacoes regulatorias de mudancas de produto ou configuracao.',n5:'Referencia tecnica em regulatorio; e consultado pelo time de produto e vendas.'},
+{id:'C6',nome:'Inteligencia competitiva',desc:'Conhecer o mercado e os concorrentes.',n1:'Nao tem contexto sobre o posicionamento do produto frente ao mercado.',n2:'Conhece os principais concorrentes, mas nao usa esse conhecimento no atendimento.',n3:'Posiciona o produto adequadamente quando o cliente menciona alternativas.',n4:'Usa inteligencia competitiva para fortalecer a retencao em negociacoes de churn.',n5:'Compartilha inteligencia competitiva com o time de produto e vendas de forma estruturada.'}
+]}};
+var NIVEL_CONFIG={N1:{faixa:'1-3',alvo:3},N2:{faixa:'2-4',alvo:3},N3:{faixa:'3-4',alvo:4},RT:{faixa:'3-5',alvo:4},AO:{faixa:'2-4',alvo:3}};var state={members:[],scores:{},autoScores:{},pdis:{},indicadores:{},historico:{},activeComps:null,currentMemberId:null,currentTab:'avaliacao',filter:'todos'};
+function loadState(){try{var s=localStorage.getItem('matriz_v3');if(s){var p=JSON.parse(s);state=Object.assign(state,p);}else{loadExampleData();}}catch(e){loadExampleData();}}
+function saveState(){localStorage.setItem('matriz_v3',JSON.stringify(state));}
+function loadExampleData(){state.members=[{id:'m1',name:'Dario Neto',level:'N1',team:'Cond21'},{id:'m2',name:'Paulo Jose Goncalves Antunes',level:'N3',team:'Cond21'}];state.scores['m1']={A1:3,A2:3,A3:3,A4:1,A5:2,A6:2,A7:2,B1:2,B2:2,B3:3,B4:-1,B5:3,B6:2,C1:1,C2:1,C3:1,C4:3};state.scores['m2']={A1:1,A2:4,A3:2,A4:1,A5:5,A6:5,A7:1,B1:3,B2:4,B3:3,B4:4,B5:3,B6:3,C1:3,C2:2,C3:3,C4:4};state.autoScores['m2']={A1:4,A2:2,A3:1,A4:5,A5:2,A6:5,A7:5,B1:2,B2:2,B3:3,B4:4,B5:3,B6:4,C1:3,C2:2,C3:3,C4:4};state.pdis['m1']=[{id:'p1',acao:'Praticar estruturacao de resposta usando formato Situacao > Acao > Resultado',prazo:'2026-07-15',status:'em-andamento',compId:'A2'},{id:'p2',acao:'Realizar 2 atendimentos por semana com foco consultivo e registrar aprendizados',prazo:'2026-08-01',status:'pendente',compId:'A5'},{id:'p3',acao:'Criar checklist pessoal de fechamento de caso para garantir contexto completo',prazo:'2026-07-31',status:'pendente',compId:'A6'}];state.currentMemberId='m1';saveState();}
+function getActiveComps(){if(state.activeComps)return state.activeComps;return{comportamental:['A1','A2','A3','A4','A5','A6','A7'],tecnico:['B1','B2','B3','B4','B5','B6'],negocio:['C1','C2','C3','C4']};}
+function getCompById(id){for(var k in BIBLIOTECA){var f=BIBLIOTECA[k].items.find(function(c){return c.id===id;});if(f)return Object.assign({},f,{cat:BIBLIOTECA[k]});}return null;}
+function getMember(id){return state.members.find(function(m){return m.id===id;});}
+function getScore(mid,cid){return((state.scores[mid]||{})[cid]);}
+function calcScores(mid){var m=getMember(mid);if(!m)return{comp:0,tec:0,neg:0,geral:0,pesos:{comportamental:35,tecnico:35,negocio:30}};var lv=m.level;var ac=getActiveComps();var pesos={comportamental:(BIBLIOTECA.comportamental.peso[lv]||35),tecnico:(BIBLIOTECA.tecnico.peso[lv]||35),negocio:(BIBLIOTECA.negocio.peso[lv]||30)};function avg(cat){var ids=ac[cat]||[];var sc=ids.map(function(id){return getScore(mid,id);}).filter(function(s){return s!==undefined&&s!==null&&s!==-1&&s>0;});if(!sc.length)return 0;return sc.reduce(function(a,b){return a+b;},0)/sc.length;}var ca=avg('comportamental'),ta=avg('tecnico'),na=avg('negocio');var cp=ca/5*100,tp=ta/5*100,np=na/5*100;var g=(cp*pesos.comportamental+tp*pesos.tecnico+np*pesos.negocio)/(pesos.comportamental+pesos.tecnico+pesos.negocio);return{comp:Math.round(cp),tec:Math.round(tp),neg:Math.round(np),geral:Math.round(g),pesos:pesos};}
+function calcAdherence(mid){return calcScores(mid).geral;}
+function getAlvoDot(nota,alvo){if(nota===undefined||nota===null||nota===-1)return'gray';if(nota>=alvo)return'green';if(nota===alvo-1)return'yellow';return'red';}
+function getMemberPDIComps(mid){var ps=state.pdis[mid]||[];return new Set(ps.filter(function(p){return p.compId;}).map(function(p){return p.compId;}));}
+function uid(){return'x'+Math.random().toString(36).substr(2,9);}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+function setFilter(f){state.filter=f;document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.toggle('active',b.dataset.filter===f);});renderSidebar();}
+function renderSidebar(){var list=document.getElementById('sidebarList');var filtered=state.filter==='todos'?state.members:state.members.filter(function(m){return m.team===state.filter||m.team==='Ambas';});if(!filtered.length){list.innerHTML='<div class="empty" style="padding:30px 10px"><div class="empty-icon">&#128100;</div><div class="empty-text">Nenhum membro</div></div>';return;}list.innerHTML=filtered.map(function(m){var adh=calcAdherence(m.id);var fc=adh>=70?'':adh>=50?' low':' critical';var lc=m.level?m.level.toLowerCase():'ao';var ia=m.id===state.currentMemberId;return'<div class="member-card'+(ia?' active':'')+'" onclick="selectMember(''+m.id+'')"><div class="member-card-top"><div class="member-name">'+m.name+'</div><span class="member-badge '+lc+'">'+m.level+'</span><button class="member-remove" onclick="event.stopPropagation();removeMember(''+m.id+'')" title="Remover">&times;</button></div><div class="member-team">'+m.team+'</div><div class="adherence-bar"><div class="adherence-fill'+fc+'" style="width:'+adh+'%"></div></div><div class="adherence-label">aderencia geral &middot; '+adh+'%</div></div>';}).join('');}
+function selectMember(id){state.currentMemberId=id;saveState();renderSidebar();renderCurrentTab();}
+function addMember(){var nm=document.getElementById('newMemberName').value.trim();var lv=document.getElementById('newMemberLevel').value;var tm=document.getElementById('newMemberTeam').value;if(!nm){showToast('Digite o nome');return;}var m={id:uid(),name:nm,level:lv,team:tm};state.members.push(m);state.currentMemberId=m.id;document.getElementById('newMemberName').value='';saveState();renderSidebar();renderCurrentTab();showToast(nm+' adicionado!');}
+function removeMember(id){if(!confirm('Remover este membro e todos os seus dados?'))return;state.members=state.members.filter(function(m){return m.id!==id;});if(state.currentMemberId===id){state.currentMemberId=state.members.length?state.members[0].id:null;}saveState();renderSidebar();renderCurrentTab();}
+function setTab(tab){state.currentTab=tab;document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===tab);});document.querySelectorAll('.tab-pane').forEach(function(p){p.style.display='none';});document.getElementById('tab-'+tab).style.display='';renderCurrentTab();}
+function renderCurrentTab(){switch(state.currentTab){case'avaliacao':renderAvaliacao();break;case'indicadores':renderIndicadores();break;case'historico':renderHistorico();break;case'autoconhecimento':renderAutoconhecimento();break;case'mapa':renderMapa();break;case'pdi':renderPDI();break;}}function renderMemberHeader(m,sc){var nc=NIVEL_CONFIG[m.level]||{faixa:'1-5',alvo:3};var pesos=sc.pesos;function donut(pct,color,sz){var rr=sz==='lg'?34:28;var cc=2*Math.PI*rr;var s=sz==='lg'?84:72;var fs=sz==='lg'?20:16;var off=cc-(pct/100)*cc;return'<div class="score-donut" style="width:'+s+'px;height:'+s+'px;display:inline-block;position:relative"><svg width="'+s+'" height="'+s+'" viewBox="0 0 '+s+' '+s+'" style="transform:rotate(-90deg)"><circle class="track" cx="'+(s/2)+'" cy="'+(s/2)+'" r="'+rr+'"></circle><circle class="fill" cx="'+(s/2)+'" cy="'+(s/2)+'" r="'+rr+'" stroke="'+color+'" stroke-dasharray="'+cc+'" stroke-dashoffset="'+off+'" stroke-linecap="round" style="transition:stroke-dashoffset .5s"></circle></svg><span class="score-num" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:700;font-size:'+fs+'px;color:'+color+'">'+pct+'</span></div>';}return'<div class="member-header"><div class="member-info"><h2>'+m.name+'</h2><div class="member-meta">equipe '+m.team+' &middot; papel '+m.level+' &middot; faixa-alvo '+nc.faixa+'</div><div class="pesos-badge">Pesos '+m.level+' &middot; comportamental '+pesos.comportamental+'% &middot; tecnico '+pesos.tecnico+'% &middot; negocio '+pesos.negocio+'%</div></div><div class="scores-row"><div class="score-circle">'+donut(sc.comp,'#0d7c66','sm')+'<div class="score-label">Comportamental</div></div><div class="score-circle">'+donut(sc.tec,'#d97706','sm')+'<div class="score-label">Tecnico</div></div><div class="score-circle">'+donut(sc.neg,'#059669','sm')+'<div class="score-label">Negocio</div></div><div class="score-circle geral">'+donut(sc.geral,'#0f4c75','lg')+'<div class="score-label">Geral</div></div></div></div>';}
+function renderAvaliacao(){var el=document.getElementById('tab-avaliacao');var m=getMember(state.currentMemberId);if(!m){el.innerHTML='<div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-text">Selecione um membro na barra lateral</div></div>';return;}var sc=calcScores(m.id);var nc=NIVEL_CONFIG[m.level]||{alvo:3};var pdiComps=getMemberPDIComps(m.id);var ac=getActiveComps();var cats=[{key:'comportamental',bib:BIBLIOTECA.comportamental},{key:'tecnico',bib:BIBLIOTECA.tecnico},{key:'negocio',bib:BIBLIOTECA.negocio}];var html=renderMemberHeader(m,sc);cats.forEach(function(c){var ids=ac[c.key]||[];var items=ids.map(getCompById).filter(Boolean);if(!items.length)return;var pw=c.bib.peso[m.level]||0;html+='<div class="category-section"><div class="category-header '+c.bib.cls+'"><div class="category-title"><span class="category-dot '+c.bib.cls+'"></span>'+c.bib.label+'</div><div class="category-weight">peso '+pw+'% neste nivel</div></div>';items.forEach(function(comp){var nota=getScore(m.id,comp.id);var isNA=nota===-1;var alvo=nc.alvo;var dc=isNA?'gray':getAlvoDot(nota,alvo);var hp=pdiComps.has(comp.id);var btns=[1,2,3,4,5].map(function(n){var ac2=(!isNA&&nota===n)?' active-'+n:'';return'<button class="score-btn'+ac2+'" data-member="'+m.id+'" data-comp="'+comp.id+'" data-nota="'+n+'" onclick="setScore(this)">'+n+'</button>';}).join('');html+='<div class="comp-card '+c.bib.cls+'-border"><div class="comp-icon">'+c.bib.icon+'</div><div class="comp-info"><div class="comp-name" onclick="openModal(''+comp.id+'',''+m.id+'')">'+comp.nome+(hp?'<span class="tag-pdi">PDI</span>':'')+'</div><div class="comp-desc">'+comp.desc+'</div></div><div class="comp-scoring">'+(isNA?'<span class="na-label">nao se aplica</span>':'')+'<div class="score-btns">'+btns+'</div><button class="na-btn'+(isNA?' active':'')+'" data-member="'+m.id+'" data-comp="'+comp.id+'" onclick="toggleNA(this)" title="Nao se aplica">&mdash;</button><div class="alvo-info">alvo '+alvo+' <span class="alvo-dot '+dc+'"></span></div></div></div>';});html+='</div>';});html+='<div style="margin-top:16px;display:flex;gap:8px"><button class="btn btn-primary" onclick="salvarHistorico(''+m.id+'')">Salvar snapshot no historico</button><button class="btn" onclick="abrirBiblioteca()">Gerenciar competencias</button></div>';el.innerHTML=html;}
+function setScore(btn){var mid=btn.dataset.member,cid=btn.dataset.comp,nota=parseInt(btn.dataset.nota);if(!state.scores[mid])state.scores[mid]={};state.scores[mid][cid]=nota;saveState();renderAvaliacao();renderSidebar();}
+function toggleNA(btn){var mid=btn.dataset.member,cid=btn.dataset.comp;if(!state.scores[mid])state.scores[mid]={};state.scores[mid][cid]=(state.scores[mid][cid]===-1)?undefined:-1;saveState();renderAvaliacao();}function openModal(compId,memberId){var comp=getCompById(compId);if(!comp)return;var m=getMember(memberId||state.currentMemberId);var nc=m?(NIVEL_CONFIG[m.level]||{alvo:3}):{alvo:3};var nota=m?getScore(m.id,compId):undefined;document.getElementById('modalSub').textContent=comp.id+' - '+comp.cat.label;document.getElementById('modalTitle').textContent=comp.nome;document.getElementById('modalDesc').textContent=comp.desc;var levels=[{key:'n1',label:'N1
+basico',text:comp.n1},{key:'n2',label:'N2
+em consol.',text:comp.n2},{key:'n3',label:'N3
+proficiente',text:comp.n3},{key:'n4',label:'N4
+avancado',text:comp.n4},{key:'n5',label:'N5
+referencia',text:comp.n5}];var html=levels.map(function(lv,i){var n=i+1;var isA=(!nota||nota===-1)?false:nota===n;var isT=nc.alvo===n;var isAT=isA&&isT;var rc='',lx='';if(isAT){rc=' atual-alvo';lx='
+- atual & alvo';}else if(isA){rc=' atual';lx='
+- atual';}else if(isT){rc=' alvo';lx='
+- alvo';}return'<div class="regua-row'+rc+'"><div class="regua-nivel '+lv.key+'" style="white-space:pre-line">'+lv.label+lx+'</div><div class="regua-text">'+(lv.text||'<em style="color:#94a3b8">Nao definido</em>')+'</div></div>';}).join('');document.getElementById('modalReguas').innerHTML=html;document.getElementById('modalRegua').style.display='flex';}
+function closeModal(){document.getElementById('modalRegua').style.display='none';}
+function renderAutoconhecimento(){var el=document.getElementById('tab-autoconhecimento');var m=getMember(state.currentMemberId);if(!m){el.innerHTML='<div class="empty"><div class="empty-icon">&#129504;</div><div class="empty-text">Selecione um membro</div></div>';return;}var sc=calcScores(m.id);var ac=getActiveComps();var auto=state.autoScores[m.id]||{};var gestor=state.scores[m.id]||{};var nc=NIVEL_CONFIG[m.level]||{alvo:3};var al=0,sp=0,sb=0;var allIds=[].concat(ac.comportamental||[],ac.tecnico||[],ac.negocio||[]);allIds.forEach(function(id){var g=gestor[id],a=auto[id];if(!g||!a||g===-1||a===-1)return;var d=a-g;if(Math.abs(d)===0)al++;else if(d>0)sp++;else sb++;});var today=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});var html=renderMemberHeader(m,sc);html+='<div class="auto-note">Autoavaliacao de '+today+'. <strong style="color:#1a2332">Petroleo = sua avaliacao</strong> &middot; <strong style="color:#d97706">ambar = como a pessoa se ve</strong>. O descompasso e o melhor insumo para o 1:1.</div><div style="margin-bottom:16px"><button class="btn btn-primary btn-sm" onclick="abrirAutoavaliacao(''+m.id+'')">Atualizar autoavaliacao</button></div><div class="auto-summary"><div class="auto-card alinhado"><div class="auto-card-num">'+al+'</div><div class="auto-card-label">alinhado</div></div><div class="auto-card superestima"><div class="auto-card-num">'+sp+'</div><div class="auto-card-label">superestima</div></div><div class="auto-card subestima"><div class="auto-card-num">'+sb+'</div><div class="auto-card-label">subestima</div></div></div>';var cats=[{key:'comportamental',bib:BIBLIOTECA.comportamental},{key:'tecnico',bib:BIBLIOTECA.tecnico},{key:'negocio',bib:BIBLIOTECA.negocio}];cats.forEach(function(c){var ids=ac[c.key]||[];var items=ids.map(getCompById).filter(Boolean);if(!items.length)return;html+='<div class="category-section"><div class="category-header '+c.bib.cls+'" style="margin-bottom:8px"><div class="category-title"><span class="category-dot '+c.bib.cls+'"></span>'+c.bib.label+'</div></div>';items.forEach(function(comp){var g=gestor[comp.id],a=auto[comp.id];if(g===-1)return;var diff=(g!==undefined&&a!==undefined)?a-g:null;var dc='',dl='';if(diff!==null){if(Math.abs(diff)===0){dc='alinhado';dl='alinhado';}else if(diff>0){dc='superestima';dl='superestima +'+diff;}else{dc='subestima';dl='subestima '+diff;}}var gBtns=[1,2,3,4,5].map(function(n){var cls=g===n?' gestor':(a===n?' auto':'');return'<div class="auto-score-btn'+cls+'">'+n+'</div>';}).join('');html+='<div class="auto-row"><div class="auto-comp-name">'+comp.nome+'</div><div class="auto-scores">'+gBtns+'</div><div class="auto-delta '+dc+'">'+（dl||'&mdash;')+'</div></div>';});html+='</div>';});el.innerHTML=html;}
+function abrirAutoavaliacao(mid){var m=getMember(mid);if(!m)return;var ac=getActiveComps();var gestor=state.scores[mid]||{};var auto=state.autoScores[mid]||{};var allIds=[].concat(ac.comportamental||[],ac.tecnico||[],ac.negocio||[]);var rows=allIds.map(function(id){var comp=getCompById(id);if(!comp||gestor[id]===-1)return'';var btns=[1,2,3,4,5].map(function(n){var sel=auto[id]===n;return'<button class="score-btn'+(sel?' active-'+n:'')+'" style="margin:0 2px" onclick="setAutoScore(''+mid+'',''+id+'','+n+',this)">'+n+'</button>';}).join('');return'<div class="auto-row"><div class="auto-comp-name">'+comp.nome+'</div><div class="auto-scores" id="auto-row-'+id+'">'+btns+'</div></div>';}).filter(Boolean).join('');var ov=document.createElement('div');ov.className='modal-overlay';ov.style.display='flex';ov.innerHTML='<div class="modal-box" style="max-width:620px"><div class="modal-header"><div><div class="modal-title">Autoavaliacao de '+m.name+'</div><div class="modal-sub">O colaborador avalia a si mesmo</div></div><button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button></div><div class="modal-body">'+rows+'<div style="margin-top:16px;display:flex;justify-content:flex-end"><button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove();renderAutoconhecimento()">Fechar</button></div></div></div>';document.body.appendChild(ov);}
+function setAutoScore(mid,cid,nota,btn){if(!state.autoScores[mid])state.autoScores[mid]={};state.autoScores[mid][cid]=nota;saveState();var row=document.getElementById('auto-row-'+cid);if(row){row.querySelectorAll('.score-btn').forEach(function(b){var n=parseInt(b.textContent);b.className='score-btn'+(n===nota?' active-'+nota:'');});}}function renderMapa(){var el=document.getElementById('tab-mapa');var filtered=state.filter==='todos'?state.members:state.members.filter(function(m){return m.team===state.filter||m.team==='Ambas';});if(!filtered.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128202;</div><div class="empty-text">Nenhum membro para exibir</div></div>';return;}var ac=getActiveComps();var cats=[{key:'comportamental',bib:BIBLIOTECA.comportamental},{key:'tecnico',bib:BIBLIOTECA.tecnico},{key:'negocio',bib:BIBLIOTECA.negocio}];var mh=filtered.map(function(m){return'<th><div class="gaps-member-header">'+m.name.split(' ').slice(0,2).join(' ')+'</div><div class="gaps-member-sub">'+m.level+' - '+m.team+'</div></th>';}).join('');var rows='';cats.forEach(function(c){var ids=ac[c.key]||[];var items=ids.map(getCompById).filter(Boolean);if(!items.length)return;rows+='<tr class="category-row"><td colspan="'+(filtered.length+1)+'">'+c.bib.label.toUpperCase()+'</td></tr>';items.forEach(function(comp){var hasPDI=filtered.some(function(m){return getMemberPDIComps(m.id).has(comp.id);});var cells=filtered.map(function(m){var nota=getScore(m.id,comp.id);if(nota===-1||nota===undefined||nota===null){return'<td><span class="gaps-cell cn">-</span></td>';}return'<td><span class="gaps-cell c'+nota+'">'+nota+'</span></td>';}).join('');rows+='<tr><td><span style="color:#94a3b8;font-size:11px">'+comp.id+(hasPDI?' <span class="pdi-tag-small">PDI</span>':'')+'</span><br>'+comp.nome+'</td>'+cells+'</tr>';});});el.innerHTML='<div style="overflow-x:auto"><table class="gaps-table"><thead><tr><th>Competencia</th>'+mh+'</tr></thead><tbody>'+rows+'</tbody></table></div>';}
+function renderPDI(){var el=document.getElementById('tab-pdi');var m=getMember(state.currentMemberId);if(!m){el.innerHTML='<div class="empty"><div class="empty-icon">&#127919;</div><div class="empty-text">Selecione um membro</div></div>';return;}var pdis=state.pdis[m.id]||[];var sc=calcScores(m.id);var html=renderMemberHeader(m,sc);var so=['pendente','em-andamento','concluido','cancelado'].map(function(s){return'<option value="'+s+'">'+s.replace('-',' ')+'</option>';}).join('');var co='<option value="">Nenhuma competencia</option>'+Object.values(BIBLIOTECA).flatMap(function(cat){return cat.items.map(function(c){return'<option value="'+c.id+'">'+c.id+' - '+c.nome+'</option>';});}).join('');html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:16px;font-weight:700">Plano de Desenvolvimento</h3><button class="btn btn-primary btn-sm" onclick="addPDI(''+m.id+'')">+ Nova acao</button></div>';if(!pdis.length){html+='<div class="empty" style="padding:40px 20px"><div class="empty-icon">&#127919;</div><div class="empty-text">Nenhuma acao de desenvolvimento</div><div class="empty-sub">Clique em "+ Nova acao" para comecar</div></div>';}else{pdis.forEach(function(pdi,i){html+='<div class="pdi-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4>Acao '+(i+1)+'</h4><button class="btn btn-sm" style="color:#ef4444;border-color:#ef4444" onclick="removePDI(''+m.id+'',''+pdi.id+'')">Remover</button></div><div style="margin-bottom:8px"><label style="font-size:11px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase">Acao de desenvolvimento</label><textarea data-pdi-field="acao" data-member="'+m.id+'" data-pdi-id="'+pdi.id+'" onchange="updatePDI(this)">'+( pdi.acao||'')+'</textarea></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><label style="font-size:11px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase">Prazo</label><input type="date" value="'+(pdi.prazo||'')+'" data-pdi-field="prazo" data-member="'+m.id+'" data-pdi-id="'+pdi.id+'" onchange="updatePDI(this)"></div><div><label style="font-size:11px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase">Status</label><select data-pdi-field="status" data-member="'+m.id+'" data-pdi-id="'+pdi.id+'" onchange="updatePDI(this)">'+so+'</select></div><div><label style="font-size:11px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;text-transform:uppercase">Competencia</label><select data-pdi-field="compId" data-member="'+m.id+'" data-pdi-id="'+pdi.id+'" onchange="updatePDI(this)">'+co+'</select></div></div></div>';});setTimeout(function(){pdis.forEach(function(pdi){var ss=document.querySelector('select[data-pdi-id="'+pdi.id+'"][data-pdi-field="status"]');if(ss)ss.value=pdi.status||'pendente';var sc=document.querySelector('select[data-pdi-id="'+pdi.id+'"][data-pdi-field="compId"]');if(sc)sc.value=pdi.compId||'';});},0);}el.innerHTML=html;}
+function addPDI(mid){if(!state.pdis[mid])state.pdis[mid]=[];state.pdis[mid].push({id:uid(),acao:'',prazo:'',status:'pendente',compId:''});saveState();renderPDI();}
+function removePDI(mid,pid){state.pdis[mid]=(state.pdis[mid]||[]).filter(function(p){return p.id!==pid;});saveState();renderPDI();}
+function updatePDI(el){var mid=el.dataset.member,pid=el.dataset.pdiId,field=el.dataset.pdiField;var pdi=(state.pdis[mid]||[]).find(function(p){return p.id===pid;});if(pdi){pdi[field]=el.value;saveState();if(field==='compId')renderAvaliacao();showToast('PDI salvo');}}function renderIndicadores(){var el=document.getElementById('tab-indicadores');var m=getMember(state.currentMemberId);if(!m){el.innerHTML='<div class="empty"><div class="empty-icon">&#128202;</div><div class="empty-text">Selecione um membro</div></div>';return;}var sc=calcScores(m.id);var periodo=new Date().toISOString().slice(0,7);var ind=((state.indicadores[m.id]||{})[periodo])||{};var html=renderMemberHeader(m,sc);html+='<div class="ind-card"><h3 style="font-size:15px;font-weight:700;margin-bottom:12px">Indicadores - '+periodo+'</h3><div class="ind-grid"><div class="ind-item"><label>TMA (min)</label><input type="number" min="0" value="'+(ind.tma||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="tma" onchange="updateInd(this)" placeholder="Ex: 12"></div><div class="ind-item"><label>CSAT (%)</label><input type="number" min="0" max="100" value="'+(ind.csat||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="csat" onchange="updateInd(this)" placeholder="Ex: 87"></div><div class="ind-item"><label>FCR (%)</label><input type="number" min="0" max="100" value="'+(ind.fcr||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="fcr" onchange="updateInd(this)" placeholder="Ex: 72"></div><div class="ind-item"><label>Volume</label><input type="number" min="0" value="'+(ind.volume||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="volume" onchange="updateInd(this)" placeholder="Ex: 320"></div><div class="ind-item"><label>SLA cumprido (%)</label><input type="number" min="0" max="100" value="'+(ind.sla||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="sla" onchange="updateInd(this)" placeholder="Ex: 94"></div><div class="ind-item"><label>Reaberturas (%)</label><input type="number" min="0" max="100" value="'+(ind.reabertura||'')+'" data-member="'+m.id+'" data-period="'+periodo+'" data-field="reabertura" onchange="updateInd(this)" placeholder="Ex: 5"></div></div></div>';el.innerHTML=html;}
+function updateInd(el){var mid=el.dataset.member,per=el.dataset.period,field=el.dataset.field;if(!state.indicadores[mid])state.indicadores[mid]={};if(!state.indicadores[mid][per])state.indicadores[mid][per]={};state.indicadores[mid][per][field]=el.value;saveState();showToast('Indicador salvo');}
+function renderHistorico(){var el=document.getElementById('tab-historico');var m=getMember(state.currentMemberId);if(!m){el.innerHTML='<div class="empty"><div class="empty-icon">&#128336;</div><div class="empty-text">Selecione um membro</div></div>';return;}var hist=(state.historico[m.id]||[]).slice().reverse();var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:16px;font-weight:700">Historico - '+m.name+'</h3><button class="btn btn-sm btn-primary" onclick="salvarHistorico(''+m.id+'')">Salvar snapshot atual</button></div>';if(!hist.length){html+='<div class="empty" style="padding:40px 20px"><div class="empty-icon">&#128336;</div><div class="empty-text">Nenhum snapshot salvo ainda</div><div class="empty-sub">Clique em "Salvar snapshot atual" para registrar</div></div>';}else{hist.forEach(function(h){html+='<div class="hist-entry"><div class="hist-header"><div class="hist-period">'+h.periodo+'</div><div class="hist-scores"><div class="hist-score-item"><div class="hist-score-val" style="color:#0d7c66">'+h.comp+'</div><div>Comportamental</div></div><div class="hist-score-item"><div class="hist-score-val" style="color:#d97706">'+h.tec+'</div><div>Tecnico</div></div><div class="hist-score-item"><div class="hist-score-val" style="color:#059669">'+h.neg+'</div><div>Negocio</div></div><div class="hist-score-item"><div class="hist-score-val">'+h.geral+'</div><div>Geral</div></div></div></div></div>';});}el.innerHTML=html;}
+function salvarHistorico(mid){var sc=calcScores(mid);if(!state.historico[mid])state.historico[mid]=[];var per=new Date().toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}).replace('/','/');;state.historico[mid].push({periodo:per,comp:sc.comp,tec:sc.tec,neg:sc.neg,geral:sc.geral});saveState();showToast('Snapshot salvo!');if(state.currentTab==='historico')renderHistorico();}
+var bibSelected={};
+function abrirBiblioteca(){var ac=getActiveComps();bibSelected={comportamental:new Set(ac.comportamental||[]),tecnico:new Set(ac.tecnico||[]),negocio:new Set(ac.negocio||[])};renderBib();document.getElementById('modalBib').style.display='flex';}
+function closeBib(){document.getElementById('modalBib').style.display='none';}
+function renderBib(){var q=(document.getElementById('libSearch').value||'').toLowerCase();var cats=[{key:'comportamental',bib:BIBLIOTECA.comportamental},{key:'tecnico',bib:BIBLIOTECA.tecnico},{key:'negocio',bib:BIBLIOTECA.negocio}];var html='';cats.forEach(function(c){var items=c.bib.items.filter(function(x){return!q||x.nome.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q);});if(!items.length)return;html+='<div class="lib-section"><h4>'+c.bib.label+'</h4>';items.forEach(function(x){var sel=bibSelected[c.key]&&bibSelected[c.key].has(x.id);html+='<div class="lib-item'+(sel?' selected':'')+'" onclick="toggleBibItem(''+c.key+'',''+x.id+'',this)"><div class="lib-item-check">'+(sel?'&#10003;':'')+'</div><div class="lib-item-text"><div class="lib-item-name">'+x.id+' - '+x.nome+'</div><div class="lib-item-desc">'+x.desc+'</div></div></div>';});html+='</div>';});document.getElementById('bibContent').innerHTML=html;}
+function toggleBibItem(cat,id,el){if(!bibSelected[cat])bibSelected[cat]=new Set();if(bibSelected[cat].has(id)){bibSelected[cat].delete(id);el.classList.remove('selected');el.querySelector('.lib-item-check').innerHTML='';}else{bibSelected[cat].add(id);el.classList.add('selected');el.querySelector('.lib-item-check').innerHTML='&#10003;';}}
+function salvarBib(){state.activeComps={comportamental:Array.from(bibSelected.comportamental),tecnico:Array.from(bibSelected.tecnico),negocio:Array.from(bibSelected.negocio)};saveState();closeBib();renderCurrentTab();renderSidebar();showToast('Competencias atualizadas!');}
+function exportarDados(){var data=JSON.stringify(state,null,2);var blob=new Blob([data],{type:'application/json'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='matriz-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);showToast('Exportado!');}
+function importarDados(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){try{var p=JSON.parse(e.target.result);if(!confirm('Substituir todos os dados?'))return;state=p;saveState();renderSidebar();renderCurrentTab();showToast('Importado com sucesso!');}catch(err){alert('Arquivo invalido: '+err.message);}};reader.readAsText(file);input.value='';}
+function imprimirPDF(){document.querySelectorAll('.tab-pane').forEach(function(p){p.style.display='';});window.print();setTimeout(function(){document.querySelectorAll('.tab-pane').forEach(function(p){p.style.display='none';});document.getElementById('tab-'+state.currentTab).style.display='';},500);}
+function confirmarLimpar(){if(!confirm('Limpar todos os dados e comecar do zero?'))return;localStorage.removeItem('matriz_v3');state={members:[],scores:{},autoScores:{},pdis:{},indicadores:{},historico:{},activeComps:null,currentMemberId:null,currentTab:'avaliacao',filter:'todos'};saveState();renderSidebar();renderCurrentTab();showToast('Dados limpos!');}
+loadState();renderSidebar();setTab('avaliacao');
+</script>
+</body>
+</html>
