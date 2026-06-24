@@ -24,251 +24,90 @@ header h1{font-size:1.1rem}
 .card{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:18px;margin-bottom:14px}
 .card h2{font-size:.85rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
 label{display:block;font-size:.83rem;color:#374151;margin-bottom:3px;margin-top:12px}
-select,input,textarea{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:.95rem}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.table-wrap{overflow-x:auto}
+input,select{width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:.9rem;outline:none}
+input:focus,select:focus{border-color:#2563eb}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.msg{margin-top:10px;padding:9px 12px;border-radius:6px;font-size:.85rem;display:none}
+.msg.ok{background:#d1fae5;color:#065f46;display:block}
+.msg.err{background:#fee2e2;color:#991b1b;display:block}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
-th{background:#f8fafc;padding:10px 12px;text-align:left;font-weight:600;color:#64748b;border-bottom:2px solid #e2e8f0}
-td{padding:9px 12px;border-bottom:1px solid #f1f5f9}
+th{background:#f8fafc;padding:10px 12px;text-align:left;font-size:.8rem;color:#64748b;text-transform:uppercase;border-bottom:2px solid #e2e8f0}
+td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 tr:hover td{background:#f8fafc}
-.badge{padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
-.badge-gestor{background:#dbeafe;color:#1e40af}
-.badge-analista{background:#ede9fe;color:#5b21b6}
-.badge-colab{background:#f0fdf4;color:#166534}
-.msg{padding:10px 14px;border-radius:6px;margin-top:12px;font-size:.9rem}
-.msg.ok{background:#dcfce7;color:#166534}
-.msg.err{background:#fee2e2;color:#991b1b}
-.empty{text-align:center;color:#94a3b8;padding:40px 0}
-.loading{text-align:center;padding:40px;color:#94a3b8}
+.badge{display:inline-block;padding:3px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
+.badge-gestor{background:#dbeafe;color:#1d4ed8}
+.badge-n1{background:#d1fae5;color:#065f46}
+.badge-n2{background:#fef3c7;color:#92400e}
+.badge-analista_op{background:#ede9fe;color:#5b21b6}
 </style>
 </head>
 <body>
 <header>
-  <h1>Painel do Gestor</h1>
-  <button class="btn btn-outline" onclick="sair()">Sair</button>
+<h1>Painel do Gestor</h1>
+<button class="btn btn-outline" onclick="sair()">Sair</button>
 </header>
 <div class="container">
-  <div class="tabs">
-    <button class="tab active" onclick="aba('equipe',this)">Equipe</button>
-    <button class="tab" onclick="aba('avaliacoes',this)">Avaliações</button>
-    <button class="tab" onclick="aba('pdi',this)">PDI</button>
-  </div>
-
-  <!-- EQUIPE -->
-  <div id="equipe" class="section active">
-    <div class="card">
-      <h2>Adicionar membro</h2>
-      <div class="grid2">
-        <div>
-          <label>E-mail</label>
-          <input id="novoEmail" type="email" placeholder="colaborador@email.com"/>
-        </div>
-        <div>
-          <label>Nome</label>
-          <input id="novoNome" placeholder="Nome completo"/>
-        </div>
-        <div>
-          <label>Equipe</label>
-          <select id="novaEquipe">
-            <option value="Cond21">Cond21</option>
-            <option value="GC">GC</option>
-          </select>
-        </div>
-        <div>
-          <label>Papel</label>
-          <select id="novoPapel">
-            <option value="colaborador">Colaborador</option>
-            <option value="analista">Analista Operacional</option>
-            <option value="gestor">Gestor</option>
-          </select>
-        </div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:14px;width:auto;padding:9px 20px" onclick="criarMembro()">Adicionar</button>
-      <div id="msgEquipe"></div>
-    </div>
-    <div class="card">
-      <h2>Membros da equipe</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Papel</th><th>Ações</th></tr></thead>
-          <tbody id="tEquipe"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- AVALIACOES -->
-  <div id="avaliacoes" class="section">
-    <div class="card">
-      <h2>Filtros</h2>
-      <div class="grid2">
-        <div>
-          <label>Colaborador</label>
-          <select id="filtroColab"><option value="">Todos</option></select>
-        </div>
-        <div>
-          <label>Período</label>
-          <input type="month" id="filtroPeriodo"/>
-        </div>
-      </div>
-      <button class="btn btn-primary" style="margin-top:14px;width:auto;padding:9px 20px" onclick="carregarAvaliacoes()">Filtrar</button>
-    </div>
-    <div id="avalLista"><div class="loading">Clique em Filtrar para carregar.</div></div>
-  </div>
-
-  <!-- PDI -->
-  <div id="pdi" class="section">
-    <div class="card">
-      <h2>Novo PDI</h2>
-      <div class="grid2">
-        <div>
-          <label>Colaborador</label>
-          <select id="pdiColab"></select>
-        </div>
-        <div>
-          <label>Título</label>
-          <input id="pdiTitulo" placeholder="Ex: Melhorar comunicação consultiva"/>
-        </div>
-      </div>
-      <label>Descrição / Ações</label>
-      <textarea id="pdiDesc" rows="3" placeholder="Descreva as ações e metas do PDI..."></textarea>
-      <button class="btn btn-primary" style="margin-top:14px;width:auto;padding:9px 20px" onclick="criarPDI()">Criar PDI</button>
-      <div id="msgPDI"></div>
-    </div>
-    <div class="card">
-      <h2>PDIs cadastrados</h2>
-      <div id="pdiLista"><div class="loading">Carregando...</div></div>
-    </div>
-  </div>
+<div class="tabs">
+<button class="tab active" onclick="aba('equipe',this)">Equipe</button>
+<button class="tab" onclick="aba('avaliacoes',this)">Avaliacoes</button>
+<button class="tab" onclick="aba('indicadores',this)">Indicadores</button>
+<button class="tab" onclick="aba('pdi',this)">PDI</button>
 </div>
-
+<div id="equipe" class="section active">
+<div class="card">
+<h2>Adicionar Membro</h2>
+<div class="form-row">
+<div><label>E-mail</label><input type="email" id="novoEmail" placeholder="colaborador@email.com"/></div>
+<div><label>Nome</label><input type="text" id="novoNome" placeholder="Nome completo"/></div>
+</div>
+<div class="form-row">
+<div><label>Equipe</label>
+<select id="novaEquipe">
+<option value="Cond21">Cond21</option>
+<option value="GC">GC</option>
+<option value="Ambas">Ambas (Cond21 + GC)</option>
+</select></div>
+<div><label>Nivel / Papel</label>
+<select id="novoPapel">
+<option value="n1">N1 - Suporte Nivel 1</option>
+<option value="n2">N2 - Suporte Nivel 2</option>
+<option value="analista_op">Analista Operacional</option>
+<option value="gestor">Gestor</option>
+</select></div>
+</div>
+<button class="btn btn-primary" style="margin-top:14px" onclick="adicionarMembro()">Adicionar</button>
+<div class="msg" id="msgEquipe"></div>
+</div>
+<div class="card">
+<h2>Membros da Equipe</h2>
+<table><thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Nivel</th><th>Acoes</th></tr></thead>
+<tbody id="listaEquipe"><tr><td colspan="4" style="text-align:center;color:#94a3b8">Carregando...</td></tr></tbody>
+</table>
+</div>
+</div>
+<div id="avaliacoes" class="section">
+<div class="card"><h2>Avaliacoes da Equipe</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+</div>
+<div id="indicadores" class="section">
+<div class="card"><h2>Indicadores Operacionais</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+</div>
+<div id="pdi" class="section">
+<div class="card"><h2>Plano de Desenvolvimento</h2><p style="color:#64748b;font-size:.9rem">Em breve.</p></div>
+</div>
+</div>
 <script>
-const sb = supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
-const COMPS = ['C1','C2','C3','C4','C5','C6','C7','C8'];
-const COMP_NOMES = {C1:'Conhecimento do produto',C2:'Escuta ativa',C3:'Comunicação consultiva',C4:'Gestão do relacionamento',C5:'Resolução de problemas',C6:'Organização e tempo',C7:'Colaboração em equipe',C8:'Adaptabilidade'};
-const PAPEL_LABEL = {gestor:'Gestor', analista:'Analista', colaborador:'Colaborador'};
-const PAPEL_BADGE = {gestor:'badge-gestor', analista:'badge-analista', colaborador:'badge-colab'};
-let GESTOR = null;
-let membros = [];
-
-function aba(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-  if (id === 'equipe') carregarEquipe();
-  if (id === 'pdi') { carregarPDILista(); preencherSelectsColab(); }
-}
-
-async function carregarEquipe() {
-  const tb = document.getElementById('tEquipe');
-  tb.innerHTML = '<tr><td colspan="4" class="loading">Carregando...</td></tr>';
-  const {data, error} = await sb.from('perfis').select('*').order('papel').order('nome');
-  if (error) { tb.innerHTML = '<tr><td colspan="4">Erro: ' + error.message + '</td></tr>'; return; }
-  membros = data || [];
-  if (!membros.length) { tb.innerHTML = '<tr><td colspan="4" class="empty">Nenhum membro ainda.</td></tr>'; return; }
-  tb.innerHTML = membros.map(m =>
-    '<tr><td><b>' + (m.nome||'—') + '</b><br><small style="color:#94a3b8">' + (m.email||'') + '</small></td>' +
-    '<td>' + (m.equipe||'—') + '</td>' +
-    '<td><span class="badge ' + (PAPEL_BADGE[m.papel]||'badge-colab') + '">' + (PAPEL_LABEL[m.papel]||m.papel) + '</span></td>' +
-    '<td><button class="btn btn-red btn-sm" onclick="removerMembro(\''+m.id+'\')">Remover</button></td></tr>'
-  ).join('');
-  preencherSelectsColab();
-}
-
-function preencherSelectsColab() {
-  const colabs = membros.filter(m => m.papel === 'colaborador');
-  ['filtroColab','pdiColab'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const temTodos = id === 'filtroColab';
-    sel.innerHTML = (temTodos ? '<option value="">Todos</option>' : '') +
-      colabs.map(c => '<option value="'+c.id+'">'+(c.nome||c.email)+'</option>').join('');
-  });
-}
-
-async function criarMembro() {
-  const email = document.getElementById('novoEmail').value.trim();
-  const nome = document.getElementById('novoNome').value.trim();
-  const equipe = document.getElementById('novaEquipe').value;
-  const papel = document.getElementById('novoPapel').value;
-  const msg = document.getElementById('msgEquipe');
-  if (!email) { showMsg(msg, 'Informe o e-mail.', 'err'); return; }
-  const {error} = await sb.from('perfis').upsert({email, nome, equipe, papel}, {onConflict:'email'});
-  if (error) { showMsg(msg, 'Erro: ' + error.message, 'err'); }
-  else { showMsg(msg, 'Membro adicionado! Peça para ele criar conta no app com este e-mail.', 'ok'); carregarEquipe(); document.getElementById('novoEmail').value=''; document.getElementById('novoNome').value=''; }
-}
-
-async function removerMembro(id) {
-  if (!confirm('Remover este membro?')) return;
-  await sb.from('perfis').delete().eq('id', id);
-  carregarEquipe();
-}
-
-async function carregarAvaliacoes() {
-  const el = document.getElementById('avalLista');
-  el.innerHTML = '<div class="loading">Carregando...</div>';
-  const colabId = document.getElementById('filtroColab').value;
-  const periodo = document.getElementById('filtroPeriodo').value;
-  let q = sb.from('autoavaliacoes').select('*, perfis(nome, email)').order('periodo', {ascending:false});
-  if (colabId) q = q.eq('colaborador_id', colabId);
-  if (periodo) q = q.eq('periodo', periodo + '-01');
-  const {data, error} = await q;
-  if (error) { el.innerHTML = '<div class="empty">Erro: ' + error.message + '</div>'; return; }
-  if (!data?.length) { el.innerHTML = '<div class="empty">Nenhuma avaliação encontrada.</div>'; return; }
-  el.innerHTML = data.map(r => {
-    const notas = r.notas || [];
-    const media = notas.length ? (notas.reduce((a,b) => a+b.nota,0)/notas.length).toFixed(1) : '-';
-    const barras = COMPS.map(c => {
-      const n = notas.find(x => x.competencia_id===c);
-      if (!n) return '';
-      return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:.8rem;color:#64748b"><span>'+COMP_NOMES[c]+'</span><span>'+n.nota+'/5</span></div>' +
-        '<div style="background:#e2e8f0;border-radius:4px;height:6px;margin-top:2px"><div style="background:#2563eb;border-radius:4px;height:6px;width:'+(n.nota/5*100)+'%"></div></div></div>';
-    }).join('');
-    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
-      '<div><b>' + (r.perfis?.nome||r.perfis?.email||'—') + '</b><br><small style="color:#94a3b8">' + (r.periodo?.substring(0,7)||'') + '</small></div>' +
-      '<div style="background:#dbeafe;color:#1e40af;padding:4px 12px;border-radius:12px;font-weight:700">Média: '+media+'</div></div>' +
-      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">' + barras + '</div>' +
-      (r.comentario ? '<p style="margin-top:10px;font-size:.85rem;color:#64748b;border-top:1px solid #f1f5f9;padding-top:10px">'+r.comentario+'</p>' : '') +
-      '</div>';
-  }).join('');
-}
-
-async function criarPDI() {
-  const colabId = document.getElementById('pdiColab').value;
-  const titulo = document.getElementById('pdiTitulo').value.trim();
-  const desc = document.getElementById('pdiDesc').value.trim();
-  const msg = document.getElementById('msgPDI');
-  if (!colabId || !titulo) { showMsg(msg, 'Selecione colaborador e preencha o título.', 'err'); return; }
-  const {error} = await sb.from('pdis').insert({colaborador_id: colabId, gestor_id: GESTOR.id, titulo, descricao: desc});
-  if (error) { showMsg(msg, 'Erro: ' + error.message, 'err'); }
-  else { showMsg(msg, 'PDI criado!', 'ok'); document.getElementById('pdiTitulo').value=''; document.getElementById('pdiDesc').value=''; carregarPDILista(); }
-}
-
-async function carregarPDILista() {
-  const el = document.getElementById('pdiLista');
-  el.innerHTML = '<div class="loading">Carregando...</div>';
-  const {data, error} = await sb.from('pdis').select('*, perfis!pdis_colaborador_id_fkey(nome,email)').order('criado_em',{ascending:false});
-  if (error || !data?.length) { el.innerHTML = '<div class="empty">Nenhum PDI ainda.</div>'; return; }
-  el.innerHTML = data.map(p => '<div class="card"><b>'+p.titulo+'</b> — <small style="color:#94a3b8">'+(p.perfis?.nome||p.perfis?.email||'—')+'</small>' +
-    (p.descricao ? '<p style="margin-top:6px;font-size:.88rem;color:#64748b">'+p.descricao+'</p>' : '') + '</div>').join('');
-}
-
-function showMsg(el, txt, tipo) {
-  el.textContent = txt; el.className = 'msg ' + tipo;
-  setTimeout(() => { el.textContent=''; el.className=''; }, 5000);
-}
-
-function sair() { sb.auth.signOut().then(() => location.href='index.html'); }
-
-(async () => {
-  const {data:{session}} = await sb.auth.getSession();
-  if (!session) { location.href = 'index.html'; return; }
-  GESTOR = session.user;
-  const {data:p} = await sb.from('perfis').select('papel').eq('id', GESTOR.id).single();
-  if (!p || p.papel !== 'gestor') { location.href = p?.papel === 'analista' ? 'analista-indicadores.html' : 'colaborador-autoavaliacao.html'; return; }
-  carregarEquipe();
-})();
+const SURL='https://zsfysyphhpsajxbkwywk.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
+const sb=supabase.createClient(SURL,SKEY);
+function showMsg(id,txt,tipo){const m=document.getElementById(id);m.textContent=txt;m.className='msg '+tipo;}
+function aba(nome,el){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(nome).classList.add('active');el.classList.add('active');}
+function badgePapel(p){const l={gestor:'Gestor',n1:'N1',n2:'N2',analista_op:'Analista Op.'};return '<span class="badge badge-'+p+'">'+(l[p]||p)+'</span>';}
+async function carregarEquipe(){const{data,error}=await sb.from('perfis').select('*').order('nome');if(error)return;const tb=document.getElementById('listaEquipe');if(!data||!data.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:#94a3b8">Nenhum membro</td></tr>';return;}tb.innerHTML=data.map(m=>'<tr><td><strong>'+(m.nome||m.email)+'</strong><br><small style="color:#64748b">'+m.email+'</small></td><td>'+(m.equipe||'&mdash;')+'</td><td>'+badgePapel(m.papel)+'</td><td><button class="btn btn-sm btn-red" onclick="removerMembro(''+m.id+'')">Remover</button></td></tr>').join('');}
+async function adicionarMembro(){const email=document.getElementById('novoEmail').value.trim();const nome=document.getElementById('novoNome').value.trim();const equipe=document.getElementById('novaEquipe').value;const papel=document.getElementById('novoPapel').value;if(!email||!nome){showMsg('msgEquipe','Preencha e-mail e nome.','err');return;}const{error}=await sb.from('perfis').upsert({email,nome,equipe,papel},{onConflict:'email'});if(error){showMsg('msgEquipe','Erro: '+error.message,'err');}else{showMsg('msgEquipe','Membro adicionado! Peca para ele criar conta no app com este e-mail.','ok');carregarEquipe();document.getElementById('novoEmail').value='';document.getElementById('novoNome').value='';}}
+async function removerMembro(id){if(!confirm('Remover este membro?'))return;const{error}=await sb.from('perfis').delete().eq('id',id);if(error)alert('Erro: '+error.message);else carregarEquipe();}
+async function sair(){await sb.auth.signOut();location.href='index.html';}
+async function init(){const{data:{session}}=await sb.auth.getSession();if(!session){location.href='index.html';return;}carregarEquipe();}
+init();
 </script>
 </body>
-          </html>
+  </html>
