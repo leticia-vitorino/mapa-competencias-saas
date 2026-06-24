@@ -33,19 +33,13 @@ td{padding:9px 12px;border-bottom:1px solid #f1f5f9}
 tr:hover td{background:#f8fafc}
 .badge{padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
 .badge-gestor{background:#dbeafe;color:#1e40af}
+.badge-analista{background:#ede9fe;color:#5b21b6}
 .badge-colab{background:#f0fdf4;color:#166534}
 .msg{padding:10px 14px;border-radius:6px;margin-top:12px;font-size:.9rem}
 .msg.ok{background:#dcfce7;color:#166534}
 .msg.err{background:#fee2e2;color:#991b1b}
-.star-bar{display:flex;align-items:center;gap:4px;font-size:.82rem}
-.star-fill{color:#f59e0b}
-.star-empty{color:#e2e8f0}
 .empty{text-align:center;color:#94a3b8;padding:40px 0}
 .loading{text-align:center;padding:40px;color:#94a3b8}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:20px}
-.kpi{background:#fff;border-radius:10px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:center}
-.kpi-val{font-size:2rem;font-weight:700;color:#2563eb}
-.kpi-label{font-size:.8rem;color:#64748b;margin-top:4px}
 </style>
 </head>
 <body>
@@ -63,7 +57,7 @@ tr:hover td{background:#f8fafc}
   <!-- EQUIPE -->
   <div id="equipe" class="section active">
     <div class="card">
-      <h2>Adicionar colaborador</h2>
+      <h2>Adicionar membro</h2>
       <div class="grid2">
         <div>
           <label>E-mail</label>
@@ -84,18 +78,19 @@ tr:hover td{background:#f8fafc}
           <label>Papel</label>
           <select id="novoPapel">
             <option value="colaborador">Colaborador</option>
+            <option value="analista">Analista Operacional</option>
             <option value="gestor">Gestor</option>
           </select>
         </div>
       </div>
-      <button class="btn btn-primary" style="margin-top:14px;width:auto;padding:9px 20px" onclick="criarColaborador()">Adicionar</button>
+      <button class="btn btn-primary" style="margin-top:14px;width:auto;padding:9px 20px" onclick="criarMembro()">Adicionar</button>
       <div id="msgEquipe"></div>
     </div>
     <div class="card">
       <h2>Membros da equipe</h2>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Nome/E-mail</th><th>Equipe</th><th>Papel</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Nome / E-mail</th><th>Equipe</th><th>Papel</th><th>Ações</th></tr></thead>
           <tbody id="tEquipe"><tr><td colspan="4" class="loading">Carregando...</td></tr></tbody>
         </table>
       </div>
@@ -151,6 +146,8 @@ tr:hover td{background:#f8fafc}
 const sb = supabase.createClient('https://zsfysyphhpsajxbkwywk.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0');
 const COMPS = ['C1','C2','C3','C4','C5','C6','C7','C8'];
 const COMP_NOMES = {C1:'Conhecimento do produto',C2:'Escuta ativa',C3:'Comunicação consultiva',C4:'Gestão do relacionamento',C5:'Resolução de problemas',C6:'Organização e tempo',C7:'Colaboração em equipe',C8:'Adaptabilidade'};
+const PAPEL_LABEL = {gestor:'Gestor', analista:'Analista', colaborador:'Colaborador'};
+const PAPEL_BADGE = {gestor:'badge-gestor', analista:'badge-analista', colaborador:'badge-colab'};
 let GESTOR = null;
 let membros = [];
 
@@ -163,21 +160,17 @@ function aba(id, btn) {
   if (id === 'pdi') { carregarPDILista(); preencherSelectsColab(); }
 }
 
-function stars(n) {
-  return [1,2,3,4,5].map(i => '<span class="' + (i<=n?'star-fill':'star-empty') + '">★</span>').join('');
-}
-
 async function carregarEquipe() {
   const tb = document.getElementById('tEquipe');
   tb.innerHTML = '<tr><td colspan="4" class="loading">Carregando...</td></tr>';
-  const {data, error} = await sb.from('perfis').select('*').order('criado_em');
+  const {data, error} = await sb.from('perfis').select('*').order('papel').order('nome');
   if (error) { tb.innerHTML = '<tr><td colspan="4">Erro: ' + error.message + '</td></tr>'; return; }
   membros = data || [];
   if (!membros.length) { tb.innerHTML = '<tr><td colspan="4" class="empty">Nenhum membro ainda.</td></tr>'; return; }
   tb.innerHTML = membros.map(m =>
-    '<tr><td>' + (m.nome||'—') + '<br><small style="color:#94a3b8">' + (m.email||'') + '</small></td>' +
+    '<tr><td><b>' + (m.nome||'—') + '</b><br><small style="color:#94a3b8">' + (m.email||'') + '</small></td>' +
     '<td>' + (m.equipe||'—') + '</td>' +
-    '<td><span class="badge badge-' + (m.papel==='gestor'?'gestor':'colab') + '">' + m.papel + '</span></td>' +
+    '<td><span class="badge ' + (PAPEL_BADGE[m.papel]||'badge-colab') + '">' + (PAPEL_LABEL[m.papel]||m.papel) + '</span></td>' +
     '<td><button class="btn btn-red btn-sm" onclick="removerMembro(\''+m.id+'\')">Remover</button></td></tr>'
   ).join('');
   preencherSelectsColab();
@@ -194,21 +187,16 @@ function preencherSelectsColab() {
   });
 }
 
-async function criarColaborador() {
+async function criarMembro() {
   const email = document.getElementById('novoEmail').value.trim();
   const nome = document.getElementById('novoNome').value.trim();
   const equipe = document.getElementById('novaEquipe').value;
   const papel = document.getElementById('novoPapel').value;
   const msg = document.getElementById('msgEquipe');
   if (!email) { showMsg(msg, 'Informe o e-mail.', 'err'); return; }
-  // Cria conta via Auth
-  const {data:authData, error:authErr} = await sb.auth.admin ? 
-    {data:null,error:{message:'Use o convite manual'}} :
-    await sb.auth.signUp({email, password: Math.random().toString(36).slice(-10) + 'A1!'});
-  // Mesmo sem auth, insere perfil diretamente se já existir
   const {error} = await sb.from('perfis').upsert({email, nome, equipe, papel}, {onConflict:'email'});
   if (error) { showMsg(msg, 'Erro: ' + error.message, 'err'); }
-  else { showMsg(msg, 'Colaborador adicionado! Peça para ele criar conta no app com este e-mail.', 'ok'); carregarEquipe(); }
+  else { showMsg(msg, 'Membro adicionado! Peça para ele criar conta no app com este e-mail.', 'ok'); carregarEquipe(); document.getElementById('novoEmail').value=''; document.getElementById('novoNome').value=''; }
 }
 
 async function removerMembro(id) {
@@ -254,7 +242,7 @@ async function criarPDI() {
   if (!colabId || !titulo) { showMsg(msg, 'Selecione colaborador e preencha o título.', 'err'); return; }
   const {error} = await sb.from('pdis').insert({colaborador_id: colabId, gestor_id: GESTOR.id, titulo, descricao: desc});
   if (error) { showMsg(msg, 'Erro: ' + error.message, 'err'); }
-  else { showMsg(msg, 'PDI criado com sucesso!', 'ok'); document.getElementById('pdiTitulo').value=''; document.getElementById('pdiDesc').value=''; carregarPDILista(); }
+  else { showMsg(msg, 'PDI criado!', 'ok'); document.getElementById('pdiTitulo').value=''; document.getElementById('pdiDesc').value=''; carregarPDILista(); }
 }
 
 async function carregarPDILista() {
@@ -267,8 +255,7 @@ async function carregarPDILista() {
 }
 
 function showMsg(el, txt, tipo) {
-  el.textContent = txt;
-  el.className = 'msg ' + tipo;
+  el.textContent = txt; el.className = 'msg ' + tipo;
   setTimeout(() => { el.textContent=''; el.className=''; }, 5000);
 }
 
@@ -279,9 +266,9 @@ function sair() { sb.auth.signOut().then(() => location.href='index.html'); }
   if (!session) { location.href = 'index.html'; return; }
   GESTOR = session.user;
   const {data:p} = await sb.from('perfis').select('papel').eq('id', GESTOR.id).single();
-  if (!p || p.papel !== 'gestor') { location.href = 'colaborador-autoavaliacao.html'; return; }
+  if (!p || p.papel !== 'gestor') { location.href = p?.papel === 'analista' ? 'analista-indicadores.html' : 'colaborador-autoavaliacao.html'; return; }
   carregarEquipe();
 })();
 </script>
 </body>
-  </html>
+          </html>
