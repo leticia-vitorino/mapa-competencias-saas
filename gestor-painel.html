@@ -24,9 +24,9 @@
 .status-ferias{background:#fef3c7;color:#92400e;}
 .status-folga{background:#e0e7ff;color:#3730a3;}
 .status-desligado{background:#fee2e2;color:#991b1b;}
-.ind-def-row{display:grid;grid-template-columns:1fr 80px 90px 1fr 140px auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);}
+.ind-def-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);min-height:44px;}.ind-def-row .ind-row-name{flex:0 0 180px;font-weight:700;font-size:.88rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.ind-def-row .ind-row-unit{flex:0 0 65px;font-size:.78rem;color:var(--muted);text-align:center;}.ind-def-row .ind-row-meta{flex:0 0 130px;font-size:.82rem;font-weight:600;color:#e2e8f0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.ind-def-row .ind-row-badges{display:flex;gap:5px;flex-wrap:nowrap;align-items:center;flex:1;min-width:0;}.ind-def-row .ind-row-eqs{flex:0 0 auto;display:flex;gap:3px;flex-wrap:nowrap;}.ind-def-row .ind-row-actions{flex:0 0 auto;display:flex;gap:5px;margin-left:auto;}
 .ind-def-row:last-child{border-bottom:none;}
-.ind-def-header{display:grid;grid-template-columns:1fr 80px 90px 1fr 140px auto;gap:8px;padding:6px 12px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border);}
+.ind-def-header{display:flex;align-items:center;gap:10px;padding:6px 16px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:var(--bg);border-bottom:1px solid var(--border);}.ind-def-header .hc-name{flex:0 0 180px;}.ind-def-header .hc-unit{flex:0 0 65px;text-align:center;}.ind-def-header .hc-meta{flex:0 0 130px;text-align:right;}.ind-def-header .hc-info{flex:1;}.ind-def-header .hc-eqs{flex:0 0 auto;min-width:80px;}.ind-def-header .hc-act{flex:0 0 auto;margin-left:auto;}
 .ind-scope-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--muted);}
 .ind-scope-global{background:#dbeafe;color:#1e40af;border-color:#93c5fd;}
 .ind-nivel-checks{display:flex;gap:6px;flex-wrap:wrap;}
@@ -652,6 +652,16 @@ if(id){var editRow=document.getElementById('ind-edit-row-'+id);if(editRow)editRo
 await loadIndDefs();
 renderInd(S.indDefs);
 }
+async function delIndDef(btn){
+  var id=btn.dataset.id;
+  if(!confirm('Remover este indicador? Esta ação não pode ser desfeita.'))return;
+  var dr=await sb.from('indicadores_def').delete().eq('id',id);
+  if(dr.error){toast('Erro ao remover: '+dr.error.message);return;}
+  await loadIndDefs();
+  renderConfig();
+  toast('Indicador removido.');
+}
+
 function indToggleTipo(radio){
 var form=radio.closest('.ind-form-card');
 if(!form) return;
@@ -1854,58 +1864,54 @@ nh+='</tbody></table></div>';
 var ih='<div class="config-section">'
 +'<div class="config-section-header"><div class="config-title">Indicadores</div>'
 +'<button class="btn-nivel-add" onclick="toggleAddIndForm()">+ Novo indicador</button></div>';
-ih+='<div class="ind-def-header">'
-+'<span>Nome</span><span>Unidade</span><span>Meta padrão</span><span>Escopo</span><span>Níveis</span><span>Ações</span>'
-+'</div>';
-if(!S.indDefs.length){
-ih+='<div style="text-align:center;color:var(--muted);padding:20px;font-size:14px">Nenhum indicador cadastrado ainda.</div>';
-}else{
-S.indDefs.forEach(function(ind){
-var niveisNames=[];
-try{
-var nids=JSON.parse(ind.niveis_ids||'[]');
-nids.forEach(function(nid){
-var nv=S.niveis.find(function(n){return n.id===nid;});
-if(nv)niveisNames.push(NM[nv.codigo]||nv.codigo);
-});
-}catch(e){}
-var escopoTag=ind.escopo==='global'?'<span class="ind-scope-tag ind-scope-global">Global</span>'
-:'<span class="ind-scope-tag">Níveis específicos</span>';
-var niveisText=ind.escopo==='global'?'<span style="color:var(--muted);font-size:12px">Todos</span>'
-:niveisNames.map(function(n){return '<span class="level-badge" style="font-size:10px;padding:1px 5px">'+n+'</span>';}).join(' ')||'<span style="color:var(--muted)">—</span>';
-ih+='<div class="ind-def-row">'
-+'<strong>'+ind.nome+'</strong>'
-+'<span>'+ind.unidade+'</span>'
-+'<span>'+(function(){
-var mpn={};try{mpn=JSON.parse(ind.metas_por_nivel||'{}');}catch(e){}
-var eqm=mpn._eqsMeta||{};
-var fmt=mpn._fmt||'numero';
-if(ind.tipo_meta==='desempenho') return 'Desempenho';
-var parts=[];
-['Cond21','GC'].forEach(function(eq){
-  if(eqm[eq]!==undefined){
-    var v=eqm[eq];
-    var disp=fmt==='tempo'?v:(v+(ind.unidade?ind.unidade:''));
-    parts.push(eq+': '+disp);
+ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span class="hc-unit">Unidade</span><span class="hc-meta">Meta / Teto</span><span class="hc-info">Tipo & Direção</span><span class="hc-eqs">Equipes</span><span class="hc-act">Ações</span></div>';
+  if (!S.indDefs.length) {
+    ih += '<div style="text-align:center;color:var(--muted);padding:20px;font-size:.85rem;">Nenhum indicador cadastrado ainda.</div>';
+  } else {
+    S.indDefs.forEach(function(ind) {
+      var niveisNames = [];
+      try { var nids = JSON.parse(ind.niveis_ids||'[]'); nids.forEach(function(nid){var nv=S.niveis.find(function(n){return n.id===nid;}); if(nv) niveisNames.push(nv.NM||nv.codigo||'?');}); } catch(e) {}
+      var tipoCls = ind.tipo_meta==='teto' ? 'background:#fee2e2;color:#991b1b;border-color:#fca5a5;' : ind.tipo_meta==='desempenho' ? 'background:#f1f5f9;color:#64748b;border-color:#cbd5e1;' : 'background:#ede9fe;color:#6d28d9;border-color:#c4b5fd;';
+      var tipoLbl = ind.tipo_meta==='teto' ? 'Teto' : ind.tipo_meta==='desempenho' ? 'Desempenho' : 'Meta';
+      var dirHtml = ind.tipo_meta==='desempenho' ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:#f0fdf4;color:#166534;border:1px solid #86efac;white-space:nowrap;">'+(ind.direcao==='menor' ? '↓ Menor=melhor' : '↑ Maior=melhor')+'</span>';
+      var metaDisp = '—';
+      if (ind.tipo_meta !== 'desempenho') {
+        try {
+          var mpn = typeof ind.metas_por_nivel==='string' ? JSON.parse(ind.metas_por_nivel) : (ind.metas_por_nivel||{});
+          var fmt2 = mpn._fmt||'numero';
+          if (mpn._eqsMeta && (mpn._eqsMeta.Cond21 !== undefined || mpn._eqsMeta.GC !== undefined)) {
+            var parts2 = [];
+            if (mpn._eqsMeta.Cond21 !== undefined) parts2.push('C21:' + mpn._eqsMeta.Cond21 + (fmt2==='percentual' ? '%' : fmt2==='tempo' ? '' : ' '+(ind.unidade||'')));
+            if (mpn._eqsMeta.GC !== undefined) parts2.push('GC:' + mpn._eqsMeta.GC + (fmt2==='percentual' ? '%' : fmt2==='tempo' ? '' : ' '+(ind.unidade||'')));
+            if (parts2.length) metaDisp = parts2.join(' · ');
+          } else if (ind.meta_padrao !== null && ind.meta_padrao !== undefined) {
+            metaDisp = ind.meta_padrao + (ind.unidade ? ' '+ind.unidade : '');
+          }
+        } catch(ex) { if (ind.meta_padrao !== null && ind.meta_padrao !== undefined) metaDisp = ind.meta_padrao + (ind.unidade ? ' '+ind.unidade : ''); }
+      }
+      var eqsHtml = '';
+      try {
+        var mpn3 = typeof ind.metas_por_nivel==='string' ? JSON.parse(ind.metas_por_nivel) : (ind.metas_por_nivel||{});
+        var eqIds3 = mpn3._eqs||[];
+        if (eqIds3.length) {
+          eqIds3.forEach(function(eid){ var eq=S.equipes.find(function(e5){return e5.id===eid;}); if(eq) eqsHtml += '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#94a3b8;margin-right:2px;white-space:nowrap;">'+eq.nome+'</span>'; });
+        } else {
+          eqsHtml = '<span style="font-size:10px;color:var(--muted);">Global</span>';
+        }
+      } catch(ex2) { eqsHtml = '<span style="font-size:10px;color:var(--muted);">Global</span>'; }
+      ih += '<div class="ind-def-row">'
+        + '<span class="ind-row-name" title="'+ind.nome+'">'+ind.nome+'</span>'
+        + '<span class="ind-row-unit">'+( ind.unidade||'—' )+'</span>'
+        + '<span class="ind-row-meta" title="'+metaDisp+'">'+metaDisp+'</span>'
+        + '<span class="ind-row-badges"><span style="font-size:10px;padding:2px 6px;border-radius:8px;border:1px solid;'+tipoCls+'white-space:nowrap;">'+tipoLbl+'</span>'+dirHtml+'</span>'
+        + '<span class="ind-row-eqs">'+eqsHtml+'</span>'
+        + '<span class="ind-row-actions"><button class="btn-membro-edit" data-id="'+ind.id+'" onclick="toggleIndEdit(this)">Editar</button><button class="btn-nivel-del" data-id="'+ind.id+'" onclick="delIndDef(this)">✕</button></span>'
+        + '</div>';
+      ih+='<div id="ind-edit-row-'+ind.id+'" style="display:none;border-bottom:1px solid var(--border);">';
+      ih+=buildIndForm(ind);
+      ih+='</div>';
+    });
   }
-});
-if(parts.length>0) return parts.join(' &middot; ');
-if(ind.meta_padrao!=null&&ind.meta_padrao!==undefined) return ind.meta_padrao+(ind.unidade?ind.unidade:'');
-return '&mdash;';
-})()+'</span>'
-+'<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;margin-left:4px;background:'+(ind.tipo_meta==='teto'?'rgba(239,68,68,.15)':ind.tipo_meta==='desempenho'?'rgba(100,116,139,.15)':'rgba(99,102,241,.15)')+';color:'+(ind.tipo_meta==='teto'?'#ef4444':ind.tipo_meta==='desempenho'?'#64748b':'#6366f1')+'">'+(ind.tipo_meta==='teto'?'Teto':ind.tipo_meta==='desempenho'?'Desempenho':'Meta')+'</span>'
-+(ind.tipo_meta!=='desempenho'?'<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:.7rem;margin-left:4px;background:rgba(16,185,129,.1);color:#10b981;">'+(ind.direcao==='menor'?'↓ Menor':'↑ Maior')+'=melhor</span>':'')
-+escopoTag
-+'<div>'+niveisText+'</div>'
-+'<div style="display:flex;gap:6px">'
-+'<button class="btn-membro-edit" data-id="'+ind.id+'" onclick="toggleIndEdit(this)">Editar</button>'
-+'<button class="btn-nivel-del" data-id="'+ind.id+'" onclick="delIndDef(this)">✕</button>'
-+'</div></div>';
-ih+='<div id="ind-edit-row-'+ind.id+'" style="display:none;padding:12px;background:var(--bg);border-bottom:1px solid var(--border)">';
-ih+=buildIndForm(ind);
-ih+='</div>';
-});
-}
 ih+='<div id="ind-add-form" style="display:none">'+buildIndForm(null)+'</div>';
 ih+='</div>';
 el.innerHTML=mh+eh+nh+ih;
