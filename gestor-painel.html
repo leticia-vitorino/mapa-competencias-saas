@@ -648,7 +648,7 @@ var r;
 if(id){r=await sb.from('indicadores_def').update(payload).eq('id',id);}
 else{payload.ordem=S.indDefs.length;r=await sb.from('indicadores_def').insert(payload);}
 if(r.error){alert('Erro ao salvar: '+r.error.message);return;}
-toggleAddIndForm();
+if(id){var editRow=document.getElementById('ind-edit-row-'+id);if(editRow)editRow.style.display='none';}else{toggleAddIndForm();}
 await loadIndDefs();
 renderInd(S.indDefs);
 }
