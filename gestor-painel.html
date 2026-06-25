@@ -393,6 +393,28 @@ renderSidebar();
 renderConfig();
 toast('Status atualizado!');
 }
+async function loadIndDefs(){
+var r=await sb.from('indicadores_def').select('*').eq('gestor_id',S.user.id).order('ordem');
+if(r.error){S.indDefs=[];return;}
+S.indDefs=r.data||[];
+}
+async function loadMembrosStatus(){
+var r=await sb.from('membros_status').select('*').eq('gestor_id',S.user.id).order('criado_em',{ascending:false});
+if(r.error){S.membrosStatus={};return;}
+var ms={};
+(r.data||[]).forEach(function(row){
+if(!ms[row.membro_id])ms[row.membro_id]=row;
+});
+S.membrosStatus=ms;
+}
+function getMembroStatus(mid){
+var ms=S.membrosStatus[mid];
+if(!ms)return {status:'ativo'};
+var today=new Date().toISOString().split('T')[0];
+if(ms.status==='ativo')return ms;
+if(ms.data_fim&&ms.data_fim<today)return {status:'ativo'};
+return ms;
+}
 async function fazerLogin(){var e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPassword').value,errEl=document.getElementById('loginError'),btn=document.getElementById('loginBtn');errEl.className='login-error';btn.textContent='Entrando...';btn.disabled=true;var r=await sb.auth.signInWithPassword({email:e,password:p});btn.textContent='Entrar';btn.disabled=false;if(r.error){errEl.textContent=r.error.message;errEl.className='login-error show';return;}S.user=r.data.user;await init();}
 async function sair(){await sb.auth.signOut();location.reload();}
 async function init(){document.getElementById('loginPage').style.display='none';document.getElementById('appPage').style.display='block';var meta=S.user.user_metadata||{};document.getElementById('topbarUserName').textContent=meta.nome||S.user.email;await Promise.all([loadEquipes(),loadNiveis(),loadMembros()]);await Promise.all([loadScores(),loadAutoScores(),loadPDI(),loadHist(),loadKpis(),loadIndDefs(),loadMembrosStatus()]);renderSidebar();renderConfig();}
