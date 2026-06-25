@@ -1880,7 +1880,7 @@ h+='<label style="font-size:12px;display:flex;flex-direction:column;gap:3px">'
 h+='</div></div>';
 h+='<div style="display:flex;gap:8px">'
 +(ind
-? '<button class="btn-nivel-save" data-id="'+ind.id+'<div style="margin-top:12px;padding:10px 0;border-top:1px solid #e8edf4">'+
+? '<button class="btn-nivel-save" data-id="'+ind.id+'" onclick="saveIndDef(this)">Salvar</button>'+'<div style="margin-top:12px;padding:10px 0;border-top:1px solid #e8edf4">'+
       '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">'+
         '<div style="flex:1;min-width:130px">'+
           '<label style="font-size:.72rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Formato do valor</label>'+
@@ -1897,7 +1897,7 @@ h+='<div style="display:flex;gap:8px">'
           (S.equipes||[]).map(function(eq){var ch=!ind||defGetEqs(ind).length===0||defGetEqs(ind).includes(eq.id);return '<label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ind-eq-check-'+suffix+'" value="'+eq.id+'"'+(ch?' checked':'')+'>'+escHtml(eq.nome)+'</label>';}).join('')+
         '</div>'+
       '</div>'+
-    '</div>'+'" onclick="saveIndDef(this)">Salvar</button>'
+    '</div>'
 +'<button class="btn-nivel-cancel" onclick="toggleIndEdit({dataset:{id:\''+ind.id+'\'}})">Cancelar</button>'
 : '<button class="btn-nivel-save" onclick="saveIndDef(this)">Adicionar indicador</button>'
 +'<button class="btn-nivel-cancel" onclick="toggleAddIndForm()">Cancelar</button>')
