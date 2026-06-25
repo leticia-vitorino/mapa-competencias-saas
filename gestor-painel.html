@@ -316,70 +316,7 @@ if(st)st.textContent='Salvo!';
 setTimeout(function(){if(st)st.textContent='';},2000);
 toast('Indicadores salvos!');
 }
-function editMembroRow(btn){
-var mid=btn.dataset.mid;
-var m=S.membros.find(function(x){return x.id===mid;});
-if(!m)return;
-var row=btn.closest('tr');
-if(!row)return;
-var nivelOpts=S.niveis.map(function(n){return '<option value="'+n.id+'" '+( n.id===m.nivel_id?'selected':'' )+'>'+n.nome+'</option>';}).join('');
-var equipeOpts=S.equipes.map(function(e){return '<option value="'+e.id+'" '+( e.id===m.equipe_id?'selected':'' )+'>'+e.nome+'</option>';}).join('');
-row.innerHTML='<td colspan="4"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
-+'<input class="nivel-input" style="min-width:160px" id="edit-nome-'+mid+'" value="'+m.nome.replace(/"/g,'&quot;')+'" placeholder="Nome">'
-+'<input class="nivel-input" style="min-width:180px" id="edit-email-'+mid+'" value="'+( m.email||'')+'" placeholder="E-mail">'
-+'<select class="nivel-input" id="edit-nivel-'+mid+'">'+nivelOpts+'</select>'
-+'<select class="nivel-input" id="edit-equipe-'+mid+'">'+equipeOpts+'</select>'
-+'</div></td>'
-+'<td style="white-space:nowrap">'
-+'<button class="btn-nivel-save" data-mid="'+mid+'" onclick="saveMembroRow(this)">Salvar</button>'
-+'<button class="btn-nivel-cancel" data-mid="'+mid+'" style="margin-left:6px" onclick="renderConfig()">&#x2715;</button>'
-+'</td>';
-}
-async function saveMembroRow(btn){
-var mid=btn.dataset.mid;
-var nome=document.getElementById('edit-nome-'+mid).value.trim();
-var email=document.getElementById('edit-email-'+mid).value.trim();
-var nivelId=document.getElementById('edit-nivel-'+mid).value;
-var equipeId=document.getElementById('edit-equipe-'+mid).value;
-if(!nome){toast('Nome obrigatório.');return;}
-var niv=S.niveis.find(function(n){return n.id===nivelId;})||{};
-var r=await sb.from('membros_matriz').update({nome:nome,email:email,nivel_id:nivelId,nivel_codigo:niv.codigo||'n1',equipe_id:equipeId}).eq('id',mid);
-if(r.error){toast('Erro ao salvar: '+r.error.message);return;}
-var idx=S.membros.findIndex(function(x){return x.id===mid;});
-if(idx>-1){
-S.membros[idx].nome=nome;
-S.membros[idx].email=email;
-S.membros[idx].nivel_id=nivelId;
-S.membros[idx].nivel_codigo=niv.codigo||'n1';
-S.membros[idx].equipe_id=equipeId;
-}
-renderSidebar();
-renderConfig();
-toast('Colaborador atualizado!');
-}
 
-async function loadIndDefs(){
-var r=await sb.from('indicadores_def').select('*').eq('gestor_id',S.user.id).order('ordem');
-if(r.error){S.indDefs=[];return;}
-S.indDefs=r.data||[];
-}
-async function loadMembrosStatus(){
-var r=await sb.from('membros_status').select('*').eq('gestor_id',S.user.id).order('criado_em',{ascending:false});
-if(r.error){S.membrosStatus={};return;}
-var ms={};
-(r.data||[]).forEach(function(row){
-if(!ms[row.membro_id])ms[row.membro_id]=row;
-});
-S.membrosStatus=ms;
-}
-function getMembroStatus(mid){
-var ms=S.membrosStatus[mid];
-if(!ms)return {status:'ativo'};
-var today=new Date().toISOString().split('T')[0];
-if(ms.status==='ativo')return ms;
-if(ms.data_fim&&ms.data_fim<today)return {status:'ativo'};
-return ms;
-}
 function statusLabel(st){
 var m={ativo:'Ativo',ferias:'F\xe9rias',folga:'Folga',desligado:'Desligado'};
 return m[st]||st;
