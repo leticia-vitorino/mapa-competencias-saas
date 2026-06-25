@@ -661,6 +661,10 @@ async function delIndDef(btn){
   renderConfig();
   toast('Indicador removido.');
 }
+function cancelIndForm(suffix){
+  if(suffix==='new'){toggleAddIndForm();}
+  else{var r=document.getElementById('ind-edit-row-'+suffix);if(r)r.style.display='none';}
+}
 
 function indToggleTipo(radio){
 var form=radio.closest('.ind-form-card');
@@ -1929,7 +1933,7 @@ var curNiveisIds=(ind&&ind.niveis_ids)?JSON.parse(ind.niveis_ids||'[]'):[];
 var html='<div class="ind-form-card" id="ind-form-'+suffix+'">';
 html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
 html+='<h3 style="margin:0;font-size:1rem;color:#f1f5f9;">'+(ind?'Editar Indicador':'Novo Indicador')+'</h3>';
-html+='<button onclick="toggleAddIndForm()" style="background:none;border:none;color:#64748b;font-size:1.2rem;cursor:pointer;padding:0 4px;">&times;</button>';
+html+='<button onclick="cancelIndForm(''+suffix+')" style="background:none;border:none;color:#64748b;font-size:1.2rem;cursor:pointer;padding:0 4px;">&times;</button>';
 html+='</div>';
 html+='<div style="display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:12px;">';
 html+='<div><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:4px;">Nome do Indicador *</label>';
@@ -1996,7 +2000,7 @@ html+='<div style="display:flex;gap:10px;flex-wrap:wrap;">';
 html+='</div></div>';
 html+='<div style="display:flex;gap:8px;justify-content:flex-end;">';
 html+='<button class="btn-nivel-save" data-id="'+(ind?ind.id:'')+'" onclick="saveIndDef(this)">Salvar</button>';
-html+='<button onclick="toggleAddIndForm()" style="padding:8px 18px;border-radius:8px;border:1.5px solid #334155;background:transparent;color:#94a3b8;font-size:.82rem;cursor:pointer;">Cancelar</button>';
+html+='<button onclick="cancelIndForm(''+suffix+')" style="padding:8px 18px;border-radius:8px;border:1.5px solid #334155;background:transparent;color:#94a3b8;font-size:.82rem;cursor:pointer;">Cancelar</button>';
 html+='</div>';
 html+='</div>';
 return html;
