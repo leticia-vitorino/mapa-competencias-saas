@@ -283,11 +283,26 @@
       <div class="dash-filters">
         <button class="dash-filter-btn active" data-dp="fechamentos" onclick="dashSetPeriodoTipo(this)">Fechamentos</button>
         <button class="dash-filter-btn" data-dp="todos" onclick="dashSetPeriodoTipo(this)">Todos os periodos</button>
-        <select class="dash-period-select" id="dashPeriodCount" onchange="renderDashboard()">
-          <option value="3">Ultimos 3 meses</option>
-          <option value="6" selected>Ultimos 6 meses</option>
-          <option value="12">Ultimos 12 meses</option>
+        <select class="dash-period-select" id="dashModoSel" onchange="dashSetModo(this)" style="min-width:130px">
+          <option value="ultimos">Ultimos N meses</option>
+          <option value="mes">Mes especifico</option>
+          <option value="range">Intervalo</option>
         </select>
+        <div id="dashUltimosDiv" style="display:flex;gap:6px;align-items:center">
+          <select class="dash-period-select" id="dashPeriodCount" onchange="renderDashboard()">
+            <option value="3">3 meses</option>
+            <option value="6" selected>6 meses</option>
+            <option value="12">12 meses</option>
+          </select>
+        </div>
+        <div id="dashMesDiv" style="display:none;gap:6px;align-items:center">
+          <input type="month" id="dashMesInput" class="dash-period-select" onchange="renderDashboard()" style="padding:6px 10px">
+        </div>
+        <div id="dashRangeDiv" style="display:none;gap:6px;align-items:center">
+          <input type="month" id="dashRangeStart" class="dash-period-select" onchange="renderDashboard()" style="padding:6px 10px">
+          <span style="color:#94a3b8;font-size:.8rem">ate</span>
+          <input type="month" id="dashRangeEnd" class="dash-period-select" onchange="renderDashboard()" style="padding:6px 10px">
+        </div>
       </div>
     </div>
 
@@ -600,6 +615,13 @@ var v=parseFloat(inp.value);
 if(!isNaN(v))metasPorNivel[inp.dataset.nivelId]=v;
 });
 var payload={gestor_id:S.user.id,nome:nome,unidade:unidade||'%',meta_padrao:metaPadrao,descricao:descricao,escopo:escopo,niveis_ids:JSON.stringify(niveisIds),metas_por_nivel:JSON.stringify(metasPorNivel),ativo:true};
+  var fmtInput = document.getElementById('ind-fmt-'+id);
+  var eqsChecks = document.querySelectorAll('.ind-eq-check-'+id+':checked');
+  if (fmtInput && fmtInput.value && fmtInput.value !== 'numero') metasPorNivel._fmt = fmtInput.value;
+  if (eqsChecks && eqsChecks.length > 0) {
+    var eqIds = Array.from(eqsChecks).map(function(c){return c.value;});
+    metasPorNivel._eqs = eqIds;
+  }
 var r;
 if(id){
 r=await sb.from('indicadores_def').update(payload).eq('id',id);
@@ -682,6 +704,71 @@ let dashPeriodoTipo = 'fechamentos';
 let _dashTeamChart = null, _dashEvolChart = null, _dashNivelChart = null, _dashTrendChart = null;
 
 // === DASH SYNC: map S state to window.* ===
+
+function fmtTempo(val) {
+  if (val === null || val === undefined || isNaN(val)) return '--';
+  var tot = Math.round(parseFloat(val));
+  var h = Math.floor(tot / 3600);
+  var m = Math.floor((tot % 3600) / 60);
+  var s = tot % 60;
+  if (h > 0) return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function fmtValor(val, def) {
+  if (val === null || val === undefined || isNaN(val)) return '--';
+  var mp = {};
+  try { mp = JSON.parse(def.metas_por_nivel || '{}'); } catch(e) {}
+  var fmt = mp._fmt || 'numero';
+  if (fmt === 'tempo') return fmtTempo(val);
+  if (fmt === 'percentual') return parseFloat(val).toFixed(1) + '%';
+  return parseFloat(val).toFixed(1) + (def.unidade ? ' ' + def.unidade : '');
+}
+
+function defGetMeta(def) {
+  // Returns null if no meta, otherwise the numeric meta value
+  if (def.meta_padrao === null || def.meta_padrao === undefined || def.meta_padrao === 0) return null;
+  return parseFloat(def.meta_padrao);
+}
+
+function defGetEqs(def) {
+  // Returns array of equipe IDs this indicator applies to (empty = all)
+  try {
+    var mp = JSON.parse(def.metas_por_nivel || '{}');
+    return mp._eqs || [];
+  } catch(e) { return []; }
+}
+
+function defGetFmt(def) {
+  try {
+    var mp = JSON.parse(def.metas_por_nivel || '{}');
+    return mp._fmt || 'numero';
+  } catch(e) { return 'numero'; }
+}
+
+function indAppliesToMembro(def, membro) {
+  var eqs = defGetEqs(def);
+  if (!eqs || eqs.length === 0) return true;
+  return eqs.includes(membro.equipe_id);
+}
+
+
+// Returns members for a given equipe name, including hibridos in both
+function dashGetMembrosEquipe(equipe, membros) {
+  if (!equipe || equipe === 'todas') return membros;
+  return membros.filter(function(m) {
+    if (m.equipe === equipe) return true;
+    if (m.equipe === 'Hibrido') return true; // hibridos show in all teams
+    return false;
+  });
+}
+
+// Returns distinct equipe names (excluding Hibrido as standalone)
+function dashGetEquipes(membros) {
+  var names = [...new Set(membros.map(function(m){ return m.equipe === 'Hibrido' ? null : m.equipe; }).filter(Boolean))];
+  return names;
+}
+
 function dashSyncState() {
   window.membros = (S.membros||[]).map(function(m) {
     var eq = (S.equipes||[]).find(function(e){return e.id===m.equipe_id;});
@@ -709,16 +796,53 @@ function dashDestroyChart(ref) {
 }
 
 function dashGetPeriodos() {
-  const n = parseInt(document.getElementById('dashPeriodCount').value || '6');
-  const now = new Date();
-  const periodos = [];
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    periodos.push(y + '-' + m);
+  var modo = (document.getElementById('dashModoSel') && document.getElementById('dashModoSel').value) || 'ultimos';
+  if (modo === 'mes') {
+    var mesVal = document.getElementById('dashMesInput') && document.getElementById('dashMesInput').value;
+    if (!mesVal) {
+      var now = new Date();
+      mesVal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    }
+    return [mesVal];
+  }
+  if (modo === 'range') {
+    var startVal = document.getElementById('dashRangeStart') && document.getElementById('dashRangeStart').value;
+    var endVal = document.getElementById('dashRangeEnd') && document.getElementById('dashRangeEnd').value;
+    if (!startVal || !endVal) {
+      var now = new Date();
+      endVal = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+      var s = new Date(now.getFullYear(), now.getMonth()-2, 1);
+      startVal = s.getFullYear() + '-' + String(s.getMonth()+1).padStart(2,'0');
+    }
+    var periodos = [];
+    var cur = new Date(startVal + '-01');
+    var end = new Date(endVal + '-01');
+    while (cur <= end) {
+      periodos.push(cur.getFullYear() + '-' + String(cur.getMonth()+1).padStart(2,'0'));
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    return periodos;
+  }
+  // Default: ultimos N meses
+  var n = parseInt((document.getElementById('dashPeriodCount') && document.getElementById('dashPeriodCount').value) || '6');
+  var now = new Date();
+  var periodos = [];
+  for (var i = n-1; i >= 0; i--) {
+    var dd = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    periodos.push(dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0'));
   }
   return periodos;
+}
+
+function dashSetModo(sel) {
+  var modo = sel.value;
+  var ultDiv = document.getElementById('dashUltimosDiv');
+  var mesDiv = document.getElementById('dashMesDiv');
+  var rangeDiv = document.getElementById('dashRangeDiv');
+  if (ultDiv) ultDiv.style.display = modo === 'ultimos' ? 'flex' : 'none';
+  if (mesDiv) mesDiv.style.display = modo === 'mes' ? 'flex' : 'none';
+  if (rangeDiv) rangeDiv.style.display = modo === 'range' ? 'flex' : 'none';
+  renderDashboard();
 }
 
 function dashFilterLancs(lancs, periodos) {
@@ -845,12 +969,12 @@ function renderDashKpis() {
 function renderDashTeamCompare() {
   const periodos = dashGetPeriodos();
   const membros = window.membros || [];
-  const equipes = [...new Set(membros.map(m => m.equipe))].filter(Boolean);
+  const equipes = dashGetEquipes(membros);
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
 
   // Team block cards
   const teamBlocks = equipes.map(eq => {
-    const mbs = membros.filter(m => m.equipe === eq && dashMemberActive(m, periodos[periodos.length-1]));
+    const mbs = dashGetMembrosEquipe(eq, membros).filter(function(m){ return dashMemberActive(m, periodos[periodos.length-1]); });
     const mbIds = new Set(mbs.map(m => m.id));
     const eqLancs = lancs.filter(l => mbIds.has(l.membro_id));
     const vals = eqLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
@@ -874,7 +998,7 @@ function renderDashTeamCompare() {
   const ctx = document.getElementById('dashTeamChart').getContext('2d');
   const palette = { 'Cond21': '#6366f1', 'GC': '#10b981' };
   const datasets = equipes.map(eq => {
-    const mbs = membros.filter(m => m.equipe === eq);
+    const mbs = dashGetMembrosEquipe(eq, membros);
     const mbIds = new Set(mbs.map(m => m.id));
     const data = periodos.map(p => {
       const pLancs = lancs.filter(l => l.periodo_ref === p && mbIds.has(l.membro_id) && dashMemberActive(membros.find(m=>m.id===l.membro_id)||{}, p));
@@ -905,9 +1029,12 @@ function renderDashEvolucao() {
   _dashEvolChart = dashDestroyChart(_dashEvolChart);
   const ctx = document.getElementById('dashEvolChart').getContext('2d');
 
-  let filtMbs = membros;
-  if (equipe !== 'todas') filtMbs = membros.filter(m => m.equipe === equipe);
-  const mbIds = new Set(filtMbs.map(m => m.id));
+  let filtMbs = dashGetMembrosEquipe(equipe !== 'todas' ? equipe : null, membros);
+  
+
+  _dashEvolChart = dashDestroyChart(_dashEvolChart);
+  
+    const mbIds = new Set(filtMbs.map(m => m.id));
 
   const mediaData = periodos.map(p => {
     const pLancs = lancs.filter(l => l.periodo_ref === p && mbIds.has(l.membro_id) && dashMemberActive(filtMbs.find(m=>m.id===l.membro_id)||{}, p));
@@ -960,12 +1087,18 @@ function renderDashEvolucao() {
 function renderDashIndicadores() {
   const periodos = dashGetPeriodos();
   const membros = window.membros || [];
-  const defs = (window.indicadoresDefs || []).filter(d => d.ativo !== false);
+  const equipeFilter = document.getElementById('dashIndEquipe') ? document.getElementById('dashIndEquipe').value : 'todas';
+  const eqFilterId = equipeFilter !== 'todas' ? (S.equipes||[]).find(function(e){return e.nome===equipeFilter;}) : null;
+  const defs = (window.indicadoresDefs || []).filter(function(d) {
+    if (d.ativo === false) return false;
+    if (!eqFilterId) return true;
+    var eqs = defGetEqs(d);
+    return eqs.length === 0 || eqs.includes(eqFilterId.id);
+  });
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   const equipe = document.getElementById('dashIndEquipe').value;
 
-  let filtMbs = membros;
-  if (equipe !== 'todas') filtMbs = membros.filter(m => m.equipe === equipe);
+  let filtMbs = dashGetMembrosEquipe(equipe !== 'todas' ? equipe : null, membros);
 
   if (!defs.length) {
     document.getElementById('dashIndicadoresBody').innerHTML = '<div class="dash-empty-dash"><div class="dash-empty-icon">📊</div><p>Nenhum indicador cadastrado. Acesse Configuracoes para cadastrar.</p></div>';
@@ -973,7 +1106,7 @@ function renderDashIndicadores() {
   }
 
   const rows = defs.map(def => {
-    const meta = parseFloat(def.meta) || null;
+    const meta = defGetMeta(def);
     const mbIds = new Set(filtMbs.filter(m => dashMemberActive(m, periodos[periodos.length-1])).map(m => m.id));
     const defLancs = lancs.filter(l => l.indicador_id === def.id && mbIds.has(l.membro_id));
     const vals = defLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
@@ -992,23 +1125,23 @@ function renderDashIndicadores() {
 
     // Meta badge
     let metaBadge = '';
-    if (media !== null && meta !== null) {
+    if (media !== null && meta !== null && meta > 0) {
       const pct = (media/meta)*100;
       const cls = pct >= 95 ? 'hit' : pct >= 75 ? 'close' : 'miss';
       const lbl = pct >= 95 ? '&#10003; Meta atingida' : pct >= 75 ? '&#9432; Proximo da meta' : '&#9888; Abaixo da meta';
       metaBadge = '<span class="dash-trend-badge ' + cls + '">' + lbl + '</span>';
     }
 
-    const pctBar = (media !== null && meta !== null) ? Math.min(100, (media/meta)*100) : (media !== null ? 50 : 0);
-    const barColor = pctBar >= 95 ? '#10b981' : pctBar >= 75 ? '#f59e0b' : '#ef4444';
+    const pctBar = (media !== null && meta !== null && meta > 0) ? Math.min(100, (media/meta)*100) : null;
+    const barColor = pctBar !== null ? (pctBar >= 95 ? '#10b981' : pctBar >= 75 ? '#f59e0b' : '#ef4444') : '#e2e8f0';
     const trendArrow = trend === 'up' ? '&#8593;' : trend === 'down' ? '&#8595;' : '&#8594;';
     const trendCls = trend === 'up' ? 'color:#10b981' : trend === 'down' ? 'color:#ef4444' : 'color:#94a3b8';
 
     return `<tr>
       <td class="ind-name">${escHtml(def.nome)}</td>
-      <td class="ind-val">${media !== null ? media.toFixed(1) : '--'}</td>
-      <td class="ind-meta">${meta !== null ? meta.toFixed(1) : '--'}</td>
-      <td class="ind-bar-cell"><div class="dash-mini-bar"><div class="dash-mini-bar-fill" style="width:${pctBar.toFixed(0)}%;background:${barColor}"></div></div></td>
+      <td class="ind-val">${media !== null ? fmtValor(media, def) : '--'}</td>
+      <td class="ind-meta">${meta !== null ? fmtValor(meta, def) : 'Sem meta'}</td>
+      <td class="ind-bar-cell">${pctBar !== null ? '<div class="dash-mini-bar"><div class="dash-mini-bar-fill" style="width:'+pctBar.toFixed(0)+'%;background:'+barColor+'"></div></div>' : '<span style="color:#cbd5e1;font-size:.7rem">--</span>'}</td>
       <td>${metaBadge}</td>
       <td style="${trendCls};font-weight:700;font-size:1rem">${trendArrow}</td>
     </tr>`;
@@ -1030,8 +1163,7 @@ function renderDashRanking() {
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   const equipe = document.getElementById('dashRankEquipe').value;
 
-  let filtMbs = membros.filter(m => dashMemberActive(m, periodos[periodos.length-1]));
-  if (equipe !== 'todas') filtMbs = filtMbs.filter(m => m.equipe === equipe);
+  let filtMbs = dashGetMembrosEquipe(equipe !== 'todas' ? equipe : null, membros).filter(m => dashMemberActive(m, periodos[periodos.length-1]));
 
   const ranking = filtMbs.map(m => {
     const mLancs = lancs.filter(l => l.membro_id === m.id);
@@ -1540,7 +1672,61 @@ function addPDI(mid){if(!S.pdiItems[mid])S.pdiItems[mid]=[];var n={id:'pdi-'+Dat
 function savePDI(mid,iid){var item=(S.pdiItems[mid]||[]).find(function(i){return i.id===iid;});if(!item)return;item.descricao=document.getElementById('pdi-desc-'+iid).value;item.prazo=document.getElementById('pdi-prazo-'+iid).value;item.status=document.getElementById('pdi-status-'+iid).value;sb.from('pdi_matrix').upsert(item,{onConflict:'id'});toast('PDI salvo!');}
 function delPDI(mid,iid){S.pdiItems[mid]=(S.pdiItems[mid]||[]).filter(function(i){return i.id!==iid;});sb.from('pdi_matrix').delete().eq('id',iid);renderPDI(mid);}
 function renderHist(mid){var el=document.getElementById('tabHistorico'),hist=S.historicos[mid]||[];if(!hist.length){el.innerHTML='<div class="empty"><div class="empty-icon">&#128190;</div><h3>Nenhum snapshot</h3><p>Salve snapshots para acompanhar a evolucao</p></div>';return;}el.innerHTML=hist.map(function(h){var d=new Date(h.criado_em),ds=d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return'<div class="hist-item"><div class="hist-date">'+ds+'</div><div class="hist-body"><div class="hist-title">Avaliacao salva</div><div class="hist-scores"><span class="hist-score-pill">Comp: '+h.comp+'%</span><span class="hist-score-pill">Tec: '+h.tec+'%</span><span class="hist-score-pill">Neg: '+h.neg+'%</span><span class="hist-score-pill" style="background:#1a2332;color:#fff;font-weight:600">Geral: '+h.geral+'%</span></div></div></div>';}).join('');}
-function renderInd(mid){var el=document.getElementById('tabIndicadores');if(!el)return;var m=S.membros.find(function(x){return x.id===mid;});if(!m){el.innerHTML='<div class="empty-state">Selecione um colaborador</div>';return;}var kpis=S.kpis[mid]||{};var periodos=['Jan/26','Fev/26','Mar/26','Abr/26','Mai/26','Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26'];var curMes=new Date().toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','');var selPer=S.kpiPer||periodos[periodos.length-1];var kd=kpis[selPer]||{};var perOpts=periodos.map(function(p){return '<option value="'+p+'" '+( p===selPer?'selected':'' )+'>'+p+'</option>';}).join('');var nk=NM[m.nivel_codigo]||'N1';var eqName=(S.equipes.find(function(e){return e.id===m.equipe_id;})||{}).nome||'';var html='<div style="padding:24px">'+'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">'+'<div><h2 style="margin:0;font-size:22px">'+m.nome+'</h2>'+'<p style="margin:4px 0 0;color:var(--muted);font-size:13px">equipe '+eqName+' · papel '+nk+'</p></div>'+'<div style="display:flex;align-items:center;gap:10px">'+'<label style="font-size:13px;color:var(--muted)">Período:</label>'+'<select id="kpiPeriodoSel" class="nivel-input" style="width:120px" onchange="mudarKpiPer(this)" data-mid="'+mid+'">'+perOpts+'</select></div></div>'+'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:20px">'+'<div class="kpi-card"><label class="kpi-label">TMA (min)</label>'+'<input type="number" min="0" class="kpi-input" id="kpi-tma-'+mid+'" data-mid="'+mid+'" data-field="tma" value="'+( kd.tma!==undefined?kd.tma:'' )+'" placeholder="Ex: 12" oninput="pendKpi(this)">'+'<span class="kpi-hint">Tempo Médio de Atendimento</span></div>'+'<div class="kpi-card"><label class="kpi-label">CSAT (%)</label>'+'<input type="number" min="0" max="100" class="kpi-input" id="kpi-csat-'+mid+'" data-mid="'+mid+'" data-field="csat" value="'+( kd.csat!==undefined?kd.csat:'' )+'" placeholder="Ex: 92" oninput="pendKpi(this)">'+'<span class="kpi-hint">Satisfação do cliente</span></div>'+'<div class="kpi-card"><label class="kpi-label">FCR (%)</label>'+'<input type="number" min="0" max="100" class="kpi-input" id="kpi-fcr-'+mid+'" data-mid="'+mid+'" data-field="fcr" value="'+( kd.fcr!==undefined?kd.fcr:'' )+'" placeholder="Ex: 78" oninput="pendKpi(this)">'+'<span class="kpi-hint">Resolução no 1º contato</span></div>'+'<div class="kpi-card"><label class="kpi-label">Volume</label>'+'<input type="number" min="0" class="kpi-input" id="kpi-volume-'+mid+'" data-mid="'+mid+'" data-field="volume" value="'+( kd.volume!==undefined?kd.volume:'' )+'" placeholder="Ex: 150" oninput="pendKpi(this)">'+'<span class="kpi-hint">Atendimentos no período</span></div>'+'<div class="kpi-card"><label class="kpi-label">Reabertos (%)</label>'+'<input type="number" min="0" max="100" class="kpi-input" id="kpi-reab-'+mid+'" data-mid="'+mid+'" data-field="reabertura" value="'+( kd.reabertura!==undefined?kd.reabertura:'' )+'" placeholder="Ex: 5" oninput="pendKpi(this)">'+'<span class="kpi-hint">Taxa de reaberturas</span></div>'+'</div>'+'<div style="display:flex;gap:10px">'+'<button class="btn-nivel-save" data-mid="'+mid+'" onclick="salvarKpi(this)">Salvar indicadores</button>'+'<span id="kpi-status-'+mid+'" style="font-size:12px;color:var(--muted);align-self:center"></span>'+'</div></div>';el.innerHTML=html;}
+function renderInd(mid) {
+  var el = document.getElementById('tabIndicadores');
+  if (!el) return;
+  var membro = (S.membros||[]).find(function(m){return m.id===mid;});
+  if (!membro) { el.innerHTML='<p style="color:#94a3b8;padding:16px">Membro nao encontrado</p>'; return; }
+  var defs = (S.indDefs||[]).filter(function(d){ return d.ativo !== false && indAppliesToMembro(d, membro); });
+  if (!defs.length) {
+    el.innerHTML='<div style="padding:20px;color:#94a3b8;text-align:center"><div style="font-size:2rem;margin-bottom:8px">&#128202;</div><p>Nenhum indicador cadastrado.<br>Acesse Configuracoes para criar indicadores.</p></div>';
+    return;
+  }
+  // Get all periods available for this member
+  var allLancs = Object.values(S.indLancamentos||{}).filter(function(l){return l.membro_id===mid;});
+  var periodos = [...new Set(allLancs.map(function(l){return l.periodo_ref;}))].sort().reverse();
+  if (!periodos.length) periodos = [new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')];
+  // Period selector
+  var curPer = S.kpiPer || periodos[0];
+  var perOpts = periodos.map(function(p){
+    var parts = p.split('-');
+    var lbl = parts[1]+'/'+parts[0].slice(2);
+    return '<option value="'+p+'"'+(p===curPer?' selected':'')+'>'+lbl+'</option>';
+  }).join('');
+  // Render indicator cards
+  var cards = defs.map(function(def){
+    var lanc = allLancs.find(function(l){return l.indicador_id===def.id && l.periodo_ref===curPer && l.periodo_tipo==='fechamento';});
+    if (!lanc) lanc = allLancs.find(function(l){return l.indicador_id===def.id && l.periodo_ref===curPer;});
+    var val = lanc ? lanc.valor : null;
+    var valStr = fmtValor(val, def);
+    var meta = defGetMeta(def);
+    var metaStr = meta !== null ? fmtValor(meta, def) : null;
+    var pct = (val !== null && meta !== null && meta > 0) ? Math.min(100,(val/meta)*100) : null;
+    var barColor = pct === null ? '#e2e8f0' : pct>=95 ? '#10b981' : pct>=75 ? '#f59e0b' : '#ef4444';
+    var statusBadge = '';
+    if (meta !== null && val !== null) {
+      var cls = pct>=95?'hit':pct>=75?'close':'miss';
+      var lbl = pct>=95?'&#10003; Meta':'pct>=75?"Prox. meta":"Abaixo"';
+      lbl = pct>=95?'&#10003; Meta':pct>=75?'Prox. meta':'Abaixo';
+      statusBadge = '<span class="dash-trend-badge '+cls+'" style="font-size:.65rem;margin-top:4px;display:inline-block">'+lbl+'</span>';
+    }
+    return '<div class="kpi-card" style="position:relative">'+
+      '<div class="kpi-label">'+escHtml(def.nome)+(def.unidade?' ('+escHtml(def.unidade)+')':'')+'</div>'+
+      '<div class="kpi-input" style="font-size:1.3rem;font-weight:800;color:#1e293b;min-height:44px;display:flex;align-items:center;justify-content:center">'+
+      (val!==null?escHtml(valStr):'<span style="color:#cbd5e1;font-size:.85rem">Sem dados</span>')+
+      '</div>'+
+      (metaStr?'<div style="font-size:.7rem;color:#94a3b8;margin-top:2px">Meta: '+escHtml(metaStr)+'</div>':'<div style="font-size:.7rem;color:#94a3b8;margin-top:2px">Sem meta definida</div>')+
+      (pct!==null?'<div style="height:4px;background:#e2e8f0;border-radius:100px;margin-top:6px"><div style="height:4px;border-radius:100px;width:'+pct.toFixed(0)+'%;background:'+barColor+'"></div></div>':'')+
+      statusBadge+
+      '</div>';
+  }).join('');
+  el.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'+
+    '<h3 style="font-size:1rem;font-weight:700;color:#1e293b;margin:0">Performance Individual</h3>'+
+    '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:.8rem;color:#64748b">Periodo:</span>'+
+    '<select class="dash-period-select" style="padding:5px 10px;font-size:.8rem" onchange="S.kpiPer=this.value;renderInd(S.mid)">'+perOpts+'</select></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">'+cards+'</div>';
+}
 function renderConfig(){
 var el=document.getElementById('configContent');
 if(!el)return;
@@ -1674,7 +1860,24 @@ h+='<label style="font-size:12px;display:flex;flex-direction:column;gap:3px">'
 h+='</div></div>';
 h+='<div style="display:flex;gap:8px">'
 +(ind
-? '<button class="btn-nivel-save" data-id="'+ind.id+'" onclick="saveIndDef(this)">Salvar</button>'
+? '<button class="btn-nivel-save" data-id="'+ind.id+'<div style="margin-top:12px;padding:10px 0;border-top:1px solid #e8edf4">'+
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">'+
+        '<div style="flex:1;min-width:130px">'+
+          '<label style="font-size:.72rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Formato do valor</label>'+
+          '<select id="ind-fmt-'+(suffix)+'" class="kpi-input" style="font-size:.82rem;padding:6px 8px">'+
+            '<option value="numero"'+((!ind||defGetFmt(ind)==='numero')?' selected':'')+'>Numero</option>'+
+            '<option value="tempo"'+((ind&&defGetFmt(ind)==='tempo')?' selected':'')+'>Tempo (HH:MM:SS)</option>'+
+            '<option value="percentual"'+((ind&&defGetFmt(ind)==='percentual')?' selected':'')+'>Percentual (%)</option>'+
+          '</select>'+
+        '</div>'+
+      '</div>'+
+      '<div>'+
+        '<label style="font-size:.72rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Aplica-se a equipes</label>'+
+        '<div style="display:flex;gap:12px;flex-wrap:wrap">'+
+          (S.equipes||[]).map(function(eq){var ch=!ind||defGetEqs(ind).length===0||defGetEqs(ind).includes(eq.id);return '<label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer"><input type="checkbox" class="ind-eq-check-'+suffix+'" value="'+eq.id+'"'+(ch?' checked':'')+'>'+escHtml(eq.nome)+'</label>';}).join('')+
+        '</div>'+
+      '</div>'+
+    '</div>'+'" onclick="saveIndDef(this)">Salvar</button>'
 +'<button class="btn-nivel-cancel" onclick="toggleIndEdit({dataset:{id:\''+ind.id+'\'}})">Cancelar</button>'
 : '<button class="btn-nivel-save" onclick="saveIndDef(this)">Adicionar indicador</button>'
 +'<button class="btn-nivel-cancel" onclick="toggleAddIndForm()">Cancelar</button>')
