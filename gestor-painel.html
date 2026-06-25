@@ -303,6 +303,15 @@
           <span style="color:#94a3b8;font-size:.8rem">ate</span>
           <input type="month" id="dashRangeEnd" class="dash-period-select" onchange="renderDashboard()" style="padding:6px 10px">
         </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-left:8px;">
+          <span style="color:#94a3b8;font-size:.8rem;white-space:nowrap;">Equipe:</span>
+          <select class="dash-period-select" id="dashEquipeFiltroSel" onchange="dashSetEquipeFiltro(this)" style="min-width:120px;">
+            <option value="todas">Todas</option>
+            <option value="GC">GC</option>
+            <option value="Cond21">Cond21</option>
+            <option value="Hibrido">Hibrido</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -701,6 +710,7 @@ async function loadIndicadoresLancamentos(){
 
 // === ETAPA 3: DASHBOARD EXECUTIVO ===
 let dashPeriodoTipo = 'fechamentos';
+let dashEquipeFiltro = 'todas';
 let _dashTeamChart = null, _dashEvolChart = null, _dashNivelChart = null, _dashTrendChart = null;
 
 // === DASH SYNC: map S state to window.* ===
@@ -767,6 +777,16 @@ function dashGetMembrosEquipe(equipe, membros) {
 function dashGetEquipes(membros) {
   var names = [...new Set(membros.map(function(m){ return m.equipe === 'Hibrido' ? null : m.equipe; }).filter(Boolean))];
   return names;
+}
+
+// === DASH EQUIPE FILTER ===
+function dashGetMembrosFiltered(allMembros) {
+  if (!dashEquipeFiltro || dashEquipeFiltro === 'todas') return allMembros;
+  return dashGetMembrosEquipe(dashEquipeFiltro, allMembros);
+}
+function dashSetEquipeFiltro(sel) {
+  dashEquipeFiltro = sel.value;
+  renderDashboard();
 }
 
 function dashSyncState() {
@@ -909,7 +929,7 @@ function renderDashboard() {
 
 function renderDashKpis() {
   const periodos = dashGetPeriodos();
-  const membros = (window.membros || []).filter(m => {
+  const membros = dashGetMembrosFiltered(window.membros || []).filter(m => {
     const lastP = periodos[periodos.length-1];
     return dashMemberActive(m, lastP);
   });
@@ -968,7 +988,7 @@ function renderDashKpis() {
 
 function renderDashTeamCompare() {
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const equipes = dashGetEquipes(membros);
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
 
@@ -1023,7 +1043,7 @@ function renderDashTeamCompare() {
 
 function renderDashEvolucao() {
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const equipe = document.getElementById('dashEvolEquipe').value;
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   _dashEvolChart = dashDestroyChart(_dashEvolChart);
@@ -1086,7 +1106,7 @@ function renderDashEvolucao() {
 
 function renderDashIndicadores() {
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const equipeFilter = document.getElementById('dashIndEquipe') ? document.getElementById('dashIndEquipe').value : 'todas';
   const eqFilterId = equipeFilter !== 'todas' ? (S.equipes||[]).find(function(e){return e.nome===equipeFilter;}) : null;
   const defs = (window.indicadoresDefs || []).filter(function(d) {
@@ -1159,7 +1179,7 @@ function renderDashIndicadores() {
 
 function renderDashRanking() {
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   const equipe = document.getElementById('dashRankEquipe').value;
 
@@ -1206,7 +1226,7 @@ function renderDashRanking() {
 
 function renderDashNivel() {
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const niveis = window.niveis || [];
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   _dashNivelChart = dashDestroyChart(_dashNivelChart);
@@ -1265,7 +1285,7 @@ function renderDashTrend() {
     return;
   }
   const periodos = dashGetPeriodos();
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
   const def = (window.indicadoresDefs || []).find(d => String(d.id) === String(indId));
   if (!def) return;
@@ -1343,7 +1363,7 @@ function renderDashTrend() {
 }
 
 function renderDashAlertas() {
-  const membros = window.membros || [];
+  const membros = dashGetMembrosFiltered(window.membros || []);
   const statusList = window.membrosStatus || [];
   const alertas = [];
   membros.forEach(m => {
