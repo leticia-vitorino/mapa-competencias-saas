@@ -681,6 +681,22 @@ async function loadIndicadoresLancamentos(){
 let dashPeriodoTipo = 'fechamentos';
 let _dashTeamChart = null, _dashEvolChart = null, _dashNivelChart = null, _dashTrendChart = null;
 
+// === DASH SYNC: map S state to window.* ===
+function dashSyncState() {
+  window.membros = (S.membros||[]).map(function(m) {
+    var eq = (S.equipes||[]).find(function(e){return e.id===m.equipe_id;});
+    var nv = (S.niveis||[]).find(function(n){return n.id===m.nivel_id;});
+    return Object.assign({}, m, {equipe: eq ? eq.nome : '', nivel_nome: nv ? nv.nome : ''});
+  });
+  window.niveis = S.niveis || [];
+  window.equipes = S.equipes || [];
+  window.indicadoresDefs = S.indDefs || [];
+  window.indicadoresLancamentos = Object.values(S.indLancamentos || {});
+  window.membrosStatus = Object.keys(S.membrosStatus||{}).map(function(k){
+    return Object.assign({}, (S.membrosStatus||{})[k], {membro_id: k});
+  });
+}
+
 function dashSetPeriodoTipo(btn) {
   dashPeriodoTipo = btn.dataset.dp;
   document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.dp === dashPeriodoTipo));
@@ -714,7 +730,8 @@ function dashFilterLancs(lancs, periodos) {
 }
 
 function dashMemberActive(membro, periodoRef) {
-  const ms = (window.membrosStatus || []).find(s => s.membro_id === membro.id);
+  if (membro.status === 'desligado') return false;
+  const ms = (S.membrosStatus||{})[membro.id] || (window.membrosStatus||[]).find(s => s.membro_id === membro.id);
   if (!ms) return true;
   if (ms.status === 'desligado' && ms.data_inicio && periodoRef >= ms.data_inicio.substring(0,7)) return false;
   return true;
@@ -1198,7 +1215,9 @@ function renderDashAlertas() {
   const statusList = window.membrosStatus || [];
   const alertas = [];
   membros.forEach(m => {
-    const s = statusList.find(x => x.membro_id === m.id);
+    // Check both direct status and membrosStatus lookup
+    const directStatus = m.status;
+    const s = statusList.find(x => x.membro_id === m.id) || (directStatus && directStatus !== 'ativo' ? {status: directStatus} : null);
     if (!s) return;
     if (s.status === 'ferias') alertas.push({ cls: 'info', msg: escHtml(m.nome.split(' ')[0]) + ' esta de ferias' + (s.data_inicio ? ' desde ' + s.data_inicio : '') });
     else if (s.status === 'folga') alertas.push({ cls: 'warn', msg: escHtml(m.nome.split(' ')[0]) + ' esta de folga' });
@@ -1504,7 +1523,7 @@ function mudarView(btn) {
   document.getElementById('viewIndicadores').style.display = view === 'indicadores' ? 'block' : 'none';
   document.getElementById('viewDashboard').style.display = view === 'dashboard' ? 'block' : 'none';
   if (view === 'indicadores') renderIndicadores();
-  if (view === 'dashboard') renderDashboard();
+  if (view === 'dashboard') { dashSyncState(); renderDashboard(); }
 }
 function renderTab(){var mid=S.mid;if(!mid)return;var t=S.tab;if(t==='avaliacao')renderAval(mid);else if(t==='autoconhecimento')renderAuto(mid);else if(t==='mapagaps')renderGaps();else if(t==='pdi')renderPDI(mid);else if(t==='historico')renderHist(mid);else if(t==='indicadores')renderInd(mid);}
 function renderAval(mid){var el=document.getElementById('tabAvaliacao'),m=S.membros.find(function(x){return x.id===mid;});if(!m){el.innerHTML='';return;}var nk=NM[m.nivel_codigo]||'N1',html='';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck],pw=cat.peso[nk]||0;html+='<div class="section-header" style="border-color:'+cat.color+'"><h3><span class="section-dot" style="background:'+cat.color+'"></span>'+cat.label+'</h3><span class="section-weight">peso '+pw+'% neste nivel</span></div>';cat.items.forEach(function(comp){var nota=gS(mid,comp.id),alvo=gA(mid,comp.id),isNA=nota===-1,hasPDI=(S.pdiItems[mid]||[]).some(function(p){return p.competencia_id===comp.id&&p.status!=='concluido';});html+='<div class="comp-card" style="border-left-color:'+cat.color+'" data-cid="'+comp.id+'" data-mid="'+mid+'" onclick="openM(event)"><div class="comp-icon">'+cat.icon+'</div><div class="comp-info"><div class="comp-name">'+comp.nome+(hasPDI?' <span class="pdi-tag">PDI</span>':'')+'</div><div class="comp-desc">'+comp.desc+'</div></div><div class="score-btns" onclick="event.stopPropagation()">';for(var n=1;n<=5;n++){html+='<button class="score-btn'+(nota===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setBt(this)">'+n+'</button>';}html+='<button class="score-btn na'+(isNA?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" onclick="togNA(this)">&mdash;</button>';if(!isNA&&nota!==null)html+='<div class="alvo-indicator"><span class="alvo-dot" style="background:'+sc(nota,alvo)+'"></span>alvo '+alvo+'</div>';else if(isNA)html+='<div class="alvo-indicator" style="color:#94a3b8">nao se aplica</div>';html+='</div></div>';});});if(!html)html='<div class="empty"><div class="empty-icon">&#127919;</div><h3>Avalie as competencias</h3></div>';el.innerHTML=html+'<div style="margin-top:20px;text-align:right"><button class="btn btn-ghost" data-mid="'+mid+'" onclick="saveHistBtn(this)">&#128190; Salvar snapshot</button></div>';}
