@@ -361,7 +361,7 @@
     <div class="dash-card" style="margin-bottom:24px">
       <div class="dash-card-header">
         <div>
-          <div class="dash-card-title">Indicadores — Visao Geral</div>
+          <div class="dash-card-title">Indicadores â Visao Geral</div>
           <div class="dash-card-subtitle">Media de cada indicador vs meta no periodo selecionado</div>
         </div>
         <select class="dash-period-select" id="dashIndEquipe" onchange="renderDashIndicadores()" style="font-size:.75rem;padding:5px 10px">
@@ -371,7 +371,7 @@
         </select>
       </div>
       <div id="dashIndicadoresBody">
-        <div class="dash-empty-dash"><div class="dash-empty-icon">📊</div><p>Sem dados de indicadores no periodo</p></div>
+        <div class="dash-empty-dash"><div class="dash-empty-icon">ð</div><p>Sem dados de indicadores no periodo</p></div>
       </div>
     </div>
 
@@ -416,7 +416,7 @@
         </select>
       </div>
       <div id="dashTrendBody">
-        <div class="dash-empty-dash"><div class="dash-empty-icon">📈</div><p>Selecione um indicador para ver a projecao</p></div>
+        <div class="dash-empty-dash"><div class="dash-empty-icon">ð</div><p>Selecione um indicador para ver a projecao</p></div>
       </div>
     </div>
 
@@ -470,7 +470,7 @@ if(!per){
 var el=document.getElementById('kpiPeriodoSel');
 per=el?el.value:'';
 }
-if(!per){toast('Selecione um período.');return;}
+if(!per){toast('Selecione um perÃ­odo.');return;}
 var tma=parseFloat(document.getElementById('kpi-tma-'+mid).value)||null;
 var csat=parseFloat(document.getElementById('kpi-csat-'+mid).value)||null;
 var fcr=parseFloat(document.getElementById('kpi-fcr-'+mid).value)||null;
@@ -578,7 +578,7 @@ if(!per){
 var el=document.getElementById('kpiPeriodoSel');
 per=el?el.value:'';
 }
-if(!per){toast('Selecione um período.');return;}
+if(!per){toast('Selecione um perÃ­odo.');return;}
 var tma=parseFloat(document.getElementById('kpi-tma-'+mid).value)||null;
 var csat=parseFloat(document.getElementById('kpi-csat-'+mid).value)||null;
 var fcr=parseFloat(document.getElementById('kpi-fcr-'+mid).value)||null;
@@ -643,6 +643,7 @@ if(tipoMeta!=='desempenho'){
   if(eqsMeta['Cond21']!==undefined) metaPadrao=eqsMeta['Cond21'];
   else if(eqsMeta['GC']!==undefined) metaPadrao=eqsMeta['GC'];
 }
+if(fmt==='tempo') metaPadrao=null;
 var payload={gestor_id:S.user.id,nome:nome,unidade:unidade||'%',meta_padrao:metaPadrao,descricao:desc,niveis_ids:JSON.stringify(niveisIds),metas_por_nivel:JSON.stringify(metasPorNivel),tipo_meta:tipoMeta,direcao:direcao,ativo:true};
 var r;
 if(id){r=await sb.from('indicadores_def').update(payload).eq('id',id);}
@@ -654,7 +655,7 @@ renderInd(S.indDefs);
 }
 async function delIndDef(btn){
   var id=btn.dataset.id;
-  if(!confirm('Remover este indicador? Esta ação não pode ser desfeita.'))return;
+  if(!confirm('Remover este indicador? Esta aÃ§Ã£o nÃ£o pode ser desfeita.'))return;
   var dr=await sb.from('indicadores_def').delete().eq('id',id);
   if(dr.error){toast('Erro ao remover: '+dr.error.message);return;}
   await loadIndDefs();
@@ -719,6 +720,16 @@ var fmt=sel.value;
   parent.appendChild(newInp);
 });
 }
+function indToggleDir(inp){
+  var nm=inp.name;
+  document.querySelectorAll('.ind-dir-pill[data-name="'+nm+'"]').forEach(function(p){
+    var act=p.dataset.val===inp.value;
+    p.style.border='1.5px solid '+(act?'#10b981':'#334155');
+    p.style.background=act?'#10b981':'transparent';
+    p.style.color=act?'#fff':'#94a3b8';
+  });
+}
+
 function toggleIndEdit(btn){
 var id=btn.dataset.id;
 var row=document.getElementById('ind-edit-row-'+id);
@@ -1036,11 +1047,11 @@ function renderDashKpis() {
   const trendArrow = trendDir === 'up' ? '&#8593;' : trendDir === 'down' ? '&#8595;' : '&#8594;';
 
   const cards = [
-    { label: 'Membros Ativos', val: totalAtivos, sub: 'no periodo selecionado', color: 'blue', icon: '👥' },
-    { label: 'Com Lancamentos', val: mbComDados, sub: 'de ' + totalAtivos + ' ativos', color: 'green', icon: '✅' },
-    { label: 'Media Indicadores', val: mediaGeral !== null ? mediaGeral.toFixed(1) : '--', sub: trendDir !== 'neutral' ? 'vs periodo anterior' : 'sem dados anteriores', color: 'purple', icon: '📊', trend: trendDir, trendArrow },
-    { label: 'Aderencia Matriz', val: aderMedia !== null ? aderMedia + '%' : '--', sub: 'media de competencias', color: 'orange', icon: '🎯' },
-    { label: 'Indicadores Ativos', val: defs.filter(d => d.ativo !== false).length, sub: 'cadastrados no sistema', color: 'blue', icon: '📋' },
+    { label: 'Membros Ativos', val: totalAtivos, sub: 'no periodo selecionado', color: 'blue', icon: 'ð¥' },
+    { label: 'Com Lancamentos', val: mbComDados, sub: 'de ' + totalAtivos + ' ativos', color: 'green', icon: 'â' },
+    { label: 'Media Indicadores', val: mediaGeral !== null ? mediaGeral.toFixed(1) : '--', sub: trendDir !== 'neutral' ? 'vs periodo anterior' : 'sem dados anteriores', color: 'purple', icon: 'ð', trend: trendDir, trendArrow },
+    { label: 'Aderencia Matriz', val: aderMedia !== null ? aderMedia + '%' : '--', sub: 'media de competencias', color: 'orange', icon: 'ð¯' },
+    { label: 'Indicadores Ativos', val: defs.filter(d => d.ativo !== false).length, sub: 'cadastrados no sistema', color: 'blue', icon: 'ð' },
   ];
 
   document.getElementById('dashKpiRow').innerHTML = cards.map(c => `
@@ -1188,7 +1199,7 @@ function renderDashIndicadores() {
   let filtMbs = dashGetMembrosEquipe(equipe !== 'todas' ? equipe : null, membros);
 
   if (!defs.length) {
-    document.getElementById('dashIndicadoresBody').innerHTML = '<div class="dash-empty-dash"><div class="dash-empty-icon">📊</div><p>Nenhum indicador cadastrado. Acesse Configuracoes para cadastrar.</p></div>';
+    document.getElementById('dashIndicadoresBody').innerHTML = '<div class="dash-empty-dash"><div class="dash-empty-icon">ð</div><p>Nenhum indicador cadastrado. Acesse Configuracoes para cadastrar.</p></div>';
     return;
   }
 
@@ -1270,7 +1281,7 @@ function renderDashRanking() {
   }).filter(r => r.media !== null).sort((a,b) => b.media - a.media).slice(0, 10);
 
   if (!ranking.length) {
-    document.getElementById('dashRankingList').innerHTML = '<div class="dash-empty-dash" style="padding:24px"><div class="dash-empty-icon">🏆</div><p>Sem dados de indicadores no periodo</p></div>';
+    document.getElementById('dashRankingList').innerHTML = '<div class="dash-empty-dash" style="padding:24px"><div class="dash-empty-icon">ð</div><p>Sem dados de indicadores no periodo</p></div>';
     return;
   }
 
@@ -1440,7 +1451,7 @@ function renderDashAlertas() {
     if (!s) return;
     if (s.status === 'ferias') alertas.push({ cls: 'info', msg: escHtml(m.nome.split(' ')[0]) + ' esta de ferias' + (s.data_inicio ? ' desde ' + s.data_inicio : '') });
     else if (s.status === 'folga') alertas.push({ cls: 'warn', msg: escHtml(m.nome.split(' ')[0]) + ' esta de folga' });
-    else if (s.status === 'desligado') alertas.push({ cls: 'danger', msg: escHtml(m.nome.split(' ')[0]) + ' foi desligado' + (s.data_inicio ? ' em ' + s.data_inicio : '') + ' — excluido das medias' });
+    else if (s.status === 'desligado') alertas.push({ cls: 'danger', msg: escHtml(m.nome.split(' ')[0]) + ' foi desligado' + (s.data_inicio ? ' em ' + s.data_inicio : '') + ' â excluido das medias' });
   });
   const el = document.getElementById('dashAlertas');
   if (alertas.length) {
@@ -1471,14 +1482,14 @@ function renderIndicadores(){
   var c=document.getElementById('indViewContainer');
   if(!c) return;
   if(S.indDefs.length===0){
-    c.innerHTML='<div class="no-ind-msg"><div style="font-size:32px;margin-bottom:12px">&#128200;</div><p style="font-size:15px;font-weight:600">Nenhum indicador cadastrado</p><p style="font-size:13px">Acesse Configurações para cadastrar indicadores</p></div>';
+    c.innerHTML='<div class="no-ind-msg"><div style="font-size:32px;margin-bottom:12px">&#128200;</div><p style="font-size:15px;font-weight:600">Nenhum indicador cadastrado</p><p style="font-size:13px">Acesse ConfiguraÃ§Ãµes para cadastrar indicadores</p></div>';
     return;
   }
   if(!S.indPeriodoRef) S.indPeriodoRef=getPeriodoRefDefault(S.indPeriodoTipo);
   var cls1=S.indSubView==='lancamento'?'ind-sub-tab active':'ind-sub-tab';
   var cls2=S.indSubView==='individual'?'ind-sub-tab active':'ind-sub-tab';
   var html='<div class="ind-sub-tabs">'
-    +'<button class="'+cls1+'" data-sv="lancamento" onclick="trocarSubView(this.dataset.sv)">&#9998; Lançamento</button>'
+    +'<button class="'+cls1+'" data-sv="lancamento" onclick="trocarSubView(this.dataset.sv)">&#9998; LanÃ§amento</button>'
     +'<button class="'+cls2+'" data-sv="individual" onclick="trocarSubView(this.dataset.sv)">&#128100; Individual</button>'
     +'</div>';
   if(S.indSubView==='lancamento') html+=renderLancamentoView();
@@ -1499,7 +1510,7 @@ function renderLancamentoView(){
     return '<button class="'+cls+'" data-pt="'+pt.v+'" onclick="setIndPeriodoTipo(this.dataset.pt)">'+pt.l+'</button>';
   }).join('');
   var html='<div class="period-controls">'
-    +'<span class="period-label">Período:</span>'
+    +'<span class="period-label">PerÃ­odo:</span>'
     +'<div class="period-type-btns">'+ptBtns+'</div>'
     +'<input class="period-ref-input" type="text" value="'+escHtml(S.indPeriodoRef||'')+'" placeholder="Ex: 2025-01" onchange="S.indPeriodoRef=this.value" />'
     +'</div>';
@@ -1509,12 +1520,12 @@ function renderLancamentoView(){
     return st.status!=='desligado';
   });
   if(inds.length===0||membros.length===0){
-    return html+'<div class="ind-empty">Nenhum membro ou indicador disponível</div>';
+    return html+'<div class="ind-empty">Nenhum membro ou indicador disponÃ­vel</div>';
   }
   html+='<div class="lanc-table-wrap"><table class="lanc-table"><thead><tr>'
-    +'<th>Colaborador</th><th>Equipe</th><th>Nível</th>';
+    +'<th>Colaborador</th><th>Equipe</th><th>NÃ­vel</th>';
   inds.forEach(function(ind){
-    var metaStr=ind.meta_padrao?' · meta: '+ind.meta_padrao:'';
+    var metaStr=ind.meta_padrao?' Â· meta: '+ind.meta_padrao:'';
     html+='<th>'+escHtml(ind.nome)+'<div style="font-size:10px;font-weight:400;color:#94a3b8">'+escHtml(ind.unidade||'')+metaStr+'</div></th>';
   });
   html+='</tr></thead><tbody>';
@@ -1539,7 +1550,7 @@ function renderLancamentoView(){
     html+='</tr>';
   });
   html+='</tbody></table></div>';
-  html+='<button class="lanc-save-btn" onclick="salvarLancamentos()">&#128190; Salvar lançamentos</button>';
+  html+='<button class="lanc-save-btn" onclick="salvarLancamentos()">&#128190; Salvar lanÃ§amentos</button>';
   return html;
 }
 
@@ -1563,7 +1574,7 @@ async function salvarLancamentos(){
   if(upserts.length===0){toast('Nenhum valor para salvar');return;}
   var res=await sb.from('indicadores_lancamentos').upsert(upserts,{onConflict:'membro_id,indicador_id,periodo_tipo,periodo_ref'});
   if(res.error){console.error('salvarLanc',res.error);toast('Erro ao salvar: '+res.error.message);return;}
-  toast('Lançamentos salvos!');
+  toast('LanÃ§amentos salvos!');
   await loadIndicadoresLancamentos();
 }
 
@@ -1593,7 +1604,7 @@ function renderIndividualView(){
       html+='<div class="ind-chart-card">'
         +'<div class="ind-chart-title">'+escHtml(ind.nome)+'</div>'
         +'<div class="ind-chart-subtitle">Unidade: '+escHtml(ind.unidade||'')+(ind.meta_padrao?' &middot; Meta: '+ind.meta_padrao:'')+'</div>'
-        +'<div class="ind-empty" style="padding:20px">Sem dados lançados</div></div>';
+        +'<div class="ind-empty" style="padding:20px">Sem dados lanÃ§ados</div></div>';
       return;
     }
     var vals=lancamentos.map(function(l){return parseFloat(l.valor);});
@@ -1604,14 +1615,14 @@ function renderIndividualView(){
     if(vals.length>=2){
       if(trend>0.01) trendBadge='<span class="trend-badge up">&#8593; Alta</span>';
       else if(trend<-0.01) trendBadge='<span class="trend-badge down">&#8595; Queda</span>';
-      else trendBadge='<span class="trend-badge flat">&#8212; Estável</span>';
+      else trendBadge='<span class="trend-badge flat">&#8212; EstÃ¡vel</span>';
     }
     var canvasId='indChart_'+idx;
     var pctHtml='';
     if(meta&&lastVal!==undefined){
       var pct=Math.round((lastVal/meta)*100);
       var metaClass=pct>=100?'meta-atingida':pct>=70?'meta-parcial':'meta-baixa';
-      pctHtml='<div style="text-align:right"><div class="'+metaClass+'" style="font-size:20px;font-weight:800">'+pct+'%</div><div class="meta-pct">último vs meta</div></div>';
+      pctHtml='<div style="text-align:right"><div class="'+metaClass+'" style="font-size:20px;font-weight:800">'+pct+'%</div><div class="meta-pct">Ãºltimo vs meta</div></div>';
     }
     html+='<div class="ind-chart-card">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
@@ -1620,7 +1631,7 @@ function renderIndividualView(){
       +pctHtml+'</div>'
       +'<canvas id="'+canvasId+'" height="120"></canvas>';
     var metaTh=meta?'<th>% Meta</th>':'';
-    html+='<table class="ind-history-table"><thead><tr><th>Período</th><th>Tipo</th><th>Valor</th>'+metaTh+'<th>Var.</th></tr></thead><tbody>';
+    html+='<table class="ind-history-table"><thead><tr><th>PerÃ­odo</th><th>Tipo</th><th>Valor</th>'+metaTh+'<th>Var.</th></tr></thead><tbody>';
     lancamentos.forEach(function(l,li){
       var v=parseFloat(l.valor);
       var prevV=li>0?parseFloat(lancamentos[li-1].valor):null;
@@ -1673,7 +1684,7 @@ function initIndCharts(){
     var projPadded=new Array(realData.length-1).fill(null).concat([realData[realData.length-1]]).concat(projVals);
     var datasets=[
       {label:cd.nome,data:realPadded,borderColor:'#4f9cf9',backgroundColor:'rgba(79,156,249,.12)',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#4f9cf9',fill:true,tension:.35},
-      {label:'Projeção',data:projPadded,borderColor:'#94a3b8',borderDash:[5,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#94a3b8',fill:false,tension:.35}
+      {label:'ProjeÃ§Ã£o',data:projPadded,borderColor:'#94a3b8',borderDash:[5,4],borderWidth:2,pointRadius:3,pointBackgroundColor:'#94a3b8',fill:false,tension:.35}
     ];
     if(cd.meta){
       datasets.push({label:'Meta ('+cd.meta+')',data:new Array(allLabels.length).fill(cd.meta),borderColor:'#16a34a',borderWidth:1.5,borderDash:[3,3],pointRadius:0,fill:false});
@@ -1749,7 +1760,7 @@ function renderAval(mid){var el=document.getElementById('tabAvaliacao'),m=S.memb
 function setBt(btn){var mid=btn.dataset.mid,cid=btn.dataset.cid,n=parseInt(btn.dataset.n);saveScore(mid,cid,n);renderAval(mid);renderDonuts(mid);renderSidebar();}
 function togNA(btn){var mid=btn.dataset.mid,cid=btn.dataset.cid,cur=gS(mid,cid);saveScore(mid,cid,cur===-1?null:-1);renderAval(mid);renderDonuts(mid);}
 function openM(e){openModal(e.currentTarget.dataset.cid,e.currentTarget.dataset.mid);}
-function openModal(cid,mid){var comp=null;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){if(c.id===cid)comp=c;});});if(!comp)return;var nota=gS(mid,cid),alvo=gA(mid,cid),ck=cid.startsWith('A')?'comportamental':cid.startsWith('B')?'tecnico':'negocio',cat=BIB[ck];document.getElementById('modalMeta').textContent=cid+' · '+cat.label;document.getElementById('modalTitulo').textContent=comp.nome;document.getElementById('modalDesc').textContent=comp.desc;var lvs=[{label:'N1',sub:'basico',text:comp.n1},{label:'N2',sub:'em consol.',text:comp.n2},{label:'N3',sub:'proficiente',text:comp.n3},{label:'N4',sub:'avancado',text:comp.n4},{label:'N5',sub:'referencia',text:comp.n5}];var ni=nota&&nota>0?nota:null;document.getElementById('modalReguaContent').innerHTML=lvs.map(function(lv,i){var n=i+1,isA=ni===n,isT=alvo===n,isAT=isA&&isT,rc='',lx='';if(isAT){rc=' atual-alvo';lx='- atual & alvo';}else if(isA){rc=' atual';lx='- atual';}else if(isT){rc=' alvo';lx='- alvo';}return'<div class="regua-row'+rc+'"><div class="nivel-badge">'+lv.label+'<br>'+lv.sub+(lx?'<br><em>'+lx+'</em>':'')+'</div><div class="nivel-text">'+lv.text+'</div></div>';}).join('');document.getElementById('modalRegua').style.display='flex';}
+function openModal(cid,mid){var comp=null;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){if(c.id===cid)comp=c;});});if(!comp)return;var nota=gS(mid,cid),alvo=gA(mid,cid),ck=cid.startsWith('A')?'comportamental':cid.startsWith('B')?'tecnico':'negocio',cat=BIB[ck];document.getElementById('modalMeta').textContent=cid+' Â· '+cat.label;document.getElementById('modalTitulo').textContent=comp.nome;document.getElementById('modalDesc').textContent=comp.desc;var lvs=[{label:'N1',sub:'basico',text:comp.n1},{label:'N2',sub:'em consol.',text:comp.n2},{label:'N3',sub:'proficiente',text:comp.n3},{label:'N4',sub:'avancado',text:comp.n4},{label:'N5',sub:'referencia',text:comp.n5}];var ni=nota&&nota>0?nota:null;document.getElementById('modalReguaContent').innerHTML=lvs.map(function(lv,i){var n=i+1,isA=ni===n,isT=alvo===n,isAT=isA&&isT,rc='',lx='';if(isAT){rc=' atual-alvo';lx='- atual & alvo';}else if(isA){rc=' atual';lx='- atual';}else if(isT){rc=' alvo';lx='- alvo';}return'<div class="regua-row'+rc+'"><div class="nivel-badge">'+lv.label+'<br>'+lv.sub+(lx?'<br><em>'+lx+'</em>':'')+'</div><div class="nivel-text">'+lv.text+'</div></div>';}).join('');document.getElementById('modalRegua').style.display='flex';}
 function fecharModal(){document.getElementById('modalRegua').style.display='none';}
 function renderAuto(mid){var el=document.getElementById('tabAutoconhecimento'),scores=S.scores[mid]||{},asc=S.autoScores[mid]||{},ali=0,sup=0,sub=0;Object.values(BIB).forEach(function(cat){cat.items.forEach(function(c){var g=scores[c.id],a=asc[c.id];if(g&&g>0&&a&&a>0){var d=a-g;if(d===0)ali++;else if(d>0)sup++;else sub++;}});});var html='<div class="auto-banner">Autoavaliacao &middot; <strong>Petroleo = sua avaliacao (gestor)</strong> &middot; <strong style="color:var(--amber)">Ambar = como a pessoa se ve</strong></div><div class="auto-counters"><div class="auto-counter alinhado"><span class="num">'+ali+'</span><span class="lbl">alinhado</span></div><div class="auto-counter superestima"><span class="num">'+sup+'</span><span class="lbl">superestima</span></div><div class="auto-counter subestima"><span class="num">'+sub+'</span><span class="lbl">subestima</span></div></div>';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck];html+='<div class="section-header" style="border-color:'+cat.color+';margin-top:16px"><h3><span class="section-dot" style="background:'+cat.color+'"></span>'+cat.label+'</h3></div>';cat.items.forEach(function(comp){var gv=scores[comp.id],sv=asc[comp.id],delta='',dcls='ali';if(gv&&gv>0&&sv&&sv>0){var d=sv-gv;if(d>0){delta='superestima +'+d;dcls='sup';}else if(d<0){delta='subestima '+d;dcls='sub';}else{delta='alinhado';dcls='ali';}}html+='<div class="auto-row"><div class="auto-comp">'+comp.nome+'</div><div class="auto-scores"><span style="font-size:11px;color:var(--muted);margin-right:4px">Gestor:</span>';for(var n=1;n<=5;n++)html+='<button class="auto-btn gestor'+(gv===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setAB(this,true)">'+n+'</button>';html+='<span style="font-size:11px;color:var(--amber);margin:0 4px">Auto:</span>';for(var n=1;n<=5;n++)html+='<button class="auto-btn self'+(sv===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setAB(this,false)">'+n+'</button>';html+='</div>';if(delta)html+='<div class="auto-delta '+dcls+'">'+delta+'</div>';html+='</div>';});});el.innerHTML=html;}
 function setAB(btn,isG){var mid=btn.dataset.mid,cid=btn.dataset.cid,n=parseInt(btn.dataset.n);if(isG)saveScore(mid,cid,n);else saveAutoScore(mid,cid,n);renderAuto(mid);renderDonuts(mid);renderSidebar();}
@@ -1818,7 +1829,7 @@ function renderConfig(){
 var el=document.getElementById('configContent');
 if(!el)return;
 var mh='<div class="config-section"><div class="config-title">Membros</div>'
-+'<table class="config-table"><thead><tr><th>Nome</th><th>E-mail</th><th>Nível</th><th>Equipe</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
++'<table class="config-table"><thead><tr><th>Nome</th><th>E-mail</th><th>NÃ­vel</th><th>Equipe</th><th>Status</th><th>AÃ§Ãµes</th></tr></thead><tbody>';
 if(!S.membros.length)mh+='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Nenhum membro</td></tr>';
 else S.membros.forEach(function(m){
 var nk=NM[m.nivel_codigo]||'N1';
@@ -1838,17 +1849,17 @@ mh+='<tr>'
 });
 mh+='</tbody></table></div>';
 var eh='<div class="config-section"><div class="config-section-header"><div class="config-title">Equipes</div></div>'
-+'<table class="config-table"><thead><tr><th>Nome</th><th>Descrição</th></tr></thead><tbody>';
++'<table class="config-table"><thead><tr><th>Nome</th><th>DescriÃ§Ã£o</th></tr></thead><tbody>';
 if(!S.equipes.length)eh+='<tr><td colspan="2" style="text-align:center;color:var(--muted);padding:20px">Nenhuma equipe</td></tr>';
 else S.equipes.forEach(function(eq){
 eh+='<tr><td><strong>'+eq.nome+'</strong></td><td style="color:var(--muted)">'+( eq.descricao||'&mdash;')+'</td></tr>';
 });
 eh+='</tbody></table></div>';
 var nh='<div class="config-section">'
-+'<div class="config-section-header"><div class="config-title">Níveis</div>'
-+'<button class="btn-nivel-add" onclick="addNivelRow()">+ Novo nível</button></div>'
++'<div class="config-section-header"><div class="config-title">NÃ­veis</div>'
++'<button class="btn-nivel-add" onclick="addNivelRow()">+ Novo nÃ­vel</button></div>'
 +'<table class="config-table"><thead><tr>'
-+'<th>Cód.</th><th>Nome</th><th>Comp%</th><th>Téc%</th><th>Neg%</th><th>Faixa</th><th>Ações</th>'
++'<th>CÃ³d.</th><th>Nome</th><th>Comp%</th><th>TÃ©c%</th><th>Neg%</th><th>Faixa</th><th>AÃ§Ãµes</th>'
 +'</tr></thead><tbody id="niveisTableBody">';
 S.niveis.forEach(function(n){
 var d={}; try{d=JSON.parse(n.descricao||'{}')}catch(e){}
@@ -1861,14 +1872,14 @@ nh+='<tr>'
 +'<td><input class="nivel-input" style="width:60px" value="'+( d.faixa||'')+'" id="niv-faixa-'+n.id+'"></td>'
 +'<td style="white-space:nowrap">'
 +'<button class="btn-nivel-save" data-id="'+n.id+'" onclick="saveNivelRow(this)">Salvar</button>'
-+'<button class="btn-nivel-del" data-id="'+n.id+'" onclick="delNivelRow(this)" style="margin-left:4px">✕</button>'
++'<button class="btn-nivel-del" data-id="'+n.id+'" onclick="delNivelRow(this)" style="margin-left:4px">â</button>'
 +'</td></tr>';
 });
 nh+='</tbody></table></div>';
 var ih='<div class="config-section">'
 +'<div class="config-section-header"><div class="config-title">Indicadores</div>'
 +'<button class="btn-nivel-add" onclick="toggleAddIndForm()">+ Novo indicador</button></div>';
-ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span class="hc-unit">Unidade</span><span class="hc-meta">Meta / Teto</span><span class="hc-info">Tipo & Direção</span><span class="hc-eqs">Equipes</span><span class="hc-act">Ações</span></div>';
+ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span class="hc-unit">Unidade</span><span class="hc-meta">Meta / Teto</span><span class="hc-info">Tipo & DireÃ§Ã£o</span><span class="hc-eqs">Equipes</span><span class="hc-act">AÃ§Ãµes</span></div>';
   if (!S.indDefs.length) {
     ih += '<div style="text-align:center;color:var(--muted);padding:20px;font-size:.85rem;">Nenhum indicador cadastrado ainda.</div>';
   } else {
@@ -1877,8 +1888,8 @@ ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span cla
       try { var nids = JSON.parse(ind.niveis_ids||'[]'); nids.forEach(function(nid){var nv=S.niveis.find(function(n){return n.id===nid;}); if(nv) niveisNames.push(nv.NM||nv.codigo||'?');}); } catch(e) {}
       var tipoCls = ind.tipo_meta==='teto' ? 'background:#fee2e2;color:#991b1b;border-color:#fca5a5;' : ind.tipo_meta==='desempenho' ? 'background:#f1f5f9;color:#64748b;border-color:#cbd5e1;' : 'background:#ede9fe;color:#6d28d9;border-color:#c4b5fd;';
       var tipoLbl = ind.tipo_meta==='teto' ? 'Teto' : ind.tipo_meta==='desempenho' ? 'Desempenho' : 'Meta';
-      var dirHtml = ind.tipo_meta==='desempenho' ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:#f0fdf4;color:#166534;border:1px solid #86efac;white-space:nowrap;">'+(ind.direcao==='menor' ? '↓ Menor=melhor' : '↑ Maior=melhor')+'</span>';
-      var metaDisp = '—';
+      var dirHtml = ind.tipo_meta==='desempenho' ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:#f0fdf4;color:#166534;border:1px solid #86efac;white-space:nowrap;">'+(ind.direcao==='menor' ? 'â Menor=melhor' : 'â Maior=melhor')+'</span>';
+      var metaDisp = 'â';
       if (ind.tipo_meta !== 'desempenho') {
         try {
           var mpn = typeof ind.metas_por_nivel==='string' ? JSON.parse(ind.metas_por_nivel) : (ind.metas_por_nivel||{});
@@ -1887,7 +1898,7 @@ ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span cla
             var parts2 = [];
             if (mpn._eqsMeta.Cond21 !== undefined) parts2.push('C21:' + mpn._eqsMeta.Cond21 + (fmt2==='percentual' ? '%' : fmt2==='tempo' ? '' : ' '+(ind.unidade||'')));
             if (mpn._eqsMeta.GC !== undefined) parts2.push('GC:' + mpn._eqsMeta.GC + (fmt2==='percentual' ? '%' : fmt2==='tempo' ? '' : ' '+(ind.unidade||'')));
-            if (parts2.length) metaDisp = parts2.join(' · ');
+            if (parts2.length) metaDisp = parts2.join(' Â· ');
           } else if (ind.meta_padrao !== null && ind.meta_padrao !== undefined) {
             metaDisp = ind.meta_padrao + (ind.unidade ? ' '+ind.unidade : '');
           }
@@ -1905,11 +1916,11 @@ ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span cla
       } catch(ex2) { eqsHtml = '<span style="font-size:10px;color:var(--muted);">Global</span>'; }
       ih += '<div class="ind-def-row">'
         + '<span class="ind-row-name" title="'+ind.nome+'">'+ind.nome+'</span>'
-        + '<span class="ind-row-unit">'+( ind.unidade||'—' )+'</span>'
+        + '<span class="ind-row-unit">'+( ind.unidade||'â' )+'</span>'
         + '<span class="ind-row-meta" title="'+metaDisp+'">'+metaDisp+'</span>'
         + '<span class="ind-row-badges"><span style="font-size:10px;padding:2px 6px;border-radius:8px;border:1px solid;'+tipoCls+'white-space:nowrap;">'+tipoLbl+'</span>'+dirHtml+'</span>'
         + '<span class="ind-row-eqs">'+eqsHtml+'</span>'
-        + '<span class="ind-row-actions"><button class="btn-membro-edit" data-id="'+ind.id+'" onclick="toggleIndEdit(this)">Editar</button><button class="btn-nivel-del" data-id="'+ind.id+'" onclick="delIndDef(this)">✕</button></span>'
+        + '<span class="ind-row-actions"><button class="btn-membro-edit" data-id="'+ind.id+'" onclick="toggleIndEdit(this)">Editar</button><button class="btn-nivel-del" data-id="'+ind.id+'" onclick="delIndDef(this)">â</button></span>'
         + '</div>';
       ih+='<div id="ind-edit-row-'+ind.id+'" style="display:none;border-bottom:1px solid var(--border);">';
       ih+=buildIndForm(ind);
@@ -1941,29 +1952,29 @@ html+='<input id="ind-nome-'+suffix+'" type="text" class="ind-input" placeholder
 html+='<div><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:4px;">Unidade</label>';
 html+='<input id="ind-unidade-'+suffix+'" type="text" class="ind-input" placeholder="%, min, pts..." value="'+(ind?ind.unidade||'':'')+'" style="width:90px;"></div>';
 html+='</div>';
-html+='<div style="margin-bottom:12px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:4px;">Descrição (opcional)</label>';
-html+='<input id="ind-desc-'+suffix+'" type="text" class="ind-input" placeholder="Descrição do indicador" value="'+(ind?ind.descricao||'':'')+'" style="width:100%;box-sizing:border-box;"></div>';
+html+='<div style="margin-bottom:12px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:4px;">DescriÃ§Ã£o (opcional)</label>';
+html+='<input id="ind-desc-'+suffix+'" type="text" class="ind-input" placeholder="DescriÃ§Ã£o do indicador" value="'+(ind?ind.descricao||'':'')+'" style="width:100%;box-sizing:border-box;"></div>';
 html+='<div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap;">';
 html+='<div><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Tipo</label>';
 html+='<div style="display:flex;gap:6px;">';
 [['meta','Meta'],['teto','Teto'],['desempenho','Desempenho']].forEach(function(pair){
   var t=pair[0],lbl=pair[1];
   var active=curTipo===t;
-  html+='<label style="cursor:pointer;"><input type="radio" name="ind-tipo-'+suffix+'" value="'+t+'" '+(active?'checked':'')+' onchange="indToggleTipo(this)" style="display:none;"><span style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;border:1.5px solid '+(active?'#6366f1':'#334155')+';background:'+(active?'#6366f1':'transparent')+';color:'+(active?'#fff':'#94a3b8')+';">'+lbl+'</span></label>';
+  html+='<label style="cursor:pointer;"><input type="radio" name="ind-tipo-'+suffix+'" value="'+t+'" '+(active?'checked':'')+' onchange="indToggleTipo(this)" style="display:none;"><span class="ind-dir-pill" data-name="ind-dir-'+suffix+'" data-val="'+t+'" style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;border:1.5px solid '+(active?'#6366f1':'#334155')+';background:'+(active?'#6366f1':'transparent')+';color:'+(active?'#fff':'#94a3b8')+';">'+lbl+'</span></label>';
 });
 html+='</div></div>';
-html+='<div id="ind-dir-box-'+suffix+'" style="'+(curTipo==='desempenho'?'display:none;':'')+'"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Direção</label>';
+html+='<div id="ind-dir-box-'+suffix+'" style="'+(curTipo==='desempenho'?'display:none;':'')+'"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">DireÃ§Ã£o</label>';
 html+='<div style="display:flex;gap:6px;">';
-[['↑ Quanto maior melhor','maior'],['↓ Quanto menor melhor','menor']].forEach(function(pair){
+[['â Quanto maior melhor','maior'],['â Quanto menor melhor','menor']].forEach(function(pair){
   var lbl=pair[0],t=pair[1];
   var active=curDir===t;
-  html+='<label style="cursor:pointer;"><input type="radio" name="ind-dir-'+suffix+'" value="'+t+'" '+(active?'checked':'')+' style="display:none;"><span style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;border:1.5px solid '+(active?'#10b981':'#334155')+';background:'+(active?'#10b981':'transparent')+';color:'+(active?'#fff':'#94a3b8')+';">'+lbl+'</span></label>';
+  html+='<label style="cursor:pointer;"><input type="radio" name="ind-dir-'+suffix+'" value="'+t+'" '+(active?'checked':'')+' onchange="indToggleDir(this)" style="display:none;"><span style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;border:1.5px solid '+(active?'#10b981':'#334155')+';background:'+(active?'#10b981':'transparent')+';color:'+(active?'#fff':'#94a3b8')+';">'+lbl+'</span></label>';
 });
 html+='</div></div>';
 html+='</div>';
 html+='<div style="margin-bottom:12px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:4px;">Formato do Valor</label>';
 html+='<select id="ind-fmt-'+suffix+'" class="ind-input" onchange="indToggleFmt(this)" style="width:200px;">';
-[['numero','Número (ex: 42, 4.5)'],['percentual','Percentual (ex: 92%)'],['tempo','Tempo (HH:MM:SS)']].forEach(function(p){
+[['numero','NÃºmero (ex: 42, 4.5)'],['percentual','Percentual (ex: 92%)'],['tempo','Tempo (HH:MM:SS)']].forEach(function(p){
   html+='<option value="'+p[0]+'" '+(curFmt===p[0]?'selected':'')+'>'+p[1]+'</option>';
 });
 html+='</select></div>';
@@ -1982,16 +1993,16 @@ html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
   html+='</div>';
 });
 html+='</div>';
-html+='<p style="font-size:.7rem;color:#475569;margin:6px 0 0;">Híbridos usarão o valor conforme equipe definida no período.</p>';
+html+='<p style="font-size:.7rem;color:#475569;margin:6px 0 0;">HÃ­bridos usarÃ£o o valor conforme equipe definida no perÃ­odo.</p>';
 html+='</div>';
-html+='<div style="margin-bottom:12px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Aplica-se aos Níveis</label>';
+html+='<div style="margin-bottom:12px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Aplica-se aos NÃ­veis</label>';
 html+='<div style="display:flex;gap:10px;flex-wrap:wrap;" id="ind-nivel-box-'+suffix+'">';
 (S.niveis||[]).forEach(function(nv){
   var checked=(curNiveisIds.length===0||curNiveisIds.includes(nv.id));
   html+='<label style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:.78rem;color:#cbd5e1;"><input type="checkbox" class="ind-nivel-chk-'+suffix+'" value="'+nv.id+'" '+(checked?'checked':'')+' style="accent-color:#6366f1;">'+nv.nome+'</label>';
 });
 html+='</div></div>';
-html+='<div style="margin-bottom:16px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Aplica-se às Equipes</label>';
+html+='<div style="margin-bottom:16px;"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">Aplica-se Ã s Equipes</label>';
 html+='<div style="display:flex;gap:10px;flex-wrap:wrap;">';
 (S.equipes||[]).forEach(function(eq){
   var checked=(curEqs.length===0||curEqs.includes(eq.id));
@@ -2022,11 +2033,11 @@ function delPDIBtn(btn){delPDI(btn.dataset.mid,btn.dataset.iid);}
 function delMembroBtn(btn){delMembro(btn.dataset.mid);}
 function toggleAddForm(){var wrap=document.getElementById('addFormWrap');var btn=document.getElementById('addToggleBtn');var isOpen=wrap.classList.contains('open');if(isOpen){wrap.classList.remove('open');btn.classList.remove('open');}else{wrap.classList.add('open');btn.classList.add('open');document.getElementById('addName').focus();}}
 function filterMembers(v){var cards=document.querySelectorAll('.member-card');var s=v.toLowerCase().trim();cards.forEach(function(c){var nm=c.querySelector('.member-name');var t=nm?nm.textContent.toLowerCase():c.textContent.toLowerCase();c.style.display=(!s||t.indexOf(s)!==-1)?'':'none';});}
-async function saveNivelRow(btn){var rid=btn.dataset.rid,nid=btn.dataset.nid;var cod=document.getElementById('nc_'+rid).value.trim();var nome=document.getElementById('nn_'+rid).value.trim();var comp=parseInt(document.getElementById('np_c_'+rid).value)||0;var tec=parseInt(document.getElementById('np_t_'+rid).value)||0;var neg=parseInt(document.getElementById('np_n_'+rid).value)||0;var faixa=document.getElementById('nf_'+rid).value.trim();if(!cod||!nome){toast('Preencha código e nome.');return;}var desc=JSON.stringify({comp:comp,tec:tec,neg:neg,faixa:faixa});var r=await sb.from('niveis').update({codigo:cod,nome:nome,descricao:desc}).eq('id',nid);if(r.error){toast('Erro: '+r.error.message);return;}var nk=cod.toUpperCase();NM[cod]=nk;PESOS[nk]={comp:comp,tec:tec,neg:neg};FAIXAS[nk]=faixa;var idx=S.niveis.findIndex(function(n){return n.id===nid;});if(idx>=0){S.niveis[idx].codigo=cod;S.niveis[idx].nome=nome;S.niveis[idx].descricao=desc;}await loadNiveis();renderConfig();renderSidebar();toast('Nível salvo!');}
-async function delNivelRow(btn){if(!confirm('Excluir este nível?'))return;var nid=btn.dataset.nid;var r=await sb.from('niveis').delete().eq('id',nid);if(r.error){toast('Erro: '+r.error.message);return;}S.niveis=S.niveis.filter(function(n){return n.id!==nid;});await loadNiveis();renderConfig();renderSidebar();toast('Nível removido.');}
+async function saveNivelRow(btn){var rid=btn.dataset.rid,nid=btn.dataset.nid;var cod=document.getElementById('nc_'+rid).value.trim();var nome=document.getElementById('nn_'+rid).value.trim();var comp=parseInt(document.getElementById('np_c_'+rid).value)||0;var tec=parseInt(document.getElementById('np_t_'+rid).value)||0;var neg=parseInt(document.getElementById('np_n_'+rid).value)||0;var faixa=document.getElementById('nf_'+rid).value.trim();if(!cod||!nome){toast('Preencha cÃ³digo e nome.');return;}var desc=JSON.stringify({comp:comp,tec:tec,neg:neg,faixa:faixa});var r=await sb.from('niveis').update({codigo:cod,nome:nome,descricao:desc}).eq('id',nid);if(r.error){toast('Erro: '+r.error.message);return;}var nk=cod.toUpperCase();NM[cod]=nk;PESOS[nk]={comp:comp,tec:tec,neg:neg};FAIXAS[nk]=faixa;var idx=S.niveis.findIndex(function(n){return n.id===nid;});if(idx>=0){S.niveis[idx].codigo=cod;S.niveis[idx].nome=nome;S.niveis[idx].descricao=desc;}await loadNiveis();renderConfig();renderSidebar();toast('NÃ­vel salvo!');}
+async function delNivelRow(btn){if(!confirm('Excluir este nÃ­vel?'))return;var nid=btn.dataset.nid;var r=await sb.from('niveis').delete().eq('id',nid);if(r.error){toast('Erro: '+r.error.message);return;}S.niveis=S.niveis.filter(function(n){return n.id!==nid;});await loadNiveis();renderConfig();renderSidebar();toast('NÃ­vel removido.');}
 function addNivelRow(){var row=document.getElementById('nivelNewRow');if(row)row.style.display='';var inp=document.getElementById('newNivCod');if(inp)inp.focus();}
 function cancelAddNivel(){var row=document.getElementById('nivelNewRow');if(row)row.style.display='none';}
-async function confirmAddNivel(){var cod=document.getElementById('newNivCod').value.trim();var nome=document.getElementById('newNivNome').value.trim();var comp=parseInt(document.getElementById('newNivComp').value)||0;var tec=parseInt(document.getElementById('newNivTec').value)||0;var neg=parseInt(document.getElementById('newNivNeg').value)||0;var faixa=document.getElementById('newNivFaixa').value.trim();if(!cod||!nome){toast('Preencha código e nome.');return;}var ordem=S.niveis.length+1;var desc=JSON.stringify({comp:comp,tec:tec,neg:neg,faixa:faixa});var r=await sb.from('niveis').insert({codigo:cod,nome:nome,descricao:desc,ordem:ordem}).select().single();if(r.error){toast('Erro: '+r.error.message);return;}S.niveis.push(r.data);var nk=cod.toUpperCase();NM[cod]=nk;PESOS[nk]={comp:comp,tec:tec,neg:neg};FAIXAS[nk]=faixa;await loadNiveis();renderConfig();renderSidebar();toast('Nível criado!');}
+async function confirmAddNivel(){var cod=document.getElementById('newNivCod').value.trim();var nome=document.getElementById('newNivNome').value.trim();var comp=parseInt(document.getElementById('newNivComp').value)||0;var tec=parseInt(document.getElementById('newNivTec').value)||0;var neg=parseInt(document.getElementById('newNivNeg').value)||0;var faixa=document.getElementById('newNivFaixa').value.trim();if(!cod||!nome){toast('Preencha cÃ³digo e nome.');return;}var ordem=S.niveis.length+1;var desc=JSON.stringify({comp:comp,tec:tec,neg:neg,faixa:faixa});var r=await sb.from('niveis').insert({codigo:cod,nome:nome,descricao:desc,ordem:ordem}).select().single();if(r.error){toast('Erro: '+r.error.message);return;}S.niveis.push(r.data);var nk=cod.toUpperCase();NM[cod]=nk;PESOS[nk]={comp:comp,tec:tec,neg:neg};FAIXAS[nk]=faixa;await loadNiveis();renderConfig();renderSidebar();toast('NÃ­vel criado!');}
 (async function(){var r=await sb.auth.getSession();if(r.data&&r.data.session){S.user=r.data.session.user;await init();}})();
 </script>
 </body>
