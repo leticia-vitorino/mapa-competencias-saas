@@ -667,7 +667,7 @@ S.membrosStatus=ms;
 }
 async function loadIndicadoresLancamentos(){
   if(!S.user) return;
-  var res=await supa.from('indicadores_lancamentos').select('*').eq('gestor_id',S.user.id);
+  var res=await sc.from('indicadores_lancamentos').select('*').eq('gestor_id',S.user.id);
   if(res.error){console.error('loadLanc',res.error);return;}
   S.indLancamentos={};
   (res.data||[]).forEach(function(l){
@@ -1323,7 +1323,7 @@ async function salvarLancamentos(){
     upserts.push({gestor_id:S.user.id,membro_id:mid,indicador_id:iid,periodo_tipo:S.indPeriodoTipo,periodo_ref:S.indPeriodoRef||getPeriodoRefDefault(S.indPeriodoTipo),valor:parseFloat(val)});
   });
   if(upserts.length===0){toast('Nenhum valor para salvar');return;}
-  var res=await supa.from('indicadores_lancamentos').upsert(upserts,{onConflict:'membro_id,indicador_id,periodo_tipo,periodo_ref'});
+  var res=await sc.from('indicadores_lancamentos').upsert(upserts,{onConflict:'membro_id,indicador_id,periodo_tipo,periodo_ref'});
   if(res.error){console.error('salvarLanc',res.error);toast('Erro ao salvar: '+res.error.message);return;}
   toast('Lançamentos salvos!');
   await loadIndicadoresLancamentos();
