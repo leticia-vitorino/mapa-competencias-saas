@@ -85,6 +85,87 @@
 .meta-parcial{color:#d97706;font-weight:700}
 .meta-baixa{color:#dc2626;font-weight:700}
 .no-ind-msg{background:var(--surface);border:1px dashed var(--border);border-radius:12px;padding:32px;text-align:center;color:var(--muted)}
+
+/* ===== ETAPA 3: DASHBOARD EXECUTIVO ===== */
+.dash-container { padding: 24px; background: #f8fafc; min-height: 100vh; }
+.dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+.dash-header h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+.dash-header p { font-size: 0.85rem; color: #64748b; margin: 2px 0 0; }
+.dash-header-left { display: flex; flex-direction: column; }
+.dash-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dash-filter-btn { padding: 7px 16px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all .18s; }
+.dash-filter-btn.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+.dash-filter-btn:hover:not(.active) { border-color: #94a3b8; background: #f1f5f9; }
+.dash-period-select { padding: 7px 14px; border-radius: 8px; border: 1.5px solid #e2e8f0; background: #fff; color: #475569; font-size: 0.82rem; font-weight: 500; cursor: pointer; outline: none; }
+.dash-kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.dash-kpi-card { background: #fff; border-radius: 14px; padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,.07); border: 1px solid #e8edf4; position: relative; overflow: hidden; }
+.dash-kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 14px 14px 0 0; }
+.dash-kpi-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.dash-kpi-card.green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.dash-kpi-card.purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.dash-kpi-card.orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.dash-kpi-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.dash-kpi-label { font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+.dash-kpi-value { font-size: 2rem; font-weight: 800; color: #1e293b; line-height: 1; }
+.dash-kpi-sub { font-size: 0.75rem; color: #94a3b8; margin-top: 6px; }
+.dash-kpi-trend { display: inline-flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: 600; padding: 2px 7px; border-radius: 20px; margin-top: 6px; }
+.dash-kpi-trend.up { background: #dcfce7; color: #15803d; }
+.dash-kpi-trend.down { background: #fee2e2; color: #b91c1c; }
+.dash-kpi-trend.neutral { background: #f1f5f9; color: #64748b; }
+.dash-section-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin: 0 0 14px; display: flex; align-items: center; gap: 8px; }
+.dash-section-title .dash-badge { font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #e0e7ff; color: #4338ca; }
+.dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.dash-card { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,.07); border: 1px solid #e8edf4; }
+.dash-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.dash-card-title { font-size: 0.9rem; font-weight: 700; color: #1e293b; }
+.dash-card-subtitle { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+.dash-chart-wrap { position: relative; height: 220px; }
+.dash-chart-wrap-tall { position: relative; height: 280px; }
+.dash-team-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.dash-team-block { border-radius: 12px; padding: 14px 16px; }
+.dash-team-block.cond21 { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; }
+.dash-team-block.gc { background: linear-gradient(135deg, #0f3460 0%, #533483 100%); color: #fff; }
+.dash-team-name { font-size: 0.8rem; font-weight: 700; opacity: .85; letter-spacing: .04em; text-transform: uppercase; }
+.dash-team-score { font-size: 1.8rem; font-weight: 800; line-height: 1.1; margin: 6px 0; }
+.dash-team-meta { font-size: 0.7rem; opacity: .65; }
+.dash-team-bar-wrap { margin-top: 8px; background: rgba(255,255,255,.15); border-radius: 100px; height: 5px; }
+.dash-team-bar { height: 5px; border-radius: 100px; background: rgba(255,255,255,.7); transition: width .5s; }
+.dash-ind-table { width: 100%; border-collapse: collapse; }
+.dash-ind-table th { font-size: 0.7rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; padding: 0 8px 10px; text-align: left; letter-spacing: .04em; }
+.dash-ind-table td { padding: 10px 8px; border-top: 1px solid #f1f5f9; font-size: 0.82rem; color: #334155; }
+.dash-ind-table tr:last-child td { border-bottom: none; }
+.dash-ind-table .ind-name { font-weight: 600; color: #1e293b; }
+.dash-ind-table .ind-val { font-weight: 700; color: #1e293b; }
+.dash-ind-table .ind-meta { color: #94a3b8; font-size: 0.75rem; }
+.dash-ind-table .ind-bar-cell { width: 100px; }
+.dash-mini-bar { height: 6px; border-radius: 100px; background: #e2e8f0; overflow: hidden; }
+.dash-mini-bar-fill { height: 100%; border-radius: 100px; transition: width .5s; }
+.dash-trend-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+.dash-trend-badge.hit { background: #dcfce7; color: #16a34a; }
+.dash-trend-badge.close { background: #fef9c3; color: #a16207; }
+.dash-trend-badge.miss { background: #fee2e2; color: #dc2626; }
+.dash-member-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.dash-member-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #e8edf4; }
+.dash-member-avatar { width: 32px; height: 32px; border-radius: 50%; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.dash-member-name { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
+.dash-member-role { font-size: 0.7rem; color: #94a3b8; }
+.dash-member-score { font-size: 0.9rem; font-weight: 800; color: #1e293b; margin-left: auto; flex-shrink: 0; }
+.dash-member-trend-arrow { font-size: 1rem; flex-shrink: 0; }
+.dash-empty-dash { text-align: center; padding: 48px 24px; color: #94a3b8; }
+.dash-empty-dash .dash-empty-icon { font-size: 3rem; margin-bottom: 12px; }
+.dash-empty-dash p { font-size: 0.9rem; margin: 0; }
+.dash-section-divider { margin: 8px 0 24px; border: none; border-top: 1px solid #e8edf4; }
+.dash-tab-row { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid #e8edf4; padding-bottom: 0; }
+.dash-sub-tab { padding: 8px 18px; border-radius: 8px 8px 0 0; border: none; background: none; font-size: 0.82rem; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+.dash-sub-tab.active { color: #1a1a2e; border-bottom-color: #1a1a2e; background: #f0f4ff; }
+.dash-sub-tab:hover:not(.active) { color: #334155; background: #f8fafc; }
+.dash-alert-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.dash-alert { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 500; }
+.dash-alert.warn { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.dash-alert.info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.dash-alert.danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+@media (max-width: 900px) { .dash-grid-2, .dash-grid-3 { grid-template-columns: 1fr; } .dash-team-compare { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -114,7 +195,8 @@
     <button class="nav-tab active" data-view="matriz" onclick="mudarView(this)">Matriz &amp; Avaliacoes</button>
     <button class="nav-tab" data-view="config" onclick="mudarView(this)">Configuracoes</button>
   
-    <button class="nav-tab" data-view="indicadores" onclick="mudarView(this)">Indicadores</button></div>
+    <button class="nav-tab" data-view="indicadores" onclick="mudarView(this)">Indicadores</button>
+  <button class="nav-tab" data-view="dashboard" onclick="mudarView(this)">Dashboard</button></div>
   <div id="viewMatriz" style="display:flex">
     <div class="layout">
       <div class="sidebar">
@@ -189,6 +271,129 @@
 <div id="viewIndicadores" style="display:none">
   <div class="ind-view-container" id="indViewContainer"></div>
 </div>
+
+<!-- ETAPA 3: DASHBOARD EXECUTIVO -->
+<div id="viewDashboard" style="display:none">
+  <div class="dash-container">
+    <div class="dash-header">
+      <div class="dash-header-left">
+        <h1>Dashboard Executivo</h1>
+        <p id="dashSubtitle">Visao consolidada das equipes</p>
+      </div>
+      <div class="dash-filters">
+        <button class="dash-filter-btn active" data-dp="fechamentos" onclick="dashSetPeriodoTipo(this)">Fechamentos</button>
+        <button class="dash-filter-btn" data-dp="todos" onclick="dashSetPeriodoTipo(this)">Todos os periodos</button>
+        <select class="dash-period-select" id="dashPeriodCount" onchange="renderDashboard()">
+          <option value="3">Ultimos 3 meses</option>
+          <option value="6" selected>Ultimos 6 meses</option>
+          <option value="12">Ultimos 12 meses</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="dashAlertas" class="dash-alert-row" style="display:none"></div>
+
+    <!-- KPI CARDS TOP -->
+    <div class="dash-kpi-row" id="dashKpiRow"></div>
+
+    <!-- TEAM OVERVIEW + EVOLUTION -->
+    <div class="dash-grid-2">
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <div class="dash-card-title">Comparativo de Equipes</div>
+            <div class="dash-card-subtitle">Media geral por equipe no periodo</div>
+          </div>
+        </div>
+        <div class="dash-team-compare" id="dashTeamCompare"></div>
+        <div class="dash-chart-wrap" id="dashTeamChartWrap">
+          <canvas id="dashTeamChart"></canvas>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <div class="dash-card-title">Evolucao da Equipe</div>
+            <div class="dash-card-subtitle">Media geral ao longo do tempo</div>
+          </div>
+          <select class="dash-period-select" id="dashEvolEquipe" onchange="renderDashEvolucao()" style="font-size:.75rem;padding:5px 10px">
+            <option value="todas">Todas as equipes</option>
+            <option value="Cond21">Cond21</option>
+            <option value="GC">GC</option>
+          </select>
+        </div>
+        <div class="dash-chart-wrap-tall">
+          <canvas id="dashEvolChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- POR INDICADOR -->
+    <div class="dash-card" style="margin-bottom:24px">
+      <div class="dash-card-header">
+        <div>
+          <div class="dash-card-title">Indicadores — Visao Geral</div>
+          <div class="dash-card-subtitle">Media de cada indicador vs meta no periodo selecionado</div>
+        </div>
+        <select class="dash-period-select" id="dashIndEquipe" onchange="renderDashIndicadores()" style="font-size:.75rem;padding:5px 10px">
+          <option value="todas">Todas as equipes</option>
+          <option value="Cond21">Cond21</option>
+          <option value="GC">GC</option>
+        </select>
+      </div>
+      <div id="dashIndicadoresBody">
+        <div class="dash-empty-dash"><div class="dash-empty-icon">📊</div><p>Sem dados de indicadores no periodo</p></div>
+      </div>
+    </div>
+
+    <!-- RANKING + NIVEL -->
+    <div class="dash-grid-2">
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <div class="dash-card-title">Ranking Individual</div>
+            <div class="dash-card-subtitle">Top performers do periodo</div>
+          </div>
+          <select class="dash-period-select" id="dashRankEquipe" onchange="renderDashRanking()" style="font-size:.75rem;padding:5px 10px">
+            <option value="todas">Todas as equipes</option>
+            <option value="Cond21">Cond21</option>
+            <option value="GC">GC</option>
+          </select>
+        </div>
+        <div class="dash-member-list" id="dashRankingList"></div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div>
+            <div class="dash-card-title">Media por Nivel</div>
+            <div class="dash-card-subtitle">Desempenho agregado por nivel de maturidade</div>
+          </div>
+        </div>
+        <div class="dash-chart-wrap">
+          <canvas id="dashNivelChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TENDENCIA PROJECAO -->
+    <div class="dash-card" style="margin-bottom:24px">
+      <div class="dash-card-header">
+        <div>
+          <div class="dash-card-title">Projecao de Tendencia</div>
+          <div class="dash-card-subtitle">Previsao baseada na evolucao recente dos indicadores</div>
+        </div>
+        <select class="dash-period-select" id="dashTrendInd" onchange="renderDashTrend()" style="font-size:.75rem;padding:5px 10px">
+          <option value="">Selecione um indicador</option>
+        </select>
+      </div>
+      <div id="dashTrendBody">
+        <div class="dash-empty-dash"><div class="dash-empty-icon">📈</div><p>Selecione um indicador para ver a projecao</p></div>
+      </div>
+    </div>
+
+  </div><!-- /dash-container -->
+</div><!-- /viewDashboard -->
+
 <script>
 const SUPA_URL='https://zsfysyphhpsajxbkwywk.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzZnlzeXBoaHBzYWp4Ymt3eXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDk3MTIsImV4cCI6MjA5NzgyNTcxMn0.wkfGIhB0YxN-VM_m1s7N1d-HIg2uK9C1FFBDmvcYfL0';
@@ -471,6 +676,547 @@ async function loadIndicadoresLancamentos(){
   });
 }
 
+
+// === ETAPA 3: DASHBOARD EXECUTIVO ===
+let dashPeriodoTipo = 'fechamentos';
+let _dashTeamChart = null, _dashEvolChart = null, _dashNivelChart = null, _dashTrendChart = null;
+
+function dashSetPeriodoTipo(btn) {
+  dashPeriodoTipo = btn.dataset.dp;
+  document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.dp === dashPeriodoTipo));
+  renderDashboard();
+}
+
+function dashDestroyChart(ref) {
+  if (ref) { try { ref.destroy(); } catch(e) {} }
+  return null;
+}
+
+function dashGetPeriodos() {
+  const n = parseInt(document.getElementById('dashPeriodCount').value || '6');
+  const now = new Date();
+  const periodos = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    periodos.push(y + '-' + m);
+  }
+  return periodos;
+}
+
+function dashFilterLancs(lancs, periodos) {
+  return lancs.filter(l => {
+    if (!periodos.includes(l.periodo_ref)) return false;
+    if (dashPeriodoTipo === 'fechamentos' && l.periodo_tipo !== 'fechamento') return false;
+    return true;
+  });
+}
+
+function dashMemberActive(membro, periodoRef) {
+  const ms = (window.membrosStatus || []).find(s => s.membro_id === membro.id);
+  if (!ms) return true;
+  if (ms.status === 'desligado' && ms.data_inicio && periodoRef >= ms.data_inicio.substring(0,7)) return false;
+  return true;
+}
+
+function dashGetAvatarColor(nome) {
+  const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'];
+  let hash = 0;
+  for (let i = 0; i < nome.length; i++) hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function dashGetInitials(nome) {
+  const parts = nome.trim().split(' ').filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  return nome.substring(0,2).toUpperCase();
+}
+
+function dashLinearRegression(ys) {
+  const n = ys.length;
+  if (n < 2) return null;
+  const xs = ys.map((_,i) => i);
+  const xMean = xs.reduce((a,b) => a+b,0)/n;
+  const yMean = ys.reduce((a,b) => a+b,0)/n;
+  let num = 0, den = 0;
+  for (let i = 0; i < n; i++) { num += (xs[i]-xMean)*(ys[i]-yMean); den += (xs[i]-xMean)**2; }
+  if (den === 0) return null;
+  const slope = num/den;
+  const intercept = yMean - slope*xMean;
+  return { slope, intercept, predict: (x) => slope*x + intercept };
+}
+
+function dashCalcTrend(vals) {
+  const reg = dashLinearRegression(vals);
+  if (!reg) return 'neutral';
+  return reg.slope > 0.5 ? 'up' : reg.slope < -0.5 ? 'down' : 'neutral';
+}
+
+function renderDashboard() {
+  renderDashKpis();
+  renderDashTeamCompare();
+  renderDashEvolucao();
+  renderDashIndicadores();
+  renderDashRanking();
+  renderDashNivel();
+  renderDashTrendOptions();
+  renderDashAlertas();
+  const p = dashGetPeriodos();
+  document.getElementById('dashSubtitle').textContent = 'Periodo: ' + p[0].replace('-','/') + ' a ' + p[p.length-1].replace('-','/');
+}
+
+function renderDashKpis() {
+  const periodos = dashGetPeriodos();
+  const membros = (window.membros || []).filter(m => {
+    const lastP = periodos[periodos.length-1];
+    return dashMemberActive(m, lastP);
+  });
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  const defs = window.indicadoresDefs || [];
+
+  // Total membros ativos
+  const totalAtivos = membros.length;
+  // Membros com pelo menos 1 lancamento no periodo
+  const mbComDados = new Set(lancs.map(l => l.membro_id)).size;
+  // Media geral (todos indicadores todos membros)
+  const allVals = lancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+  const mediaGeral = allVals.length ? (allVals.reduce((a,b)=>a+b,0)/allVals.length) : null;
+  // Calcular aderencia media de competencias
+  const scores = window.scores || [];
+  const niveis = window.niveis || [];
+  let totalAdher = 0, countAdher = 0;
+  membros.forEach(m => {
+    const nv = niveis.find(n => n.id === m.nivel_id);
+    if (!nv) return;
+    const habs = nv.habilidades || [];
+    const mScores = scores.filter(s => s.membro_id === m.id);
+    if (!habs.length) return;
+    let ok = 0;
+    habs.forEach(h => { const sc = mScores.find(s => s.habilidade_id === h.id); if (sc && sc.nota >= 3) ok++; });
+    totalAdher += (ok/habs.length)*100;
+    countAdher++;
+  });
+  const aderMedia = countAdher ? Math.round(totalAdher/countAdher) : null;
+
+  // Trend kpis
+  const periodosPrev = periodos.slice(0, Math.max(1, periodos.length-1));
+  const lancsPrev = dashFilterLancs(window.indicadoresLancamentos || [], periodosPrev);
+  const prevVals = lancsPrev.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+  const prevMedia = prevVals.length ? prevVals.reduce((a,b)=>a+b,0)/prevVals.length : null;
+  const trendDir = (mediaGeral !== null && prevMedia !== null) ? (mediaGeral > prevMedia ? 'up' : mediaGeral < prevMedia ? 'down' : 'neutral') : 'neutral';
+  const trendArrow = trendDir === 'up' ? '&#8593;' : trendDir === 'down' ? '&#8595;' : '&#8594;';
+
+  const cards = [
+    { label: 'Membros Ativos', val: totalAtivos, sub: 'no periodo selecionado', color: 'blue', icon: '👥' },
+    { label: 'Com Lancamentos', val: mbComDados, sub: 'de ' + totalAtivos + ' ativos', color: 'green', icon: '✅' },
+    { label: 'Media Indicadores', val: mediaGeral !== null ? mediaGeral.toFixed(1) : '--', sub: trendDir !== 'neutral' ? 'vs periodo anterior' : 'sem dados anteriores', color: 'purple', icon: '📊', trend: trendDir, trendArrow },
+    { label: 'Aderencia Matriz', val: aderMedia !== null ? aderMedia + '%' : '--', sub: 'media de competencias', color: 'orange', icon: '🎯' },
+    { label: 'Indicadores Ativos', val: defs.filter(d => d.ativo !== false).length, sub: 'cadastrados no sistema', color: 'blue', icon: '📋' },
+  ];
+
+  document.getElementById('dashKpiRow').innerHTML = cards.map(c => `
+    <div class="dash-kpi-card ${c.color}">
+      <div class="dash-kpi-label">${c.icon} ${c.label}</div>
+      <div class="dash-kpi-value">${c.val}</div>
+      <div class="dash-kpi-sub">${c.sub}</div>
+      ${c.trend ? '<div class="dash-kpi-trend ' + c.trend + '">' + c.trendArrow + ' ' + (c.trend === 'up' ? 'Subindo' : c.trend === 'down' ? 'Caindo' : 'Estavel') + '</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function renderDashTeamCompare() {
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const equipes = [...new Set(membros.map(m => m.equipe))].filter(Boolean);
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+
+  // Team block cards
+  const teamBlocks = equipes.map(eq => {
+    const mbs = membros.filter(m => m.equipe === eq && dashMemberActive(m, periodos[periodos.length-1]));
+    const mbIds = new Set(mbs.map(m => m.id));
+    const eqLancs = lancs.filter(l => mbIds.has(l.membro_id));
+    const vals = eqLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    const media = vals.length ? (vals.reduce((a,b)=>a+b,0)/vals.length) : null;
+    return { eq, media, count: mbs.length };
+  }).filter(t => t.media !== null);
+
+  const maxMedia = Math.max(...teamBlocks.map(t => t.media), 1);
+
+  document.getElementById('dashTeamCompare').innerHTML = teamBlocks.map(t => `
+    <div class="dash-team-block ${t.eq === 'Cond21' ? 'cond21' : 'gc'}">
+      <div class="dash-team-name">${escHtml(t.eq)}</div>
+      <div class="dash-team-score">${t.media.toFixed(1)}</div>
+      <div class="dash-team-meta">${t.count} membros ativos</div>
+      <div class="dash-team-bar-wrap"><div class="dash-team-bar" style="width:${Math.min(100,(t.media/maxMedia)*100).toFixed(0)}%"></div></div>
+    </div>
+  `).join('') || '<p style="color:#94a3b8;font-size:.82rem">Sem dados no periodo</p>';
+
+  // Line chart: media por equipe por periodo
+  _dashTeamChart = dashDestroyChart(_dashTeamChart);
+  const ctx = document.getElementById('dashTeamChart').getContext('2d');
+  const palette = { 'Cond21': '#6366f1', 'GC': '#10b981' };
+  const datasets = equipes.map(eq => {
+    const mbs = membros.filter(m => m.equipe === eq);
+    const mbIds = new Set(mbs.map(m => m.id));
+    const data = periodos.map(p => {
+      const pLancs = lancs.filter(l => l.periodo_ref === p && mbIds.has(l.membro_id) && dashMemberActive(membros.find(m=>m.id===l.membro_id)||{}, p));
+      const vals = pLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+      return vals.length ? parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2)) : null;
+    });
+    return { label: eq, data, borderColor: palette[eq] || '#94a3b8', backgroundColor: (palette[eq] || '#94a3b8') + '22', tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6, spanGaps: true };
+  });
+  _dashTeamChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: periodos.map(p => { const [y,m] = p.split('-'); return m+'/'+y.slice(2); }), datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: false }
+      }
+    }
+  });
+}
+
+function renderDashEvolucao() {
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const equipe = document.getElementById('dashEvolEquipe').value;
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  _dashEvolChart = dashDestroyChart(_dashEvolChart);
+  const ctx = document.getElementById('dashEvolChart').getContext('2d');
+
+  let filtMbs = membros;
+  if (equipe !== 'todas') filtMbs = membros.filter(m => m.equipe === equipe);
+  const mbIds = new Set(filtMbs.map(m => m.id));
+
+  const mediaData = periodos.map(p => {
+    const pLancs = lancs.filter(l => l.periodo_ref === p && mbIds.has(l.membro_id) && dashMemberActive(filtMbs.find(m=>m.id===l.membro_id)||{}, p));
+    const vals = pLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    return vals.length ? parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2)) : null;
+  });
+
+  // Trend projection (2 extra periods)
+  const knownVals = mediaData.filter(v => v !== null);
+  const reg = dashLinearRegression(knownVals);
+  const allLabels = [...periodos];
+  const projData = [...mediaData.map(() => null)];
+  if (reg && knownVals.length >= 2) {
+    const lastKnownIdx = mediaData.reduceRight((acc, v, i) => acc === -1 && v !== null ? i : acc, -1);
+    for (let i = 1; i <= 2; i++) {
+      const d = new Date();
+      d.setMonth(d.getMonth() + i);
+      const lbl = String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getFullYear()).slice(2);
+      allLabels.push(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
+      projData.push(parseFloat(reg.predict(knownVals.length - 1 + i).toFixed(2)));
+      mediaData.push(null);
+    }
+  }
+
+  const labels = allLabels.map(p => { const [y,m] = p.split('-'); return m+'/'+y.slice(2); });
+
+  _dashEvolChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: equipe === 'todas' ? 'Media Geral' : equipe, data: mediaData, borderColor: '#6366f1', backgroundColor: '#6366f133', tension: 0.4, fill: true, pointRadius: 4, pointHoverRadius: 6, spanGaps: true },
+        { label: 'Projecao', data: projData, borderColor: '#f59e0b', backgroundColor: 'transparent', borderDash: [6,4], tension: 0.4, pointRadius: 4, pointStyle: 'triangle', spanGaps: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true } },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: false }
+      }
+    }
+  });
+}
+
+function renderDashIndicadores() {
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const defs = (window.indicadoresDefs || []).filter(d => d.ativo !== false);
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  const equipe = document.getElementById('dashIndEquipe').value;
+
+  let filtMbs = membros;
+  if (equipe !== 'todas') filtMbs = membros.filter(m => m.equipe === equipe);
+
+  if (!defs.length) {
+    document.getElementById('dashIndicadoresBody').innerHTML = '<div class="dash-empty-dash"><div class="dash-empty-icon">📊</div><p>Nenhum indicador cadastrado. Acesse Configuracoes para cadastrar.</p></div>';
+    return;
+  }
+
+  const rows = defs.map(def => {
+    const meta = parseFloat(def.meta) || null;
+    const mbIds = new Set(filtMbs.filter(m => dashMemberActive(m, periodos[periodos.length-1])).map(m => m.id));
+    const defLancs = lancs.filter(l => l.indicador_id === def.id && mbIds.has(l.membro_id));
+    const vals = defLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    
+    // Trend: compare last 2 periods
+    let trend = 'neutral';
+    const p2 = periodos.slice(-2);
+    if (p2.length === 2) {
+      const v1 = lancs.filter(l => l.indicador_id === def.id && l.periodo_ref === p2[0] && mbIds.has(l.membro_id)).map(l=>parseFloat(l.valor)).filter(v=>!isNaN(v)&&v>0);
+      const v2 = lancs.filter(l => l.indicador_id === def.id && l.periodo_ref === p2[1] && mbIds.has(l.membro_id)).map(l=>parseFloat(l.valor)).filter(v=>!isNaN(v)&&v>0);
+      const m1 = v1.length ? v1.reduce((a,b)=>a+b,0)/v1.length : null;
+      const m2 = v2.length ? v2.reduce((a,b)=>a+b,0)/v2.length : null;
+      if (m1 !== null && m2 !== null) trend = m2 > m1 ? 'up' : m2 < m1 ? 'down' : 'neutral';
+    }
+
+    // Meta badge
+    let metaBadge = '';
+    if (media !== null && meta !== null) {
+      const pct = (media/meta)*100;
+      const cls = pct >= 95 ? 'hit' : pct >= 75 ? 'close' : 'miss';
+      const lbl = pct >= 95 ? '&#10003; Meta atingida' : pct >= 75 ? '&#9432; Proximo da meta' : '&#9888; Abaixo da meta';
+      metaBadge = '<span class="dash-trend-badge ' + cls + '">' + lbl + '</span>';
+    }
+
+    const pctBar = (media !== null && meta !== null) ? Math.min(100, (media/meta)*100) : (media !== null ? 50 : 0);
+    const barColor = pctBar >= 95 ? '#10b981' : pctBar >= 75 ? '#f59e0b' : '#ef4444';
+    const trendArrow = trend === 'up' ? '&#8593;' : trend === 'down' ? '&#8595;' : '&#8594;';
+    const trendCls = trend === 'up' ? 'color:#10b981' : trend === 'down' ? 'color:#ef4444' : 'color:#94a3b8';
+
+    return `<tr>
+      <td class="ind-name">${escHtml(def.nome)}</td>
+      <td class="ind-val">${media !== null ? media.toFixed(1) : '--'}</td>
+      <td class="ind-meta">${meta !== null ? meta.toFixed(1) : '--'}</td>
+      <td class="ind-bar-cell"><div class="dash-mini-bar"><div class="dash-mini-bar-fill" style="width:${pctBar.toFixed(0)}%;background:${barColor}"></div></div></td>
+      <td>${metaBadge}</td>
+      <td style="${trendCls};font-weight:700;font-size:1rem">${trendArrow}</td>
+    </tr>`;
+  });
+
+  document.getElementById('dashIndicadoresBody').innerHTML = `
+    <table class="dash-ind-table">
+      <thead><tr>
+        <th>Indicador</th><th>Media</th><th>Meta</th><th style="width:120px">Progresso</th><th>Status</th><th>Tend.</th>
+      </tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  `;
+}
+
+function renderDashRanking() {
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  const equipe = document.getElementById('dashRankEquipe').value;
+
+  let filtMbs = membros.filter(m => dashMemberActive(m, periodos[periodos.length-1]));
+  if (equipe !== 'todas') filtMbs = filtMbs.filter(m => m.equipe === equipe);
+
+  const ranking = filtMbs.map(m => {
+    const mLancs = lancs.filter(l => l.membro_id === m.id);
+    const vals = mLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    const media = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    // Trend
+    const p2 = periodos.slice(-2);
+    let trend = 'neutral';
+    if (p2.length === 2) {
+      const v1 = lancs.filter(l=>l.membro_id===m.id&&l.periodo_ref===p2[0]).map(l=>parseFloat(l.valor)).filter(v=>!isNaN(v)&&v>0);
+      const v2 = lancs.filter(l=>l.membro_id===m.id&&l.periodo_ref===p2[1]).map(l=>parseFloat(l.valor)).filter(v=>!isNaN(v)&&v>0);
+      const m1 = v1.length ? v1.reduce((a,b)=>a+b,0)/v1.length : null;
+      const m2 = v2.length ? v2.reduce((a,b)=>a+b,0)/v2.length : null;
+      if (m1 !== null && m2 !== null) trend = m2 > m1 ? 'up' : m2 < m1 ? 'down' : 'neutral';
+    }
+    return { m, media, trend };
+  }).filter(r => r.media !== null).sort((a,b) => b.media - a.media).slice(0, 10);
+
+  if (!ranking.length) {
+    document.getElementById('dashRankingList').innerHTML = '<div class="dash-empty-dash" style="padding:24px"><div class="dash-empty-icon">🏆</div><p>Sem dados de indicadores no periodo</p></div>';
+    return;
+  }
+
+  document.getElementById('dashRankingList').innerHTML = ranking.map((r, idx) => {
+    const arrow = r.trend === 'up' ? '<span style="color:#10b981">&#8593;</span>' : r.trend === 'down' ? '<span style="color:#ef4444">&#8595;</span>' : '<span style="color:#94a3b8">&#8594;</span>';
+    const initials = dashGetInitials(r.m.nome);
+    const color = dashGetAvatarColor(r.m.nome);
+    return `<div class="dash-member-row">
+      <div style="font-size:.75rem;font-weight:700;color:#94a3b8;width:16px;flex-shrink:0">${idx+1}</div>
+      <div class="dash-member-avatar" style="background:${color}">${escHtml(initials)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="dash-member-name">${escHtml(r.m.nome.split(' ').slice(0,2).join(' '))}</div>
+        <div class="dash-member-role">${escHtml(r.m.equipe || '')} &middot; ${escHtml((window.niveis||[]).find(n=>n.id===r.m.nivel_id)?.nome||'')}</div>
+      </div>
+      <div class="dash-member-score">${r.media.toFixed(1)}</div>
+      <div class="dash-member-trend-arrow">${arrow}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashNivel() {
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const niveis = window.niveis || [];
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  _dashNivelChart = dashDestroyChart(_dashNivelChart);
+  const ctx = document.getElementById('dashNivelChart').getContext('2d');
+
+  const nivelData = niveis.map(nv => {
+    const mbs = membros.filter(m => m.nivel_id === nv.id && dashMemberActive(m, periodos[periodos.length-1]));
+    const mbIds = new Set(mbs.map(m => m.id));
+    const nvLancs = lancs.filter(l => mbIds.has(l.membro_id));
+    const vals = nvLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    const media = vals.length ? parseFloat((vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1)) : 0;
+    return { nome: nv.nome, media };
+  }).filter(nv => nv.media > 0);
+
+  if (!nivelData.length) {
+    _dashNivelChart = new Chart(ctx, { type: 'bar', data: { labels: [], datasets: [{ data: [] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    return;
+  }
+
+  const colors = ['#6366f1','#8b5cf6','#a78bfa','#c4b5fd','#ddd6fe','#10b981','#34d399'];
+  _dashNivelChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: nivelData.map(n => n.nome),
+      datasets: [{
+        label: 'Media',
+        data: nivelData.map(n => n.media),
+        backgroundColor: colors.slice(0, nivelData.length),
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' Media: ' + ctx.raw } } },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: true },
+        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function renderDashTrendOptions() {
+  const defs = (window.indicadoresDefs || []).filter(d => d.ativo !== false);
+  const sel = document.getElementById('dashTrendInd');
+  const curVal = sel.value;
+  sel.innerHTML = '<option value="">Selecione um indicador</option>' + defs.map(d => '<option value="' + d.id + '"' + (String(d.id) === curVal ? ' selected' : '') + '>' + escHtml(d.nome) + '</option>').join('');
+  if (curVal && sel.value) renderDashTrend();
+}
+
+function renderDashTrend() {
+  const indId = document.getElementById('dashTrendInd').value;
+  if (!indId) {
+    document.getElementById('dashTrendBody').innerHTML = '<div class="dash-empty-dash"><div class="dash-empty-icon">&#128200;</div><p>Selecione um indicador para ver a projecao</p></div>';
+    return;
+  }
+  const periodos = dashGetPeriodos();
+  const membros = window.membros || [];
+  const lancs = dashFilterLancs(window.indicadoresLancamentos || [], periodos);
+  const def = (window.indicadoresDefs || []).find(d => String(d.id) === String(indId));
+  if (!def) return;
+  const meta = parseFloat(def.meta) || null;
+
+  // Get media per period
+  const mediaByPeriodo = periodos.map(p => {
+    const activeMbIds = new Set(membros.filter(m => dashMemberActive(m, p)).map(m => m.id));
+    const pLancs = lancs.filter(l => l.indicador_id == indId && l.periodo_ref === p && activeMbIds.has(l.membro_id));
+    const vals = pLancs.map(l => parseFloat(l.valor)).filter(v => !isNaN(v) && v > 0);
+    return { p, media: vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null };
+  });
+
+  const knownData = mediaByPeriodo.filter(x => x.media !== null);
+  const reg = knownData.length >= 2 ? dashLinearRegression(knownData.map(x => x.media)) : null;
+
+  // Project 3 future periods
+  const futureLabels = [];
+  const futureData = [];
+  if (reg) {
+    for (let i = 1; i <= 3; i++) {
+      const d = new Date();
+      d.setMonth(d.getMonth() + i);
+      futureLabels.push(String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear());
+      futureData.push(parseFloat(reg.predict(knownData.length - 1 + i).toFixed(2)));
+    }
+  }
+
+  // Trend badge
+  let trendBadge = '';
+  if (reg && meta !== null && futureData.length) {
+    const projNext = futureData[0];
+    const pct = (projNext/meta)*100;
+    const cls = pct >= 95 ? 'hit' : pct >= 70 ? 'close' : 'miss';
+    const lbl = pct >= 95 ? '&#9989; Tendencia: bater a meta' : pct >= 70 ? '&#9888; Tendencia: proximo da meta' : '&#128201; Tendencia: abaixo da meta';
+    trendBadge = '<div style="margin-bottom:14px"><span class="dash-trend-badge ' + cls + '" style="font-size:.8rem;padding:6px 14px">' + lbl + ' (proj: ' + projNext.toFixed(1) + ')</span></div>';
+  }
+
+  // Destroy existing trend chart
+  _dashTrendChart = dashDestroyChart(_dashTrendChart);
+
+  document.getElementById('dashTrendBody').innerHTML = trendBadge + '<div style="position:relative;height:280px"><canvas id="dashTrendChart"></canvas></div>';
+
+  const allLabels = [...mediaByPeriodo.map(x => { const [y,m] = x.p.split('-'); return m+'/'+y.slice(2); }), ...futureLabels];
+  const realData = [...mediaByPeriodo.map(x => x.media), ...futureData.map(() => null)];
+  const projDataArr = [...mediaByPeriodo.map(() => null), ...futureData];
+  // Connect projection to last known real point
+  const lastRealIdx = realData.reduceRight((acc, v, i) => acc === -1 && v !== null ? i : acc, -1);
+  if (lastRealIdx >= 0 && projDataArr.some(v => v !== null)) {
+    projDataArr[lastRealIdx] = realData[lastRealIdx];
+  }
+  const metaLine = meta !== null ? allLabels.map(() => meta) : null;
+
+  const datasets = [
+    { label: escHtml(def.nome), data: realData, borderColor: '#6366f1', backgroundColor: '#6366f122', tension: 0.4, fill: true, pointRadius: 5, pointHoverRadius: 7, spanGaps: false },
+    { label: 'Projecao', data: projDataArr, borderColor: '#f59e0b', backgroundColor: 'transparent', borderDash: [7,4], tension: 0.4, pointRadius: 4, pointStyle: 'triangle', spanGaps: false }
+  ];
+  if (metaLine) {
+    datasets.push({ label: 'Meta (' + meta + ')', data: metaLine, borderColor: '#10b981', backgroundColor: 'transparent', borderDash: [4,3], pointRadius: 0, borderWidth: 2 });
+  }
+
+  const tCtx = document.getElementById('dashTrendChart').getContext('2d');
+  _dashTrendChart = new Chart(tCtx, {
+    type: 'line',
+    data: { labels: allLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true } }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } }, beginAtZero: false }
+      }
+    }
+  });
+}
+
+function renderDashAlertas() {
+  const membros = window.membros || [];
+  const statusList = window.membrosStatus || [];
+  const alertas = [];
+  membros.forEach(m => {
+    const s = statusList.find(x => x.membro_id === m.id);
+    if (!s) return;
+    if (s.status === 'ferias') alertas.push({ cls: 'info', msg: escHtml(m.nome.split(' ')[0]) + ' esta de ferias' + (s.data_inicio ? ' desde ' + s.data_inicio : '') });
+    else if (s.status === 'folga') alertas.push({ cls: 'warn', msg: escHtml(m.nome.split(' ')[0]) + ' esta de folga' });
+    else if (s.status === 'desligado') alertas.push({ cls: 'danger', msg: escHtml(m.nome.split(' ')[0]) + ' foi desligado' + (s.data_inicio ? ' em ' + s.data_inicio : '') + ' — excluido das medias' });
+  });
+  const el = document.getElementById('dashAlertas');
+  if (alertas.length) {
+    el.style.display = 'flex';
+    el.innerHTML = alertas.map(a => '<div class="dash-alert ' + a.cls + '"><span>' + (a.cls==='info'?'&#8505;':a.cls==='warn'?'&#9888;':'&#9888;') + '</span><span>' + a.msg + '</span></div>').join('');
+  } else {
+    el.style.display = 'none';
+    el.innerHTML = '';
+  }
+}
+
+
+
+
 function getPeriodoRefDefault(tipo){
   var now=new Date();
   var y=now.getFullYear();
@@ -749,17 +1495,16 @@ function filterEq(btn){document.querySelectorAll('.filter-btn').forEach(function
 function selectMembro(id){S.mid=id;S.tab='avaliacao';renderSidebar();var m=S.membros.find(function(x){return x.id===id;});if(!m)return;document.getElementById('noMemberMsg').style.display='none';document.getElementById('memberPanel').style.display='block';var nk=NM[m.nivel_codigo]||'N1',pw=PESOS[nk]||PESOS.N1,fa=FAIXAS[nk]||'1-3',eq=S.equipes.find(function(e){return e.id===m.equipe_id;})||{};document.getElementById('memberName').textContent=m.nome;document.getElementById('memberMeta').innerHTML='equipe '+(eq.nome||'&mdash;')+' &middot; papel '+nk+' &middot; faixa-alvo '+fa;document.getElementById('weightsInfo').innerHTML='Pesos '+nk+' &middot; comportamental '+pw.comp+'% &middot; tecnico '+pw.tec+'% &middot; negocio '+pw.neg+'%';renderDonuts(id);document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.remove('active');});document.querySelector('[data-tab="avaliacao"]').classList.add('active');document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});document.getElementById('tabAvaliacao').classList.add('active');renderAval(id);}
 function renderDonuts(mid){var s=calcS(mid),cats=[{k:'comp',lbl:'Comportamental',c:'#1a2332'},{k:'tec',lbl:'Tecnico',c:'#d97706'},{k:'neg',lbl:'Negocio',c:'#16a34a'},{k:'geral',lbl:'Geral',c:s.geral>=75?'#16a34a':s.geral>=50?'#d97706':'#dc2626'}];document.getElementById('donuts').innerHTML=cats.map(function(cat){return'<div class="donut-wrap"><div class="donut-ring">'+donut(s[cat.k],cat.c)+'<div class="donut-val">'+s[cat.k]+'</div></div><div class="donut-label">'+cat.lbl+'</div></div>';}).join('');}
 function mudarTab(btn){document.querySelectorAll('[data-tab]').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');S.tab=btn.dataset.tab;document.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});document.getElementById('tab'+S.tab.charAt(0).toUpperCase()+S.tab.slice(1)).classList.add('active');renderTab();}
-function mudarView(tab){
-  document.querySelectorAll('.nav-tabs .nav-tab').forEach(function(t){t.classList.remove('active');});
-  tab.classList.add('active');
-  var vm=document.getElementById('viewMatriz');
-  var vc=document.getElementById('viewConfig');
-  var vi=document.getElementById('viewIndicadores');
-  vm.style.display='none';vc.style.display='none';vi.style.display='none';
-  var v=tab.dataset.view;
-  if(v==='matriz'){vm.style.display='flex';}
-  else if(v==='config'){vc.style.display='block';renderConfig();}
-  else if(v==='indicadores'){vi.style.display='block';renderIndicadores();}
+function mudarView(btn) {
+  const view = btn.dataset.view;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('viewMatriz').style.display = view === 'matriz' ? 'flex' : 'none';
+  document.getElementById('viewConfig').style.display = view === 'config' ? 'block' : 'none';
+  document.getElementById('viewIndicadores').style.display = view === 'indicadores' ? 'block' : 'none';
+  document.getElementById('viewDashboard').style.display = view === 'dashboard' ? 'block' : 'none';
+  if (view === 'indicadores') renderIndicadores();
+  if (view === 'dashboard') renderDashboard();
 }
 function renderTab(){var mid=S.mid;if(!mid)return;var t=S.tab;if(t==='avaliacao')renderAval(mid);else if(t==='autoconhecimento')renderAuto(mid);else if(t==='mapagaps')renderGaps();else if(t==='pdi')renderPDI(mid);else if(t==='historico')renderHist(mid);else if(t==='indicadores')renderInd(mid);}
 function renderAval(mid){var el=document.getElementById('tabAvaliacao'),m=S.membros.find(function(x){return x.id===mid;});if(!m){el.innerHTML='';return;}var nk=NM[m.nivel_codigo]||'N1',html='';Object.keys(BIB).forEach(function(ck){var cat=BIB[ck],pw=cat.peso[nk]||0;html+='<div class="section-header" style="border-color:'+cat.color+'"><h3><span class="section-dot" style="background:'+cat.color+'"></span>'+cat.label+'</h3><span class="section-weight">peso '+pw+'% neste nivel</span></div>';cat.items.forEach(function(comp){var nota=gS(mid,comp.id),alvo=gA(mid,comp.id),isNA=nota===-1,hasPDI=(S.pdiItems[mid]||[]).some(function(p){return p.competencia_id===comp.id&&p.status!=='concluido';});html+='<div class="comp-card" style="border-left-color:'+cat.color+'" data-cid="'+comp.id+'" data-mid="'+mid+'" onclick="openM(event)"><div class="comp-icon">'+cat.icon+'</div><div class="comp-info"><div class="comp-name">'+comp.nome+(hasPDI?' <span class="pdi-tag">PDI</span>':'')+'</div><div class="comp-desc">'+comp.desc+'</div></div><div class="score-btns" onclick="event.stopPropagation()">';for(var n=1;n<=5;n++){html+='<button class="score-btn'+(nota===n?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" data-n="'+n+'" onclick="setBt(this)">'+n+'</button>';}html+='<button class="score-btn na'+(isNA?' active':'')+'" data-mid="'+mid+'" data-cid="'+comp.id+'" onclick="togNA(this)">&mdash;</button>';if(!isNA&&nota!==null)html+='<div class="alvo-indicator"><span class="alvo-dot" style="background:'+sc(nota,alvo)+'"></span>alvo '+alvo+'</div>';else if(isNA)html+='<div class="alvo-indicator" style="color:#94a3b8">nao se aplica</div>';html+='</div></div>';});});if(!html)html='<div class="empty"><div class="empty-icon">&#127919;</div><h3>Avalie as competencias</h3></div>';el.innerHTML=html+'<div style="margin-top:20px;text-align:right"><button class="btn btn-ghost" data-mid="'+mid+'" onclick="saveHistBtn(this)">&#128190; Salvar snapshot</button></div>';}
