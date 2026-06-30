@@ -1888,7 +1888,7 @@ ih+='<div class="ind-def-header"><span class="hc-name">Indicador</span><span cla
       try { var nids = JSON.parse(ind.niveis_ids||'[]'); nids.forEach(function(nid){var nv=S.niveis.find(function(n){return n.id===nid;}); if(nv) niveisNames.push(nv.NM||nv.codigo||'?');}); } catch(e) {}
       var tipoCls = ind.tipo_meta==='teto' ? 'background:#fee2e2;color:#991b1b;border-color:#fca5a5;' : ind.tipo_meta==='desempenho' ? 'background:#f1f5f9;color:#64748b;border-color:#cbd5e1;' : 'background:#ede9fe;color:#6d28d9;border-color:#c4b5fd;';
       var tipoLbl = ind.tipo_meta==='teto' ? 'Teto' : ind.tipo_meta==='desempenho' ? 'Desempenho' : 'Meta';
-      var dirHtml = ind.tipo_meta==='desempenho' ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:#f0fdf4;color:#166534;border:1px solid #86efac;white-space:nowrap;">'+(ind.direcao==='menor' ? 'Ã¢ÂÂ Menor=melhor' : 'Ã¢ÂÂ Maior=melhor')+'</span>';
+      var dirHtml = ind.tipo_meta==='desempenho' ? '' : '<span style="font-size:10px;padding:2px 6px;border-radius:8px;background:#f0fdf4;color:#166534;border:1px solid #86efac;white-space:nowrap;">'+(ind.direcao==='menor' ? '↓ Menor=melhor' : '↑ Maior=melhor')+'</span>';
       var metaDisp = 'Ã¢ÂÂ';
       if (ind.tipo_meta !== 'desempenho') {
         try {
@@ -1965,7 +1965,7 @@ html+='<div style="display:flex;gap:6px;">';
 html+='</div></div>';
 html+='<div id="ind-dir-box-'+suffix+'" style="'+(curTipo==='desempenho'?'display:none;':'')+'"><label style="font-size:.75rem;color:#64748b;display:block;margin-bottom:6px;">DireÃÂ§ÃÂ£o</label>';
 html+='<div style="display:flex;gap:6px;">';
-[['Ã¢ÂÂ Quanto maior melhor','maior'],['Ã¢ÂÂ Quanto menor melhor','menor']].forEach(function(pair){
+[['↑ Quanto maior melhor','maior'],['↓ Quanto menor melhor','menor']].forEach(function(pair){
   var lbl=pair[0],t=pair[1];
   var active=curDir===t;
   html+='<label style="cursor:pointer;"><input type="radio" name="ind-dir-'+suffix+'" value="'+t+'" '+(active?'checked':'')+' onchange="indToggleDir(this)" style="display:none;"><span class="ind-dir-pill" data-name="ind-dir-'+suffix+'" data-val="'+t+'" style="display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;border:1.5px solid '+(active?'#10b981':'#334155')+';background:'+(active?'#10b981':'transparent')+';color:'+(active?'#fff':'#94a3b8')+';">'+lbl+'</span></label>';
